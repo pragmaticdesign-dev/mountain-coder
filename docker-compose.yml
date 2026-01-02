@@ -1,9 +1,28 @@
 version: '3.8'
+
 services:
   mountain-coder:
     build: .
-    container_name: mountain_coder
+    container_name: mountain-coder
     ports:
       - "8000:8000"
     volumes:
-      - ./my_data:/app/data
+      # 1. Persist Database (Mapped to /app/data because of WORKDIR /app)
+      - ./app/data:/app/data
+      
+      # 2. Allow Container to read your JSON files for import
+      - ./import_data:/app/import_data
+      
+    environment:
+      - PYTHONUNBUFFERED=1
+      
+    # ✅ THE MAGIC COMMAND
+    # 1. Starts server in background (&)
+    # 2. Waits 5s for it to boot
+    # 3. Runs import script
+    # 4. Waits forever (keeping container alive)
+    command: >
+      sh -c "uvicorn main:app --host 0.0.0.0 --port 8000 &
+             sleep 5 &&
+             python import_script.py &&
+             wait"

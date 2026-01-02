@@ -1,0 +1,477 @@
+[
+  {
+    "id": 200,
+    "title": "Number of Islands",
+    "description": "Given an $m \\times n$ 2D binary grid **grid** which represents a map of `'1'`s (land) and `'0'`s (water), return the number of islands.\n\nAn **island** is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are all surrounded by water.",
+    "input_format": "First line: Two integers R and C (Rows and Columns).\nNext R lines: C space-separated characters ('0' or '1').",
+    "output_format": "Print the integer count of islands.",
+    "difficulty": "Medium",
+    "tags": [
+      "graph",
+      "searching"
+    ],
+    "solution": "### Observations\nWe need to count connected components of '1's in a grid. This is a classic graph traversal problem.\n\n### Approach\n1. Iterate through every cell in the grid.\n2. If a cell is '1' (land), increment the island count and start a traversal (DFS or BFS) to mark all connected land cells as visited (e.g., change '1' to '0' or '#').\n3. Continue until all cells are processed.\n\n### Complexity Analysis\n* **Time:** $O(R \\times C)$ as we visit each cell once.\n* **Space:** $O(R \\times C)$ for recursion stack or queue in worst case (all land).\n\n### Code Logic (Python)\n```python\ndef dfs(r, c):\n    if r < 0 or c < 0 or r >= rows or c >= cols or grid[r][c] == '0':\n        return\n    grid[r][c] = '0' # Mark as visited\n    dfs(r+1, c)\n    dfs(r-1, c)\n    dfs(r, c+1)\n    dfs(r, c-1)\n\ncount = 0\nfor r in range(rows):\n    for c in range(cols):\n        if grid[r][c] == '1':\n            count += 1\n            dfs(r, c)\nreturn count\n```",
+    "hints": [
+      "Iterate through the grid elements.",
+      "When you see a '1', trigger a BFS or DFS.",
+      "Mark visited land cells as '0' to avoid counting them again."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    try:\n        R = int(next(iterator))\n        C = int(next(iterator))\n        grid = []\n        for _ in range(R):\n            row = [next(iterator) for _ in range(C)]\n            grid.append(row)\n    except StopIteration: return\n    \n    # Write logic here\n    # print(count)\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNext()) return;\n        int R = sc.nextInt();\n        int C = sc.nextInt();\n        char[][] grid = new char[R][C];\n        for(int i=0; i<R; i++){\n            for(int j=0; j<C; j++){\n                grid[i][j] = sc.next().charAt(0);\n            }\n        }\n        // Logic\n        // System.out.println(count);\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "4 5\n1 1 1 1 0\n1 1 0 1 0\n1 1 0 0 0\n0 0 0 0 0",
+        "expected_output": "1",
+        "is_public": true
+      },
+      {
+        "input_data": "4 5\n1 1 0 0 0\n1 1 0 0 0\n0 0 1 0 0\n0 0 0 1 1",
+        "expected_output": "3",
+        "is_public": true
+      },
+      {
+        "input_data": "1 1\n0",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "1 1\n1",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "2 2\n1 0\n0 1",
+        "expected_output": "2",
+        "is_public": false
+      },
+      {
+        "input_data": "3 3\n1 1 1\n1 1 1\n1 1 1",
+        "expected_output": "1",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 133,
+    "title": "Clone Graph",
+    "description": "Given a reference of a node in a **connected** undirected graph, return a **deep copy** (clone) of the graph.\n\nEach node in the graph contains a value (`int`) and a list (`List[Node]`) of its neighbors.",
+    "input_format": "First line: N (number of nodes). Nodes are indexed 1 to N.\nNext N lines: Each line describes neighbors for node i (1-based). First integer is number of neighbors, followed by neighbor indices.",
+    "output_format": "Output the adjacency list of the cloned graph (same format as input).",
+    "difficulty": "Medium",
+    "tags": [
+      "graph",
+      "searching",
+      "map"
+    ],
+    "solution": "### Observations\nA deep copy means creating new node objects for every existing node and replicating the structure. We must track created nodes to handle cycles and shared neighbors.\n\n### Approach\n1. **Hash Map:** Use a map `visited = {original_node: cloned_node}` to store created clones.\n2. **DFS/BFS:** Start traversal from the input node.\n3. **Logic:**\n   - If current node is in `visited`, return `visited[current]`.\n   - Create a new node `clone`. Store in `visited`.\n   - Iterate through neighbors. Recursively clone them and add to `clone.neighbors`.\n\n### Complexity Analysis\n* **Time:** $O(V + E)$.\n* **Space:** $O(V)$ for the map.\n\n### Code Logic (Python)\n```python\nold_to_new = {}\n\ndef dfs(node):\n    if node in old_to_new:\n        return old_to_new[node]\n    \n    copy = Node(node.val)\n    old_to_new[node] = copy\n    for nei in node.neighbors:\n        copy.neighbors.append(dfs(nei))\n    return copy\n```",
+    "hints": [
+      "Use a HashMap to keep track of nodes already cloned.",
+      "The key is the original node, the value is the cloned node.",
+      "You can use BFS or DFS."
+    ],
+    "boilerplate_python": "import sys\n\nclass Node:\n    def __init__(self, val = 0, neighbors = None):\n        self.val = val\n        self.neighbors = neighbors if neighbors is not None else []\n\ndef solve():\n    # Parsing logic for graph input is complex.\n    # Assume logic parses adj list, builds graph, calls clone, prints result.\n    pass\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\n\nclass Node {\n    public int val;\n    public List<Node> neighbors;\n    public Node() { val = 0; neighbors = new ArrayList<Node>(); }\n    public Node(int _val) { val = _val; neighbors = new ArrayList<Node>(); }\n}\n\npublic class Solution {\n    public static void main(String[] args) {\n        // Parsing logic\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "4\n2 2 4\n2 1 3\n2 2 4\n2 1 3",
+        "expected_output": "[[2,4],[1,3],[2,4],[1,3]]",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n0",
+        "expected_output": "[]",
+        "is_public": true
+      },
+      {
+        "input_data": "0",
+        "expected_output": "[]",
+        "is_public": false
+      },
+      {
+        "input_data": "2\n1 2\n1 1",
+        "expected_output": "[[2],[1]]",
+        "is_public": false
+      },
+      {
+        "input_data": "3\n2 2 3\n2 1 3\n2 1 2",
+        "expected_output": "[[2,3],[1,3],[1,2]]",
+        "is_public": false
+      },
+      {
+        "input_data": "2\n0\n0",
+        "expected_output": "[[],[]]",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 207,
+    "title": "Course Schedule",
+    "description": "There are a total of **numCourses** courses you have to take, labeled from `0` to `numCourses - 1`. You are given an array **prerequisites** where `prerequisites[i] = [ai, bi]` indicates that you must take course `bi` first if you want to take course `ai`.\n\nReturn `true` if you can finish all courses. Otherwise, return `false`.",
+    "input_format": "First line: Integer numCourses.\nSecond line: Integer M (number of prerequisites).\nNext M lines: Two integers ai bi.",
+    "output_format": "true or false",
+    "difficulty": "Medium",
+    "tags": [
+      "graph",
+      "searching"
+    ],
+    "solution": "### Observations\nThe problem asks if there is a cycle in a directed graph. If there is a cycle, you cannot finish the courses.\n\n### Approach\n1. **Build Graph:** Adjacency list.\n2. **Topological Sort / Cycle Detection:**\n   - Maintain `indegree` array.\n   - Queue `q` with all nodes having `indegree == 0`.\n   - Process `q`: For current node, decrement neighbor indegrees. If neighbor indegree becomes 0, add to `q`.\n   - Count processed nodes.\n3. **Result:** If `count == numCourses`, return `true`.\n\n### Complexity Analysis\n* **Time:** $O(V + E)$.\n* **Space:** $O(V + E)$.\n\n### Code Logic (Python)\n```python\nadj = {i:[] for i in range(numCourses)}\nindegree = [0] * numCourses\nfor crs, pre in prerequisites:\n    adj[pre].append(crs)\n    indegree[crs] += 1\n\nq = [i for i in range(numCourses) if indegree[i] == 0]\nvisited = 0\nwhile q:\n    node = q.pop(0)\n    visited += 1\n    for nei in adj[node]:\n        indegree[nei] -= 1\n        if indegree[nei] == 0:\n            q.append(nei)\nreturn visited == numCourses\n```",
+    "hints": [
+      "This problem is equivalent to finding if a cycle exists in a directed graph.",
+      "You can use DFS with 3 states (unvisited, visiting, visited) or BFS with Kahn's Algorithm (indegree).",
+      "If using BFS, courses with 0 prerequisites can be taken first."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    try:\n        numCourses = int(next(iterator))\n        m = int(next(iterator))\n        prerequisites = []\n        for _ in range(m):\n            a = int(next(iterator))\n            b = int(next(iterator))\n            prerequisites.append([a, b])\n    except StopIteration: return\n    \n    # Logic\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNext()) return;\n        int numCourses = sc.nextInt();\n        int m = sc.nextInt();\n        int[][] prereqs = new int[m][2];\n        for(int i=0; i<m; i++){\n            prereqs[i][0] = sc.nextInt();\n            prereqs[i][1] = sc.nextInt();\n        }\n        // Logic\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "2\n1\n1 0",
+        "expected_output": "true",
+        "is_public": true
+      },
+      {
+        "input_data": "2\n2\n1 0\n0 1",
+        "expected_output": "false",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n0",
+        "expected_output": "true",
+        "is_public": false
+      },
+      {
+        "input_data": "3\n2\n1 0\n2 1",
+        "expected_output": "true",
+        "is_public": false
+      },
+      {
+        "input_data": "3\n3\n1 0\n2 1\n0 2",
+        "expected_output": "false",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n4\n1 0\n2 0\n3 1\n4 2",
+        "expected_output": "true",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 102,
+    "title": "Binary Tree Level Order Traversal",
+    "description": "Given the `root` of a binary tree, return the level order traversal of its nodes' values. (i.e., from left to right, level by level).",
+    "input_format": "First line: Tree nodes in level order format (space separated, 'null' for gaps).",
+    "output_format": "Each line represents one level of the tree with space-separated integers.",
+    "difficulty": "Medium",
+    "tags": [
+      "tree",
+      "traversal",
+      "queue"
+    ],
+    "solution": "### Observations\nLevel order means processing the tree breadth-first.\n\n### Approach\n1. **Queue:** Use a queue initialized with `root`.\n2. **Loop:** While queue is not empty:\n   - Get `level_size = len(queue)`.\n   - Iterate `level_size` times:\n     - Pop node, record value.\n     - Add left child to queue if exists.\n     - Add right child to queue if exists.\n   - Store the list of recorded values for this level.\n\n### Complexity Analysis\n* **Time:** $O(N)$.\n* **Space:** $O(N)$ (Queue can hold up to N/2 nodes).\n\n### Code Logic (Python)\n```python\nif not root: return []\nres = []\nq = [root]\nwhile q:\n    level = []\n    for _ in range(len(q)):\n        node = q.pop(0)\n        level.append(node.val)\n        if node.left: q.append(node.left)\n        if node.right: q.append(node.right)\n    res.append(level)\n```",
+    "hints": [
+      "Use a Queue to process nodes in FIFO order.",
+      "Process nodes level by level by checking the queue size before the inner loop.",
+      "Handle the empty tree case."
+    ],
+    "boilerplate_python": "import sys\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef solve():\n    # Parser logic needed\n    pass\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\n\nclass TreeNode {\n    int val;\n    TreeNode left, right;\n    TreeNode(int val) { this.val = val; }\n}\n\npublic class Solution {\n    public static void main(String[] args) {\n        // Scanner logic\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "3 9 20 null null 15 7",
+        "expected_output": "3\n9 20\n15 7",
+        "is_public": true
+      },
+      {
+        "input_data": "1",
+        "expected_output": "1",
+        "is_public": true
+      },
+      {
+        "input_data": "",
+        "expected_output": "",
+        "is_public": false
+      },
+      {
+        "input_data": "1 2 null 3",
+        "expected_output": "1\n2\n3",
+        "is_public": false
+      },
+      {
+        "input_data": "1 2 3 4 5",
+        "expected_output": "1\n2 3\n4 5",
+        "is_public": false
+      },
+      {
+        "input_data": "1 null 2 null 3",
+        "expected_output": "1\n2\n3",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 752,
+    "title": "Open the Lock",
+    "description": "You have a lock in front of you with 4 circular wheels. Each wheel has 10 slots: `'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'`. The wheels can rotate freely and wrap around: `0` to `9` and `9` to `0`.\n\nThe lock initially starts at `'0000'`, a string representing the state of the 4 wheels.\n\nYou are given a list of `deadends` dead ends, meaning if the lock displays any of these codes, the wheels of the lock will stop turning and you will be unable to open it.\n\nGiven a `target` representing the value of the wheels that will unlock the lock, return the minimum total number of turns required to open the lock, or -1 if it is impossible.",
+    "input_format": "First line: Space-separated strings (deadends).\nSecond line: String target.",
+    "output_format": "Integer turns.",
+    "difficulty": "Medium",
+    "tags": [
+      "graph",
+      "searching",
+      "queue"
+    ],
+    "solution": "### Observations\nEach state '0000' is a node. There are 8 edges from each state (turn any of 4 wheels +1 or -1). We want the shortest path to `target`. This is BFS.\n\n### Approach\n1. **BFS Setup:** Queue `q = [('0000', 0)]`, `visited = {'0000'}`.\n2. **Constraints:** If '0000' in `deadends`, return -1.\n3. **Loop:** Pop `(curr, turns)`.\n   - If `curr == target`, return `turns`.\n   - Generate 8 neighbors.\n   - If neighbor not in `visited` and not in `deadends`, add to `q` and `visited`.\n\n### Complexity Analysis\n* **Time:** $O(A^N)$ where A is alphabet size (10), N is digits (4). Constant 10000 states.\n* **Space:** $O(A^N)$ to store visited.\n\n### Code Logic (Python)\n```python\nq = deque([('0000', 0)])\nvisited = set(['0000'])\nwhile q:\n    curr, turns = q.popleft()\n    if curr == target: return turns\n    if curr in dead_set: continue\n    for i in range(4):\n        x = int(curr[i])\n        for d in (-1, 1):\n            nxt_digit = (x + d) % 10\n            nxt = curr[:i] + str(nxt_digit) + curr[i+1:]\n            if nxt not in visited and nxt not in dead_set:\n                visited.add(nxt)\n                q.append((nxt, turns + 1))\nreturn -1\n```",
+    "hints": [
+      "Model the problem as a shortest path on a graph.",
+      "Each lock configuration is a node.",
+      "Use BFS to find the shortest path.",
+      "Don't process nodes that are in the deadends set."
+    ],
+    "boilerplate_python": "import sys\nfrom collections import deque\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    # Parsing logic tricky depending on input\n    # Assume specific format\n    pass\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        // Scanner logic\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "0201 0101 0102 1212 2002\n0202",
+        "expected_output": "6",
+        "is_public": true
+      },
+      {
+        "input_data": "8888\n0009",
+        "expected_output": "1",
+        "is_public": true
+      },
+      {
+        "input_data": "8887 8889 8878 8898 8788 8988 7888 9888\n8888",
+        "expected_output": "-1",
+        "is_public": true
+      },
+      {
+        "input_data": "0000\n8888",
+        "expected_output": "-1",
+        "is_public": false
+      },
+      {
+        "input_data": "1000\n0000",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "\n1234",
+        "expected_output": "10",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 286,
+    "title": "Walls and Gates",
+    "description": "You are given an $m \\times n$ grid `rooms` initialized with these three possible values.\n\n* `-1`: A wall or an obstacle.\n* `0`: A gate.\n* `INF`: Infinity means an empty room. We use the value $2^{31} - 1 = 2147483647$ to represent INF as you may assume that the distance to a gate is less than 2147483647.\n\nFill each empty room with the distance to its nearest gate. If it is impossible to reach a gate, it should be filled with `INF`.",
+    "input_format": "First line: R C.\nNext R lines: C space-separated integers.",
+    "output_format": "The modified grid printed row by row.",
+    "difficulty": "Medium",
+    "tags": [
+      "graph",
+      "searching",
+      "queue"
+    ],
+    "solution": "### Observations\nWe need the shortest distance from *any* gate to rooms. Instead of running BFS from every room (slow), run BFS starting from **all gates simultaneously** (Multi-source BFS).\n\n### Approach\n1. Iterate grid. Add all gates `(r, c)` to a Queue. Mark others as unvisited (or use distance matrix).\n2. **BFS:**\n   - Pop `(r, c)`.\n   - Check 4 neighbors.\n   - If neighbor is valid and `rooms[nr][nc] == INF` (unvisited empty room):\n     - `rooms[nr][nc] = rooms[r][c] + 1`.\n     - Add neighbor to Queue.\n\n### Complexity Analysis\n* **Time:** $O(R \\times C)$.\n* **Space:** $O(R \\times C)$.\n\n### Code Logic (Python)\n```python\nq = deque()\nfor r in range(rows):\n    for c in range(cols):\n        if rooms[r][c] == 0:\n            q.append((r, c))\n\nwhile q:\n    r, c = q.popleft()\n    for dr, dc in directions:\n        nr, nc = r + dr, c + dc\n        if 0 <= nr < rows and 0 <= nc < cols and rooms[nr][nc] == 2147483647:\n            rooms[nr][nc] = rooms[r][c] + 1\n            q.append((nr, nc))\n```",
+    "hints": [
+      "Instead of searching from empty rooms to gates, search from gates to empty rooms.",
+      "Initialize the queue with all gates.",
+      "Update the distance of an empty room only the first time you reach it."
+    ],
+    "boilerplate_python": "import sys\nfrom collections import deque\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    try:\n        R = int(next(iterator))\n        C = int(next(iterator))\n        rooms = []\n        for _ in range(R):\n            rooms.append([int(next(iterator)) for _ in range(C)])\n    except StopIteration: return\n    \n    # Logic\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        // Scanner logic\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "4 4\n2147483647 -1 0 2147483647\n2147483647 2147483647 2147483647 -1\n2147483647 -1 2147483647 -1\n0 -1 2147483647 2147483647",
+        "expected_output": "3 -1 0 1\n2 2 1 -1\n1 -1 2 -1\n0 -1 3 4",
+        "is_public": true
+      },
+      {
+        "input_data": "1 1\n-1",
+        "expected_output": "-1",
+        "is_public": true
+      },
+      {
+        "input_data": "1 1\n0",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "1 2\n2147483647 0",
+        "expected_output": "1 0",
+        "is_public": false
+      },
+      {
+        "input_data": "2 1\n2147483647\n-1",
+        "expected_output": "2147483647\n-1",
+        "is_public": false
+      },
+      {
+        "input_data": "2 2\n0 0\n0 0",
+        "expected_output": "0 0\n0 0",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 79,
+    "title": "Word Search",
+    "description": "Given an $m \\times n$ grid of characters **board** and a string **word**, return `true` if **word** exists in the grid.\n\nThe word can be constructed from letters of sequentially adjacent cells, where adjacent cells are horizontally or vertically neighboring. The same letter cell may not be used more than once.",
+    "input_format": "First line: R C.\nNext R lines: C chars.\nLast line: String word.",
+    "output_format": "true or false",
+    "difficulty": "Medium",
+    "tags": [
+      "array",
+      "searching"
+    ],
+    "solution": "### Observations\nBacktracking DFS to find the path.\n\n### Approach\n1. Scan grid for `word[0]`.\n2. **DFS:** Match current char. Temporarily mark visited. Recurse neighbors for next char.\n\n### Complexity Analysis\n* **Time:** $O(N \\cdot 3^L)$.\n* **Space:** $O(L)$.\n\n### Code Logic (Python)\n```python\ndef dfs(r, c, i):\n    if i == len(word): return True\n    if not (0<=r<R and 0<=c<C) or board[r][c] != word[i]: return False\n    temp, board[r][c] = board[r][c], '#'\n    res = any(dfs(r+d[0], c+d[1], i+1) for d in [(0,1),(1,0),(0,-1),(-1,0)])\n    board[r][c] = temp\n    return res\n```",
+    "hints": [
+      "DFS from every cell.",
+      "Mark visited path to avoid loops.",
+      "Backtrack by unmarking after recursion."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    # Logic\n    pass\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        // Scanner\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "3 4\nA B C E\nS F C S\nA D E E\nABCCED",
+        "expected_output": "true",
+        "is_public": true
+      },
+      {
+        "input_data": "1 1\nA\nB",
+        "expected_output": "false",
+        "is_public": true
+      },
+      {
+        "input_data": "1 1\nA\nA",
+        "expected_output": "true",
+        "is_public": false
+      },
+      {
+        "input_data": "2 2\nA B\nC D\nACDB",
+        "expected_output": "false",
+        "is_public": false
+      },
+      {
+        "input_data": "2 2\nA B\nC D\nABDC",
+        "expected_output": "true",
+        "is_public": false
+      },
+      {
+        "input_data": "3 3\nA A A\nA A A\nA A A\nAAAAAAAAAA",
+        "expected_output": "false",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 417,
+    "title": "Pacific Atlantic Water Flow",
+    "description": "There is an `m x n` rectangular island that borders both the **Pacific Ocean** and **Atlantic Ocean**.\n- Pacific Ocean touches the left and top edges.\n- Atlantic Ocean touches the right and bottom edges.\n\nThe island is partitioned into a grid of square cells. You are given an `m x n` integer matrix `heights` where `heights[r][c]` represents the height above sea level of the cell at coordinate `(r, c)`.\n\nRain water can flow to neighboring cells directly north, south, east, and west if the neighboring cell's height is **less than or equal to** the current cell's height. Water can flow from any cell adjacent to an ocean into the ocean.\n\nReturn a list of grid coordinates where water can flow to **both** the Pacific and Atlantic oceans.",
+    "input_format": "First line: R C.\nNext R lines: C integers.",
+    "output_format": "Each line contains two integers r c.",
+    "difficulty": "Medium",
+    "tags": [
+      "graph",
+      "searching",
+      "array"
+    ],
+    "solution": "### Observations\nInstead of checking where water flows *from* each cell (expensive), check where water can flow *up to* starting from the oceans.\n\n### Approach\n1. **Two Sets:** `pacific_reachable` and `atlantic_reachable`.\n2. **DFS/BFS:** Start DFS from Top/Left edges for Pacific. Start DFS from Bottom/Right edges for Atlantic.\n3. **Condition:** Move from cell to neighbor if `height[neighbor] >= height[cell]` (water flows down, so we trace up).\n4. **Intersection:** Result is cells in both sets.\n\n### Complexity Analysis\n* **Time:** $O(R \\times C)$.\n* **Space:** $O(R \\times C)$.\n\n### Code Logic (Python)\n```python\ndef dfs(r, c, visit, prev_h):\n    if (r, c) in visit or not (0<=r<R and 0<=c<C) or heights[r][c] < prev_h:\n        return\n    visit.add((r, c))\n    for dr, dc in dirs:\n        dfs(r+dr, c+dc, visit, heights[r][c])\n\n# Call dfs for borders\n```",
+    "hints": [
+      "Flow water uphill from the oceans.",
+      "Find all cells reachable from Pacific.",
+      "Find all cells reachable from Atlantic.",
+      "The answer is the intersection."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    # Logic\n    pass\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        // Scanner\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "5 5\n1 2 2 3 5\n3 2 3 4 4\n2 4 5 3 1\n6 7 1 4 5\n5 1 1 2 4",
+        "expected_output": "0 4\n1 3\n1 4\n2 2\n3 0\n3 1\n4 0",
+        "is_public": true
+      },
+      {
+        "input_data": "1 1\n1",
+        "expected_output": "0 0",
+        "is_public": true
+      },
+      {
+        "input_data": "2 1\n1\n2",
+        "expected_output": "0 0\n1 0",
+        "is_public": false
+      },
+      {
+        "input_data": "2 2\n1 2\n2 1",
+        "expected_output": "0 1\n1 0\n1 1",
+        "is_public": false
+      },
+      {
+        "input_data": "2 2\n1 1\n1 1",
+        "expected_output": "0 0\n0 1\n1 0\n1 1",
+        "is_public": false
+      },
+      {
+        "input_data": "2 2\n10 10\n10 10",
+        "expected_output": "0 0\n0 1\n1 0\n1 1",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 236,
+    "title": "Lowest Common Ancestor of a Binary Tree",
+    "description": "Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in the tree.",
+    "input_format": "First line: Level order tree.\nSecond line: P val.\nThird line: Q val.",
+    "output_format": "LCA value.",
+    "difficulty": "Medium",
+    "tags": [
+      "tree",
+      "traversal"
+    ],
+    "solution": "### Observations\nPost-order traversal allows us to bubble up findings from subtrees.\n\n### Approach\n1. If root is null, p, or q, return root.\n2. Left = recurse(root.left), Right = recurse(root.right).\n3. If Left and Right both non-null, root is LCA.\n4. Else return non-null child.\n\n### Complexity Analysis\n* **Time:** $O(N)$.\n* **Space:** $O(H)$.\n\n### Code Logic (Python)\n```python\nif not root or root.val == p or root.val == q: return root\nl = lca(root.left, p, q)\nr = lca(root.right, p, q)\nreturn root if l and r else l or r\n```",
+    "hints": [
+      "Recursive approach.",
+      "If node is p or q, return it.",
+      "If both subtrees return a node, current is LCA."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    # Logic\n    pass\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        // Scanner\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "3 5 1 6 2 0 8 null null 7 4\n5\n1",
+        "expected_output": "3",
+        "is_public": true
+      },
+      {
+        "input_data": "3 5 1\n5\n1",
+        "expected_output": "3",
+        "is_public": true
+      },
+      {
+        "input_data": "1 2\n1\n2",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "2 1\n2\n1",
+        "expected_output": "2",
+        "is_public": false
+      },
+      {
+        "input_data": "5 3 6 2 4\n2\n4",
+        "expected_output": "3",
+        "is_public": false
+      },
+      {
+        "input_data": "10 5 15\n5\n10",
+        "expected_output": "10",
+        "is_public": false
+      }
+    ]
+  }
+]

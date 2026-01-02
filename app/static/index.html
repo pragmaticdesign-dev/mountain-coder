@@ -2,44 +2,275 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mountain Coder</title>
     <link rel="stylesheet" href="/static/style.css">
+    
+    <!-- MathJax Configuration -->
+    <script>
+        window.MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']] 
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
-    <div id="view-dashboard">
-        <h1 style="text-align:center; padding:10px;">🏔️ Mountain Coder</h1>
-        <div id="cards-container" class="card-grid"></div>
-    </div>
 
-    <div id="view-editor" class="hidden">
-        <div id="editor-container">
-            <div id="left-pane" class="pane">
-                <button onclick="loadDashboard()" style="background:#444; margin-bottom:10px;">← Back</button>
-                <h2 id="q-title">Title</h2>
-                <p id="q-desc" style="line-height:1.6; opacity:0.8;">Description...</p>
-                <div id="q-examples" style="background:#111; padding:10px; margin:10px 0; font-family:monospace;"></div>
-                <details>
-                    <summary style="cursor:pointer; color:#0e639c;">Show Hints</summary>
-                    <ul id="q-hints"></ul>
-                </details>
-                <div style="margin-top:20px;">
-                    <label>Language: </label>
-                    <select id="lang-select" onchange="changeLanguage()">
-                        <option value="python">Python</option>
-                        <option value="java">Java</option>
-                    </select>
-                </div>
-            </div>
-            <div id="right-pane">
-                <div id="monaco-editor"></div>
-                <div id="output-panel">Ready to code...</div>
-                <div style="background:var(--panel); padding:10px; text-align:right;">
-                    <button onclick="submitCode()">Run & Submit</button>
-                </div>
+    <!-- ========================================== -->
+    <!-- NAVIGATION BAR -->
+    <!-- ========================================== -->
+    <nav class="navbar">
+        <div class="logo" onclick="loadDashboard()">🏔️ Mountain Coder</div>
+        <div class="search-box">
+            <input 
+                type="text" 
+                id="search-input" 
+                placeholder="Search problems..." 
+                onkeyup="handleSearch(event)"
+                aria-label="Search problems"
+            >
+        </div>
+    </nav>
+
+    <!-- ========================================== -->
+    <!-- VIEW: DASHBOARD -->
+    <!-- ========================================== -->
+    <main id="view-dashboard" class="view-section">
+        <header class="dashboard-header">
+            <h2>Study Plans</h2>
+            <div id="dashboard-filters"></div>
+        </header>
+        
+        <section id="cards-container" class="card-grid"></section>
+    </main>
+
+    <!-- ========================================== -->
+    <!-- VIEW: PROBLEM LIST -->
+    <!-- ========================================== -->
+    <main id="view-list" class="view-section hidden">
+        <div class="list-container">
+            <header class="list-header">
+                <h2 id="list-title">Problems</h2>
+                <button 
+                    onclick="loadDashboard()" 
+                    class="btn-secondary"
+                    aria-label="Back to dashboard"
+                >
+                    ← Back to Cards
+                </button>
+            </header>
+            
+            <div class="table-wrapper">
+                <table class="problem-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">ID</th>
+                            <th>Title</th>
+                            <th>Tags</th>
+                            <th style="width: 100px;">Difficulty</th>
+                            <th style="width: 80px; text-align:right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="problems-tbody"></tbody>
+                </table>
             </div>
         </div>
-    </div>
+    </main>
 
+    <!-- ========================================== -->
+    <!-- VIEW: CODE EDITOR -->
+    <!-- ========================================== -->
+    <main id="view-editor" class="view-section hidden">
+        <div id="editor-container">
+            
+            <!-- LEFT PANE: Problem Description -->
+            <aside id="left-pane" class="pane">
+                <nav class="nav-header">
+                    <button 
+                        onclick="goBackToList()" 
+                        class="btn-back"
+                        aria-label="Back to problem list"
+                    >
+                        ← Problem List
+                    </button>
+                    
+                    <div class="nav-controls">
+                        <button 
+                            onclick="resetCode()" 
+                            class="btn-reset"
+                            title="Reset code to default"
+                            aria-label="Reset code"
+                        >
+                            ↺ Reset
+                        </button>
+
+                        <div class="lang-select-wrapper">
+                            <select 
+                                id="lang-select" 
+                                onchange="changeLanguage()"
+                                aria-label="Select programming language"
+                            >
+                                <option value="python">Python 3</option>
+                                <option value="java">Java 17</option>
+                            </select>
+                        </div>
+                    </div>
+                </nav>
+
+                <!-- Problem Tabs -->
+                <div class="tabs" role="tablist">
+                    <button 
+                        id="btn-tab-desc" 
+                        class="tab-btn active" 
+                        onclick="switchTab('desc')"
+                        role="tab"
+                        aria-selected="true"
+                    >
+                        Description
+                    </button>
+                    <button 
+                        id="btn-tab-hints" 
+                        class="tab-btn" 
+                        onclick="switchTab('hints')"
+                        role="tab"
+                        aria-selected="false"
+                    >
+                        Hints
+                    </button>
+                    <button 
+                        id="btn-tab-notes" 
+                        class="tab-btn" 
+                        onclick="switchTab('notes')"
+                        role="tab"
+                        aria-selected="false"
+                    >
+                        My Notes
+                    </button>
+                    <button 
+                        id="btn-tab-sol" 
+                        class="tab-btn" 
+                        onclick="switchTab('sol')"
+                        role="tab"
+                        aria-selected="false"
+                    >
+                        Solution
+                    </button>
+                </div>
+
+                <!-- Tab: Description -->
+                <article id="tab-desc" class="tab-content" role="tabpanel">
+                    <h2 id="q-title"></h2>
+                    <div id="q-desc"></div>
+                    
+                    <hr class="content-divider">
+                    
+                    <section class="format-section">
+                        <h3>Input Format</h3>
+                        <pre id="q-input-fmt" class="code-block"></pre>
+                        
+                        <h3>Output Format</h3>
+                        <pre id="q-output-fmt" class="code-block"></pre>
+                        
+                        <h3>Example</h3>
+                        <pre id="q-examples" class="code-block"></pre>
+                    </section>
+                </article>
+
+                <!-- Tab: Hints -->
+                <article id="tab-hints" class="tab-content hidden" role="tabpanel">
+                    <ul id="q-hints-list"></ul>
+                </article>
+                
+                <!-- Tab: Notes -->
+                <article id="tab-notes" class="tab-content hidden" role="tabpanel">
+                    <p class="notes-help">
+                        Write pseudocode, approach, or complexity analysis here. Auto-saved locally.
+                    </p>
+                    <textarea 
+                        id="notes-area" 
+                        class="notes-box" 
+                        placeholder="1. Initialize pointers...&#10;2. Loop while left < right..."
+                        aria-label="Problem notes"
+                    ></textarea>
+                </article>
+
+                <!-- Tab: Solution -->
+                <article id="tab-sol" class="tab-content hidden" role="tabpanel">
+                    <div id="q-solution" class="markdown-body"></div>
+                </article>
+            </aside>
+
+            <!-- RIGHT PANE: Code Editor & Console -->
+            <section id="right-pane">
+                <!-- Monaco Editor -->
+                <div 
+                    id="monaco-editor" 
+                    role="textbox" 
+                    aria-label="Code editor"
+                ></div>
+                
+                <!-- Output Panel -->
+                <div id="output-panel">
+                    <div class="panel-tabs" role="tablist">
+                        <button 
+                            class="panel-tab active" 
+                            onclick="toggleConsole('output')"
+                            role="tab"
+                            aria-selected="true"
+                        >
+                            Output
+                        </button>
+                        <button 
+                            class="panel-tab" 
+                            onclick="toggleConsole('input')"
+                            role="tab"
+                            aria-selected="false"
+                        >
+                            Custom Input
+                        </button>
+                    </div>
+
+                    <!-- Console Output -->
+                    <div id="console-output" role="tabpanel">
+                        <pre id="output-text">Ready...</pre>
+                    </div>
+
+                    <!-- Console Input -->
+                    <div id="console-input" class="hidden" role="tabpanel">
+                        <textarea 
+                            id="custom-input-box" 
+                            placeholder="Enter input here (e.g. 4 &#10; 1 2 3 4)..."
+                            aria-label="Custom input for code execution"
+                        ></textarea>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <footer class="footer-controls">
+                    <span class="keyboard-hint">Ctrl+Enter to Run</span>
+                    <button 
+                        onclick="runCustom()" 
+                        class="btn-secondary"
+                    >
+                        Run Code
+                    </button>
+                    <button 
+                        onclick="submitCode()" 
+                        class="btn-run"
+                    >
+                        Submit
+                    </button>
+                </footer>
+            </section>
+        </div>
+    </main>
+
+    <!-- ========================================== -->
+    <!-- EXTERNAL SCRIPTS -->
+    <!-- ========================================== -->
+    <script src="/static/lib/marked.min.js"></script>
     <script src="/static/vs/loader.js"></script>
     <script src="/static/app.js"></script>
 </body>

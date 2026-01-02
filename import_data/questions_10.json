@@ -1,0 +1,638 @@
+[
+  {
+    "id": 743,
+    "title": "Network Delay Time",
+    "description": "You are given a network of `n` nodes, labeled from `1` to `n`. You are also given `times`, a list of travel times as directed edges `times[i] = (ui, vi, wi)`, where `ui` is the source node, `vi` is the target node, and `wi` is the time it takes for a signal to travel from source to target.\n\nWe will send a signal from a given node `k`. Return *the minimum time it takes for all the* `n` *nodes to receive the signal*. If it is impossible for all the `n` nodes to receive the signal, return `-1`.",
+    "input_format": "First line: Two integers N (nodes) and M (edges).\nNext M lines: Three space-separated integers u v w.\nLast line: Integer K (start node).",
+    "output_format": "Integer representing the minimum time.",
+    "difficulty": "Medium",
+    "tags": [
+      "graph",
+      "heap",
+      "searching"
+    ],
+    "solution": "### Observations\nWe need the maximum of the shortest paths from node `k` to all other nodes. This is a classic shortest path problem with non-negative weights.\n\n### Approach\n1. **Algorithm:** Dijkstra's Algorithm is optimal here.\n2. **Data Structures:** Min-Heap to store `(time, node)`, `dist` array initialized to infinity.\n3. **Steps:**\n   - Push `(0, k)` to heap.\n   - While heap is not empty, pop smallest time.\n   - Update neighbors if a shorter path is found.\n   - Push updated neighbors to heap.\n4. **Result:** The answer is `max(dist.values())`. If any node is unreachable (dist is infinite), return -1.\n\n### Complexity Analysis\n* **Time:** $O(E \\log V)$ or $O(E + V \\log V)$.\n* **Space:** $O(V + E)$.\n\n### Code Logic (Python)\n```python\nimport heapq\ndist = {i: float('inf') for i in range(1, n + 1)}\ndist[k] = 0\npq = [(0, k)]\n\nwhile pq:\n    d, u = heapq.heappop(pq)\n    if d > dist[u]: continue\n    for v, w in graph[u]:\n        if dist[u] + w < dist[v]:\n            dist[v] = dist[u] + w\n            heapq.heappush(pq, (dist[v], v))\n\nans = max(dist.values())\nreturn ans if ans != float('inf') else -1\n```",
+    "hints": [
+      "Use Dijkstra's algorithm to find the shortest path from K to all other nodes.",
+      "The time taken for the signal to reach the last node is the maximum of the shortest paths.",
+      "Initialize distances to infinity and the start node to 0."
+    ],
+    "boilerplate_python": "import sys\nimport heapq\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        m = int(next(iterator))\n        times = []\n        for _ in range(m):\n            u = int(next(iterator))\n            v = int(next(iterator))\n            w = int(next(iterator))\n            times.append((u, v, w))\n        k = int(next(iterator))\n    except StopIteration: return\n\n    # Logic\n    # print(result)\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNext()) return;\n        int n = sc.nextInt();\n        int m = sc.nextInt();\n        List<int[]> times = new ArrayList<>();\n        for(int i=0; i<m; i++){\n            times.add(new int[]{sc.nextInt(), sc.nextInt(), sc.nextInt()});\n        }\n        int k = sc.nextInt();\n        // Logic\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "4 3\n2 1 1\n2 3 1\n3 4 1\n2",
+        "expected_output": "2",
+        "is_public": true
+      },
+      {
+        "input_data": "2 1\n1 2 1\n2",
+        "expected_output": "-1",
+        "is_public": true
+      },
+      {
+        "input_data": "2 1\n1 2 1\n1",
+        "expected_output": "1",
+        "is_public": true
+      },
+      {
+        "input_data": "1 0\n1",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "3 2\n1 2 10\n1 3 5\n1",
+        "expected_output": "10",
+        "is_public": false
+      },
+      {
+        "input_data": "3 1\n1 2 1\n3",
+        "expected_output": "-1",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 1514,
+    "title": "Path with Maximum Probability",
+    "description": "You are given an undirected weighted graph of `n` nodes (0-indexed), represented by an edge list where `edges[i] = [a, b]` is an undirected edge connecting the nodes `a` and `b` with a probability of success of traversing that edge `succProb[i]`.\n\nGiven two nodes `start` and `end`, find the path with the maximum probability of success to go from `start` to `end` and return its success probability. (If there is no path, return 0).",
+    "input_format": "First line: N M.\nNext M lines: u v p (nodes and probability).\nLast line: start end.",
+    "output_format": "Float representing maximum probability (error margin 1e-5).",
+    "difficulty": "Medium",
+    "tags": [
+      "graph",
+      "heap",
+      "searching"
+    ],
+    "solution": "### Observations\nStandard shortest path finds the *minimum sum* of weights. Here we want the *maximum product* of probabilities. \nSince probabilities are $\\le 1$, the product decreases as path length increases, similar to sum increasing. We can use a modified Dijkstra.\n\n### Approach\n1. **Algorithm:** Max-Heap Dijkstra.\n2. **State:** `(current_prob, node)`. Note: Python's heap is min-heap, so store `(-prob, node)`.\n3. **Relaxation:** If `curr_prob * edge_prob > recorded_prob[neighbor]`, update and push.\n\n### Complexity Analysis\n* **Time:** $O(E \\log V)$.\n* **Space:** $O(V + E)$.\n\n### Code Logic (Python)\n```python\nprobs = [0.0] * n\nprobs[start] = 1.0\npq = [(-1.0, start)] # Max heap using negative\n\nwhile pq:\n    curr_p, u = heapq.heappop(pq)\n    curr_p = -curr_p\n    if u == end: return curr_p\n    if curr_p < probs[u]: continue\n    \n    for v, p in adj[u]:\n        if curr_p * p > probs[v]:\n            probs[v] = curr_p * p\n            heapq.heappush(pq, (-probs[v], v))\nreturn 0.0\n```",
+    "hints": [
+      "Multiplication of probabilities is similar to addition of logs.",
+      "Use Dijkstra's algorithm but prioritize the path with the highest probability.",
+      "Store probabilities in a max-heap."
+    ],
+    "boilerplate_python": "import sys\nimport heapq\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        m = int(next(iterator))\n        adj = [[] for _ in range(n)]\n        for _ in range(m):\n            u = int(next(iterator))\n            v = int(next(iterator))\n            p = float(next(iterator))\n            adj[u].append((v, p))\n            adj[v].append((u, p))\n        start = int(next(iterator))\n        end = int(next(iterator))\n    except StopIteration: return\n\n    # Logic\n    # print(f\"{result:.5f}\")\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNext()) return;\n        int n = sc.nextInt();\n        int m = sc.nextInt();\n        // Store graph logic\n        // Logic\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "3 3\n0 1 0.5\n1 2 0.5\n0 2 0.2\n0 2",
+        "expected_output": "0.25000",
+        "is_public": true
+      },
+      {
+        "input_data": "3 3\n0 1 0.5\n1 2 0.5\n0 2 0.3\n0 2",
+        "expected_output": "0.30000",
+        "is_public": true
+      },
+      {
+        "input_data": "3 1\n0 1 0.5\n0 2",
+        "expected_output": "0.00000",
+        "is_public": true
+      },
+      {
+        "input_data": "2 1\n0 1 1.0\n0 1",
+        "expected_output": "1.00000",
+        "is_public": false
+      },
+      {
+        "input_data": "2 1\n0 1 0.1\n0 1",
+        "expected_output": "0.10000",
+        "is_public": false
+      },
+      {
+        "input_data": "4 3\n0 1 0.9\n1 2 0.9\n2 3 0.9\n0 3",
+        "expected_output": "0.72900",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 787,
+    "title": "Cheapest Flights Within K Stops",
+    "description": "There are `n` cities connected by some number of flights. You are given an array `flights` where `flights[i] = [from, to, price]` indicates that there is a flight from city `from` to city `to` with cost `price`.\n\nYou are also given three integers `src`, `dst`, and `k`, return the **cheapest price** from `src` to `dst` with at most `k` stops. If there is no such route, return `-1`.",
+    "input_format": "First line: N M.\nNext M lines: u v w.\nLast line: src dst k.",
+    "output_format": "Integer price.",
+    "difficulty": "Medium",
+    "tags": [
+      "graph",
+      "heap",
+      "dp"
+    ],
+    "solution": "### Observations\nWe need the shortest path but with a constraint on the number of edges (stops). Standard Dijkstra doesn't count edges efficiently for this constraint.\n\n### Approach\n1. **Bellman-Ford / SPFA**: Run relaxation `K+1` times. This ensures we process paths with at most `K+1` edges (which means `K` stops).\n2. **Dijkstra variant**: Store `stops` in the priority queue state `(cost, stops, node)`. Only process if `stops <= k` and we found a cheaper way to reach `node` with similar or fewer stops.\n\n### Complexity Analysis\n* **Time:** $O((N+E) \\cdot K)$ for Bellman-Ford.\n* **Space:** $O(N)$.\n\n### Code Logic (Python)\n```python\n# Using Bellman-Ford style relaxation\nprices = [float('inf')] * n\nprices[src] = 0\n\nfor _ in range(k + 1):\n    temp_prices = prices[:]\n    for u, v, w in flights:\n        if prices[u] == float('inf'): continue\n        if prices[u] + w < temp_prices[v]:\n            temp_prices[v] = prices[u] + w\n    prices = temp_prices\nreturn prices[dst] if prices[dst] != float('inf') else -1\n```",
+    "hints": [
+      "The constraint is on the number of edges (K stops means K+1 edges).",
+      "Dijkstra alone might fail if a cheaper path has more stops than allowed.",
+      "Try Bellman-Ford algorithm running K+1 iterations or BFS carrying (cost, stops) state."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        m = int(next(iterator))\n        flights = []\n        for _ in range(m):\n            u = int(next(iterator))\n            v = int(next(iterator))\n            w = int(next(iterator))\n            flights.append((u, v, w))\n        src = int(next(iterator))\n        dst = int(next(iterator))\n        k = int(next(iterator))\n    except StopIteration: return\n\n    # Logic\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNext()) return;\n        int n = sc.nextInt();\n        int m = sc.nextInt();\n        int[][] flights = new int[m][3];\n        for(int i=0; i<m; i++){\n            flights[i][0] = sc.nextInt();\n            flights[i][1] = sc.nextInt();\n            flights[i][2] = sc.nextInt();\n        }\n        int src = sc.nextInt();\n        int dst = sc.nextInt();\n        int k = sc.nextInt();\n        // Logic\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "4 5\n0 1 100\n1 2 100\n2 0 100\n1 3 600\n2 3 200\n0 3 1",
+        "expected_output": "700",
+        "is_public": true
+      },
+      {
+        "input_data": "3 3\n0 1 100\n1 2 100\n0 2 500\n0 2 1",
+        "expected_output": "200",
+        "is_public": true
+      },
+      {
+        "input_data": "3 3\n0 1 100\n1 2 100\n0 2 500\n0 2 0",
+        "expected_output": "500",
+        "is_public": true
+      },
+      {
+        "input_data": "2 1\n0 1 100\n0 1 0",
+        "expected_output": "100",
+        "is_public": false
+      },
+      {
+        "input_data": "3 2\n0 1 10\n1 2 10\n0 2 0",
+        "expected_output": "-1",
+        "is_public": false
+      },
+      {
+        "input_data": "4 3\n0 1 100\n1 2 100\n2 3 100\n0 3 1",
+        "expected_output": "-1",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 752,
+    "title": "Open the Lock",
+    "description": "You have a lock with 4 wheels (0-9). From '0000', you can turn any wheel +1 or -1. Given `deadends` which block movement, find minimum turns to reach `target`.\n\nDeadends stop you immediately. If '0000' is a deadend, return -1.",
+    "input_format": "First line: Space-separated deadends strings.\nSecond line: target string.",
+    "output_format": "Integer turns.",
+    "difficulty": "Medium",
+    "tags": [
+      "graph",
+      "searching",
+      "queue"
+    ],
+    "solution": "### Observations\nShortest path in an unweighted graph -> BFS.\n\n### Approach\n1. Queue `q` initialized with `('0000', 0)`.\n2. Visited set containing `deadends` and `'0000'`.\n3. Expand current node: change each of 4 digits by +1 and -1 (modulo 10).\n4. If neighbor == target, return moves.\n\n### Complexity Analysis\n* **Time:** $O(10^4 \\cdot 4 \\cdot 2) = O(1)$. Finite state space.\n* **Space:** $O(10^4)$.\n\n### Code Logic (Python)\n```python\nif \"0000\" in deads: return -1\nq = deque([(\"0000\", 0)])\nvisited = set(deads)\nvisited.add(\"0000\")\nwhile q:\n    curr, step = q.popleft()\n    if curr == target: return step\n    for i in range(4):\n        x = int(curr[i])\n        for d in (-1, 1):\n            nxt_digit = (x + d) % 10\n            nxt = curr[:i] + str(nxt_digit) + curr[i+1:]\n            if nxt not in visited:\n                visited.add(nxt)\n                q.append((nxt, step + 1))\nreturn -1\n```",
+    "hints": [
+      "BFS for shortest path.",
+      "Handle the 0000 deadend case.",
+      "Use modulo 10 for wrapping around."
+    ],
+    "boilerplate_python": "import sys\nfrom collections import deque\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    # Logic to parse deadends list and target\n    # If only 1 line input, handle carefully\n    pass\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        // Logic\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "0201 0101 0102 1212 2002\n0202",
+        "expected_output": "6",
+        "is_public": true
+      },
+      {
+        "input_data": "8888\n0009",
+        "expected_output": "1",
+        "is_public": true
+      },
+      {
+        "input_data": "0000\n8888",
+        "expected_output": "-1",
+        "is_public": false
+      },
+      {
+        "input_data": "1111\n0000",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "8887 8889 8878 8898 8788 8988 7888 9888\n8888",
+        "expected_output": "-1",
+        "is_public": false
+      },
+      {
+        "input_data": "1234\n0002",
+        "expected_output": "2",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 1091,
+    "title": "Shortest Path in Binary Matrix",
+    "description": "Given an `n x n` binary matrix `grid`, return the length of the shortest clear path in the matrix. If there is no clear path, return `-1`.\n\nA clear path in a binary matrix is a path from the top-left cell (i.e., `(0, 0)`) to the bottom-right cell (i.e., `(n - 1, n - 1)`) such that:\n- All the visited cells of the path are `0`.\n- All the adjacent cells of the path are **8-directionally** connected (i.e., they are different and they share an edge or a corner).",
+    "input_format": "First line: N.\nNext N lines: N space-separated integers (0 or 1).",
+    "output_format": "Integer length.",
+    "difficulty": "Medium",
+    "tags": [
+      "graph",
+      "searching",
+      "queue"
+    ],
+    "solution": "### Observations\nUnweighted grid shortest path with 8 directions -> BFS.\n\n### Approach\n1. Check if `grid[0][0]` or `grid[n-1][n-1]` is 1. If so, return -1.\n2. **BFS:** Queue `[(0, 0, 1)]`. Mark visited.\n3. Iterate 8 neighbors. Valid if within bounds, `0`, and not visited.\n\n### Complexity Analysis\n* **Time:** $O(N^2)$.\n* **Space:** $O(N^2)$.\n\n### Code Logic (Python)\n```python\nif grid[0][0] == 1 or grid[n-1][n-1] == 1: return -1\nq = deque([(0, 0, 1)])\ngrid[0][0] = 1 # mark visited\ndirs = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]\n\nwhile q:\n    r, c, d = q.popleft()\n    if r == n-1 and c == n-1: return d\n    for dr, dc in dirs:\n        nr, nc = r+dr, c+dc\n        if 0 <= nr < n and 0 <= nc < n and grid[nr][nc] == 0:\n            grid[nr][nc] = 1\n            q.append((nr, nc, d+1))\nreturn -1\n```",
+    "hints": [
+      "BFS is suitable for shortest path in unweighted graphs.",
+      "Remember to check 8 directions.",
+      "Check starting and ending cells first."
+    ],
+    "boilerplate_python": "import sys\nfrom collections import deque\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        grid = []\n        for _ in range(n):\n            row = [int(next(iterator)) for _ in range(n)]\n            grid.append(row)\n    except StopIteration: return\n\n    # Logic\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        // Logic\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "2\n0 1\n1 0",
+        "expected_output": "2",
+        "is_public": true
+      },
+      {
+        "input_data": "3\n0 0 0\n1 1 0\n1 1 0",
+        "expected_output": "4",
+        "is_public": true
+      },
+      {
+        "input_data": "3\n1 0 0\n1 1 0\n1 1 0",
+        "expected_output": "-1",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n0",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "1\n1",
+        "expected_output": "-1",
+        "is_public": false
+      },
+      {
+        "input_data": "2\n0 0\n0 0",
+        "expected_output": "2",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 127,
+    "title": "Word Ladder",
+    "description": "A **transformation sequence** from word `beginWord` to word `endWord` using a dictionary `wordList` is a sequence of words `beginWord -> s1 -> s2 -> ... -> sk` such that:\n- Every adjacent pair of words differs by a single letter.\n- Every `si` for `1 <= i <= k` is in `wordList`. Note that `beginWord` does not need to be in `wordList`.\n- `sk == endWord`.\n\nGiven two words, `beginWord` and `endWord`, and a dictionary `wordList`, return *the number of words in the **shortest transformation sequence** from* `beginWord` *to* `endWord`, or `0` if no such sequence exists.",
+    "input_format": "First line: beginWord endWord.\nSecond line: N (list size).\nThird line: N space-separated words.",
+    "output_format": "Integer length.",
+    "difficulty": "Hard",
+    "tags": [
+      "graph",
+      "searching",
+      "string"
+    ],
+    "solution": "### Observations\nShortest path in graph where words are nodes and edges exist if 1 char differs.\n\n### Approach\n1. **BFS** from `beginWord`.\n2. **Optimization:** Instead of comparing every word (O(N^2)), generate all possible variations of the current word by changing one letter `a-z` and check if in set (O(L * 26)).\n3. Use a Set for `wordList` for O(1) lookups.\n\n### Complexity Analysis\n* **Time:** $O(N \\cdot L^2)$ or $O(M^2 \\cdot N)$ where L is word length.\n* **Space:** $O(N \\cdot L)$.\n\n### Code Logic (Python)\n```python\nwordSet = set(wordList)\nif endWord not in wordSet: return 0\nq = deque([(beginWord, 1)])\n\nwhile q:\n    word, length = q.popleft()\n    if word == endWord: return length\n    for i in range(len(word)):\n        for c in 'abcdefghijklmnopqrstuvwxyz':\n            new_word = word[:i] + c + word[i+1:]\n            if new_word in wordSet:\n                wordSet.remove(new_word)\n                q.append((new_word, length + 1))\nreturn 0\n```",
+    "hints": [
+      "Find the shortest path -> BFS.",
+      "Pre-process wordList into a Set.",
+      "Generate neighbors by changing 1 character at a time."
+    ],
+    "boilerplate_python": "import sys\nfrom collections import deque\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    try:\n        begin = next(iterator)\n        end = next(iterator)\n        n = int(next(iterator))\n        words = [next(iterator) for _ in range(n)]\n    except StopIteration: return\n\n    # Logic\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNext()) return;\n        String begin = sc.next();\n        String end = sc.next();\n        int n = sc.nextInt();\n        List<String> wordList = new ArrayList<>();\n        for(int i=0; i<n; i++) wordList.add(sc.next());\n        // Logic\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "hit cog\n6\nhot dot dog lot log cog",
+        "expected_output": "5",
+        "is_public": true
+      },
+      {
+        "input_data": "hit cog\n5\nhot dot dog lot log",
+        "expected_output": "0",
+        "is_public": true
+      },
+      {
+        "input_data": "a c\n1\nb",
+        "expected_output": "0",
+        "is_public": true
+      },
+      {
+        "input_data": "a c\n1\nc",
+        "expected_output": "2",
+        "is_public": false
+      },
+      {
+        "input_data": "hot dog\n2\nhot dog",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "cat bat\n1\nbat",
+        "expected_output": "2",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 1334,
+    "title": "Find the City With the Smallest Number of Neighbors at a Threshold Distance",
+    "description": "There are `n` cities numbered from `0` to `n-1`. Given the array `edges` where `edges[i] = [from, to, weight]`, and an integer `distanceThreshold`.\n\nReturn the city with the smallest number of cities that are reachable through some path and whose distance is **at most** `distanceThreshold`.\n\nIf there are multiple such cities, return the city with the **greatest** number.",
+    "input_format": "First line: n.\nSecond line: m.\nNext m lines: u v w.\nLast line: threshold.",
+    "output_format": "Integer city index.",
+    "difficulty": "Medium",
+    "tags": [
+      "graph",
+      "dp",
+      "searching"
+    ],
+    "solution": "### Observations\nWe need the shortest distance between ALL pairs of cities to check the threshold. N is usually small (~100).\n\n### Approach\n1. **Floyd-Warshall Algorithm:** Compute all-pairs shortest paths.\n   - Init `dist[i][j] = inf`, `dist[i][i] = 0`.\n   - Update `dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])` for all k, i, j.\n2. **Count:** For each city, count reachable cities within threshold.\n3. **Select:** Filter for min count, break ties with max index.\n\n### Complexity Analysis\n* **Time:** $O(N^3)$.\n* **Space:** $O(N^2)$.\n\n### Code Logic (Python)\n```python\ndist = [[float('inf')] * n for _ in range(n)]\nfor i in range(n): dist[i][i] = 0\nfor u, v, w in edges:\n    dist[u][v] = dist[v][u] = w\n\nfor k in range(n):\n    for i in range(n):\n        for j in range(n):\n            dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])\n\nres, min_count = -1, float('inf')\nfor i in range(n):\n    count = sum(1 for d in dist[i] if d <= threshold)\n    if count <= min_count:\n        min_count = count\n        res = i\nreturn res\n```",
+    "hints": [
+      "Use Floyd-Warshall for all-pairs shortest path if N is small (< 100).",
+      "Alternatively, run Dijkstra from every node.",
+      "Iterate through the distance matrix to count neighbors for each city."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        m = int(next(iterator))\n        edges = []\n        for _ in range(m):\n            u = int(next(iterator))\n            v = int(next(iterator))\n            w = int(next(iterator))\n            edges.append((u, v, w))\n        threshold = int(next(iterator))\n    except StopIteration: return\n\n    # Logic\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNext()) return;\n        int n = sc.nextInt();\n        int m = sc.nextInt();\n        // Store edges\n        int threshold = sc.nextInt();\n        // Logic\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "4 4\n0 1 3\n1 2 1\n1 3 4\n2 3 1\n4",
+        "expected_output": "3",
+        "is_public": true
+      },
+      {
+        "input_data": "5 6\n0 1 2\n0 4 8\n1 2 3\n1 4 2\n2 3 1\n3 4 1\n2",
+        "expected_output": "0",
+        "is_public": true
+      },
+      {
+        "input_data": "2 1\n0 1 1\n1",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "2 1\n0 1 10\n1",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "3 2\n0 1 1\n1 2 1\n2",
+        "expected_output": "2",
+        "is_public": false
+      },
+      {
+        "input_data": "1 0\n10",
+        "expected_output": "0",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 1584,
+    "title": "Min Cost to Connect All Points",
+    "description": "You are given an array **points** representing integer coordinates of some points on a 2D-plane, where **points[i] = [xi, yi]**.\n\nThe cost of connecting two points **[xi, yi]** and **[xj, yj]** is the **Manhattan distance** between them: **|xi - xj| + |yi - yj|**.\n\nReturn the minimum cost to make all points connected. All points are connected if there is exactly one simple path between any two points.",
+    "input_format": "First line: Integer N (number of points)\nNext N lines: Two integers x y per line",
+    "output_format": "Print a single integer representing the minimum cost.",
+    "difficulty": "Medium",
+    "tags": [
+      "graph",
+      "heap",
+      "array"
+    ],
+    "solution": "### Observations\nThis is a Minimum Spanning Tree (MST) problem. The graph is dense (complete graph) because every point can connect to every other point. There are $N^2$ edges.\n\n### Approach\n1.  **Prim's Algorithm:** Start from an arbitrary node (0). Maintain a `min_dist` array tracking the shortest edge to connect non-visited nodes to the MST.\n2.  Use a Min-Heap or an array scan to find the next closest node.\n3.  Since it's dense ($E \\approx N^2$), an $O(N^2)$ array implementation is often faster than $O(E \\log V)$ heap implementation in Python, but Heap is standard.\n\n### Complexity Analysis\n- **Time:** O(N^2) or O(N^2 log N) depending on implementation.\n- **Space:** O(N) to store distances/visited status.\n\n### Code Logic\n**Python:**\n```python\nimport heapq\nn = len(points)\nvisited = [False] * n\nmin_heap = [(0, 0)] # cost, node\ncost = 0\nedges_used = 0\nwhile edges_used < n:\n    d, u = heapq.heappop(min_heap)\n    if visited[u]: continue\n    visited[u] = True\n    cost += d\n    edges_used += 1\n    for v in range(n):\n        if not visited[v]:\n            dist = abs(points[u][0] - points[v][0]) + abs(points[u][1] - points[v][1])\n            heapq.heappush(min_heap, (dist, v))\nreturn cost\n```",
+    "hints": [
+      "Model this as a graph with N vertices and N*(N-1)/2 edges.",
+      "The weight of an edge is the Manhattan distance.",
+      "Use Prim's or Kruskal's algorithm to find the MST."
+    ],
+    "boilerplate_python": "import sys\nimport heapq\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        points = []\n        for _ in range(n):\n            x = int(next(iterator))\n            y = int(next(iterator))\n            points.append([x, y])\n        # Write solution here\n        # print(result)\n    except StopIteration:\n        pass\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNextInt()) return;\n        int n = scanner.nextInt();\n        int[][] points = new int[n][2];\n        for(int i=0; i<n; i++) {\n            points[i][0] = scanner.nextInt();\n            points[i][1] = scanner.nextInt();\n        }\n        // Write solution here\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "5\n0 0\n2 2\n3 10\n5 2\n7 0",
+        "expected_output": "20",
+        "is_public": true
+      },
+      {
+        "input_data": "3\n3 12\n-2 5\n-4 1",
+        "expected_output": "18",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n0 0",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "2\n1 1\n100 100",
+        "expected_output": "198",
+        "is_public": false
+      },
+      {
+        "input_data": "4\n0 0\n1 1\n1 0\n0 1",
+        "expected_output": "4",
+        "is_public": false
+      },
+      {
+        "input_data": "3\n0 0\n1 1\n2 2",
+        "expected_output": "4",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 1135,
+    "title": "Connecting Cities With Minimum Cost",
+    "description": "There are **N** cities labeled from 1 to N. You are given the integer **N** and an array **connections**, where **connections[i] = [city1, city2, cost]** represents the cost to connect city1 and city2.\n\nReturn the minimum cost so that for every pair of cities, there exists a path of connections (possibly of length 1) that connects those two cities. If it is impossible, return -1.",
+    "input_format": "First line: Integer N\nSecond line: Integer M (number of connections)\nNext M lines: u v cost",
+    "output_format": "Print single integer (min cost) or -1.",
+    "difficulty": "Medium",
+    "tags": [
+      "graph",
+      "heap",
+      "array"
+    ],
+    "solution": "### Observations\nThis is a standard Minimum Spanning Tree (MST) problem. If the MST has fewer than $N-1$ edges, the graph is disconnected.\n\n### Approach\n1.  **Kruskal's Algorithm:** Sort all edges by cost.\n2.  Iterate through sorted edges and use a **Union-Find** (Disjoint Set) data structure to connect cities.\n3.  If adding an edge connects two previously unconnected components, add its cost and decrement the component count.\n4.  Stop when components == 1. If loop finishes and components > 1, return -1.\n\n### Complexity Analysis\n- **Time:** O(M log M) for sorting.\n- **Space:** O(N) for Union-Find.\n\n### Code Logic\n**Python:**\n```python\nparent = list(range(n + 1))\ndef find(i):\n    if parent[i] != i: parent[i] = find(parent[i])\n    return parent[i]\n\ndef union(i, j):\n    root_i, root_j = find(i), find(j)\n    if root_i != root_j:\n        parent[root_i] = root_j\n        return True\n    return False\n\nconnections.sort(key=lambda x: x[2])\ncost = 0\nedges = 0\nfor u, v, w in connections:\n    if union(u, v):\n        cost += w\n        edges += 1\nreturn cost if edges == n - 1 else -1\n```",
+    "hints": [
+      "What if we modeled the cities as nodes and connections as weighted edges?",
+      "Can we use Kruskal's algorithm with Union-Find?",
+      "Sort edges by weight."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        m = int(next(iterator))\n        connections = []\n        for _ in range(m):\n            u = int(next(iterator))\n            v = int(next(iterator))\n            c = int(next(iterator))\n            connections.append([u, v, c])\n        # Write solution here\n    except StopIteration:\n        pass\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNextInt()) return;\n        int n = scanner.nextInt();\n        int m = scanner.nextInt();\n        int[][] connections = new int[m][3];\n        for(int i=0; i<m; i++) {\n            connections[i][0] = scanner.nextInt();\n            connections[i][1] = scanner.nextInt();\n            connections[i][2] = scanner.nextInt();\n        }\n        // Write solution here\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "3\n3\n1 2 5\n1 3 6\n2 3 1",
+        "expected_output": "6",
+        "is_public": true
+      },
+      {
+        "input_data": "4\n3\n1 2 3\n3 4 4\n2 3 5",
+        "expected_output": "12",
+        "is_public": true
+      },
+      {
+        "input_data": "4\n2\n1 2 3\n3 4 4",
+        "expected_output": "-1",
+        "is_public": false
+      },
+      {
+        "input_data": "1\n0",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n4\n1 2 1\n2 3 2\n3 4 3\n4 5 4",
+        "expected_output": "10",
+        "is_public": false
+      },
+      {
+        "input_data": "2\n1\n1 2 100",
+        "expected_output": "100",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 236,
+    "title": "Lowest Common Ancestor of a Binary Tree",
+    "description": "Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in the tree.\n\nThe LCA is defined between two nodes p and q as the lowest node in T that has both p and q as descendants (where we allow a node to be a descendant of itself).",
+    "input_format": "First line: Level order traversal (null for empty nodes)\nSecond line: Integer p\nThird line: Integer q",
+    "output_format": "Print the value of the LCA node.",
+    "difficulty": "Medium",
+    "tags": [
+      "tree",
+      "traversal",
+      "searching"
+    ],
+    "solution": "### Observations\nWe need to find the node where the paths to `p` and `q` diverge from the bottom up, or the first node that sees `p` in one branch and `q` in the other.\n\n### Approach\n1.  **DFS Recursion:** Function `lca(node)`.\n2.  **Base Case:** If `node` is `None`, return `None`. If `node.val` is `p` or `q`, return `node`.\n3.  **Recursive Step:** Call `lca` on left and right children.\n4.  **Logic:**\n    - If both left and right return a node, `node` is the LCA.\n    - If only one returns a node, pass that up (it's either the LCA or one of the targets).\n\n### Complexity Analysis\n- **Time:** O(N) visit every node.\n- **Space:** O(H) recursion stack.\n\n### Code Logic\n**Python:**\n```python\ndef dfs(root):\n    if not root or root.val == p or root.val == q:\n        return root\n    left = dfs(root.left)\n    right = dfs(root.right)\n    if left and right:\n        return root\n    return left if left else right\nresult = dfs(root)\nprint(result.val)\n```",
+    "hints": [
+      "Perform a post-order traversal.",
+      "If you find p or q, return it up.",
+      "If a node receives non-null values from both left and right, it is the LCA."
+    ],
+    "boilerplate_python": "import sys\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef build_tree(nodes):\n    if not nodes or nodes[0] == 'null': return None\n    root = TreeNode(int(nodes[0]))\n    queue = [root]\n    i = 1\n    while i < len(nodes):\n        curr = queue.pop(0)\n        if i < len(nodes) and nodes[i] != 'null':\n            curr.left = TreeNode(int(nodes[i]))\n            queue.append(curr.left)\n        i += 1\n        if i < len(nodes) and nodes[i] != 'null':\n            curr.right = TreeNode(int(nodes[i]))\n            queue.append(curr.right)\n        i += 1\n    return root\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    # Assuming input stream has enough data for tree and p, q\n    # This part is tricky as tree size is dynamic, but boilerplate assumes \n    # p and q are the last two integers in the stream.\n    p_val = int(input_data[-2])\n    q_val = int(input_data[-1])\n    tree_data = input_data[:-2]\n    root = build_tree(tree_data)\n    \n    # Write solution here (assign p and q based on values if needed)\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\nclass TreeNode {\n    int val;\n    TreeNode left;\n    TreeNode right;\n    TreeNode(int x) { val = x; }\n}\n\npublic class Solution {\n    public static TreeNode buildTree(String[] nodes) {\n        if (nodes.length == 0 || nodes[0].equals(\"null\")) return null;\n        TreeNode root = new TreeNode(Integer.parseInt(nodes[0]));\n        Queue<TreeNode> q = new LinkedList<>();\n        q.add(root);\n        int i = 1;\n        while (i < nodes.length) {\n            TreeNode curr = q.poll();\n            if (i < nodes.length && !nodes[i].equals(\"null\")) {\n                curr.left = new TreeNode(Integer.parseInt(nodes[i]));\n                q.add(curr.left);\n            }\n            i++;\n            if (i < nodes.length && !nodes[i].equals(\"null\")) {\n                curr.right = new TreeNode(Integer.parseInt(nodes[i]));\n                q.add(curr.right);\n            }\n            i++;\n        }\n        return root;\n    }\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNext()) return;\n        List<String> parts = new ArrayList<>();\n        while(scanner.hasNext()) parts.add(scanner.next());\n        int qVal = Integer.parseInt(parts.remove(parts.size()-1));\n        int pVal = Integer.parseInt(parts.remove(parts.size()-1));\n        String[] treeNodes = parts.toArray(new String[0]);\n        TreeNode root = buildTree(treeNodes);\n        // Write solution here\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "3 5 1 6 2 0 8 null null 7 4\n5\n1",
+        "expected_output": "3",
+        "is_public": true
+      },
+      {
+        "input_data": "3 5 1 6 2 0 8 null null 7 4\n5\n4",
+        "expected_output": "5",
+        "is_public": true
+      },
+      {
+        "input_data": "1 2\n1\n2",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "2 1 null\n2\n1",
+        "expected_output": "2",
+        "is_public": false
+      },
+      {
+        "input_data": "10 5 20 3 8 15 25\n3\n8",
+        "expected_output": "5",
+        "is_public": false
+      },
+      {
+        "input_data": "10 5 20\n5\n20",
+        "expected_output": "10",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 235,
+    "title": "Lowest Common Ancestor of a Binary Search Tree",
+    "description": "Given a binary search tree (BST), find the lowest common ancestor (LCA) of two given nodes in the BST.\n\nThe LCA is defined between two nodes p and q as the lowest node in T that has both p and q as descendants.",
+    "input_format": "First line: Level order traversal\nSecond line: Integer p\nThird line: Integer q",
+    "output_format": "Print the value of the LCA.",
+    "difficulty": "Easy",
+    "tags": [
+      "bst",
+      "tree",
+      "traversal"
+    ],
+    "solution": "### Observations\nIn a BST, all values in the left subtree are smaller, and all values in the right are larger. The LCA is the split point.\n\n### Approach\n1.  Start at `root`.\n2.  If both `p` and `q` are less than `root.val`, LCA must be in the **left** subtree.\n3.  If both `p` and `q` are greater than `root.val`, LCA must be in the **right** subtree.\n4.  Otherwise, `root` is the split point (or one of the nodes is the root), so `root` is the LCA.\n\n### Complexity Analysis\n- **Time:** O(H), where H is height of the tree.\n- **Space:** O(1) iterative.\n\n### Code Logic\n**Python:**\n```python\nwhile root:\n    if p > root.val and q > root.val:\n        root = root.right\n    elif p < root.val and q < root.val:\n        root = root.left\n    else:\n        return root.val\n```",
+    "hints": [
+      "Utilize the BST property: Left < Root < Right.",
+      "If both p and q are smaller than root, go left.",
+      "If both p and q are larger than root, go right."
+    ],
+    "boilerplate_python": "import sys\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef build_tree(nodes):\n    if not nodes or nodes[0] == 'null': return None\n    root = TreeNode(int(nodes[0]))\n    queue = [root]\n    i = 1\n    while i < len(nodes):\n        curr = queue.pop(0)\n        if i < len(nodes) and nodes[i] != 'null':\n            curr.left = TreeNode(int(nodes[i]))\n            queue.append(curr.left)\n        i += 1\n        if i < len(nodes) and nodes[i] != 'null':\n            curr.right = TreeNode(int(nodes[i]))\n            queue.append(curr.right)\n        i += 1\n    return root\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    p_val = int(input_data[-2])\n    q_val = int(input_data[-1])\n    tree_data = input_data[:-2]\n    root = build_tree(tree_data)\n    # Write solution here using root, p_val, q_val\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\nclass TreeNode {\n    int val;\n    TreeNode left;\n    TreeNode right;\n    TreeNode(int x) { val = x; }\n}\n\npublic class Solution {\n    public static TreeNode buildTree(String[] nodes) {\n        if (nodes.length == 0 || nodes[0].equals(\"null\")) return null;\n        TreeNode root = new TreeNode(Integer.parseInt(nodes[0]));\n        Queue<TreeNode> q = new LinkedList<>();\n        q.add(root);\n        int i = 1;\n        while (i < nodes.length) {\n            TreeNode curr = q.poll();\n            if (i < nodes.length && !nodes[i].equals(\"null\")) {\n                curr.left = new TreeNode(Integer.parseInt(nodes[i]));\n                q.add(curr.left);\n            }\n            i++;\n            if (i < nodes.length && !nodes[i].equals(\"null\")) {\n                curr.right = new TreeNode(Integer.parseInt(nodes[i]));\n                q.add(curr.right);\n            }\n            i++;\n        }\n        return root;\n    }\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNext()) return;\n        List<String> parts = new ArrayList<>();\n        while(scanner.hasNext()) parts.add(scanner.next());\n        int qVal = Integer.parseInt(parts.remove(parts.size()-1));\n        int pVal = Integer.parseInt(parts.remove(parts.size()-1));\n        String[] treeNodes = parts.toArray(new String[0]);\n        TreeNode root = buildTree(treeNodes);\n        // Write solution here\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "6 2 8 0 4 7 9 null null 3 5\n2\n8",
+        "expected_output": "6",
+        "is_public": true
+      },
+      {
+        "input_data": "6 2 8 0 4 7 9 null null 3 5\n2\n4",
+        "expected_output": "2",
+        "is_public": true
+      },
+      {
+        "input_data": "2 1\n2\n1",
+        "expected_output": "2",
+        "is_public": false
+      },
+      {
+        "input_data": "5 3 6 2 4\n2\n4",
+        "expected_output": "3",
+        "is_public": false
+      },
+      {
+        "input_data": "20 10 30\n10\n30",
+        "expected_output": "20",
+        "is_public": false
+      },
+      {
+        "input_data": "3 1 4 null 2\n2\n4",
+        "expected_output": "3",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 1123,
+    "title": "Lowest Common Ancestor of Deepest Leaves",
+    "description": "Given the **root** of a binary tree, return the lowest common ancestor of its deepest leaves.\n\nRecall that:\n* The node of a binary tree is a leaf if and only if it has no children.\n* The depth of the root of the tree is 0. if the depth of a node is d, the depth of each of its children is d + 1.\n* The lowest common ancestor of a set S of nodes, is the node A with the largest depth such that every node in S is in the subtree with root A.",
+    "input_format": "First line: Level order traversal",
+    "output_format": "Print the value of the LCA.",
+    "difficulty": "Medium",
+    "tags": [
+      "tree",
+      "traversal",
+      "dfs"
+    ],
+    "solution": "### Observations\nWe need a node that is an ancestor of all deepest nodes. This implies determining the height of subtrees.\n\n### Approach\n1.  **DFS Helper:** Create a function `dfs(node)` that returns a pair: `(LCA_Node, Height)`.\n2.  **Recursion:**\n    - If `node` is `None`, return `(None, 0)`.\n    - `left = dfs(node.left)`, `right = dfs(node.right)`.\n3.  **Merge Logic:**\n    - If `left.height == right.height`: The deepest nodes are split, so `node` is the LCA. Height is `left.height + 1`.\n    - If `left.height > right.height`: Deepest nodes are on the left. Return `(left.LCA, left.height + 1)`.\n    - Else: Return `(right.LCA, right.height + 1)`.\n\n### Complexity Analysis\n- **Time:** O(N) one pass.\n- **Space:** O(H) recursion.\n\n### Code Logic\n**Python:**\n```python\ndef dfs(node):\n    if not node: return None, 0\n    l_node, l_h = dfs(node.left)\n    r_node, r_h = dfs(node.right)\n    if l_h == r_h:\n        return node, l_h + 1\n    return (l_node, l_h + 1) if l_h > r_h else (r_node, r_h + 1)\n\nreturn dfs(root)[0].val\n```",
+    "hints": [
+      "Calculate the height of the left and right subtrees.",
+      "If left height == right height, the current node is the LCA.",
+      "If heights differ, the LCA is in the deeper subtree."
+    ],
+    "boilerplate_python": "import sys\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef build_tree(nodes):\n    if not nodes or nodes[0] == 'null': return None\n    root = TreeNode(int(nodes[0]))\n    queue = [root]\n    i = 1\n    while i < len(nodes):\n        curr = queue.pop(0)\n        if i < len(nodes) and nodes[i] != 'null':\n            curr.left = TreeNode(int(nodes[i]))\n            queue.append(curr.left)\n        i += 1\n        if i < len(nodes) and nodes[i] != 'null':\n            curr.right = TreeNode(int(nodes[i]))\n            queue.append(curr.right)\n        i += 1\n    return root\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    root = build_tree(input_data)\n    # Write solution here\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\nclass TreeNode {\n    int val;\n    TreeNode left;\n    TreeNode right;\n    TreeNode(int x) { val = x; }\n}\n\npublic class Solution {\n    public static TreeNode buildTree(String[] nodes) {\n        if (nodes.length == 0 || nodes[0].equals(\"null\")) return null;\n        TreeNode root = new TreeNode(Integer.parseInt(nodes[0]));\n        Queue<TreeNode> q = new LinkedList<>();\n        q.add(root);\n        int i = 1;\n        while (i < nodes.length) {\n            TreeNode curr = q.poll();\n            if (i < nodes.length && !nodes[i].equals(\"null\")) {\n                curr.left = new TreeNode(Integer.parseInt(nodes[i]));\n                q.add(curr.left);\n            }\n            i++;\n            if (i < nodes.length && !nodes[i].equals(\"null\")) {\n                curr.right = new TreeNode(Integer.parseInt(nodes[i]));\n                q.add(curr.right);\n            }\n            i++;\n        }\n        return root;\n    }\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNext()) return;\n        String line = scanner.nextLine();\n        String[] nodes = line.split(\"\\\\s+\");\n        TreeNode root = buildTree(nodes);\n        // Write solution here\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "3 5 1 6 2 0 8 null null 7 4",
+        "expected_output": "2",
+        "is_public": true
+      },
+      {
+        "input_data": "1",
+        "expected_output": "1",
+        "is_public": true
+      },
+      {
+        "input_data": "0 1 3 null 2",
+        "expected_output": "2",
+        "is_public": true
+      },
+      {
+        "input_data": "1 2 3 4 5",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "1 2 null 3 null 4 null 5",
+        "expected_output": "5",
+        "is_public": false
+      },
+      {
+        "input_data": "1 2 3 4 null null 5",
+        "expected_output": "1",
+        "is_public": false
+      }
+    ]
+  }
+]

@@ -2,7 +2,6 @@ from sqlalchemy import Column, Integer, String, Text, ForeignKey, Table, Boolean
 from sqlalchemy.orm import relationship
 from database import Base
 
-# Bridge table for Cards <-> Questions
 card_questions = Table(
     "card_questions",
     Base.metadata,
@@ -15,11 +14,17 @@ class Question(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, unique=True, index=True)
     description = Column(Text)
+    input_format = Column(Text)
+    output_format = Column(Text)
+    solution = Column(Text)
+    tags = Column(JSON)
+    difficulty = Column(String, default="Medium")
     hints = Column(JSON)      
     boilerplate_python = Column(Text)
     boilerplate_java = Column(Text)
     
     test_cases = relationship("TestCase", back_populates="question")
+    # Corrected Relationship:
     cards = relationship("Card", secondary=card_questions, back_populates="questions")
 
 class TestCase(Base):
@@ -37,4 +42,5 @@ class Card(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String, unique=True)
     description = Column(String)
+    # Corrected Relationship:
     questions = relationship("Question", secondary=card_questions, back_populates="cards")

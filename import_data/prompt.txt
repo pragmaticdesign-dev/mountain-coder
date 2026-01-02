@@ -1,0 +1,60 @@
+Act as a Content Generator for a custom coding judge platform. 
+I will paste a coding problem (Title and Description). 
+You must output a single, valid JSON object that matches the following schema exactly.
+
+**JSON Schema Rules:**
+1. "id": Use a standard LeetCode ID number if applicable, otherwise generate a random unique integer 4 character.
+2. "title": The exact title of the problem.
+3. "description": Use Markdown. Make sure to bold key variables (e.g., **nums**) and format code blocks.
+4. "input_format": A short string describing how the standard input is structured (e.g., "First line: N\nSecond line: Array elements").
+5. "output_format": A short string describing the expected print output.
+6. "difficulty": One specific string: "Easy", "Medium", or "Hard".
+7. "tags": A list of strings representing topics , lower cases and kebab case (e.g., ["array", "two_pointers", "dp"]).
+    predefined tags are  ["array", "map", "two_pointers", "string", "dp","linked_list","graph","searching","binary_search","stacks","queue","heap","tree","bst","set","traversal","trie"];
+8. "solution": A detailed explanation in Markdown with:
+   - **Observations:** Key insights.
+   - **Approach:** Step-by-step logic moving from brute force to optimized.
+   - **Complexity Analysis:** Time and Space complexity.
+   - **Code Logic:** Python and Java snippets of the *core logic only* (no boilerplate).
+9. "hints": A list of 3-7 hints that guide the user from a naive solution to the optimal one.
+10. "boilerplate_python": A template starting with "import sys\ndef solve():". It MUST include the code to read `sys.stdin` based on the input_format.
+11. "boilerplate_java": A template class named "Solution" with a `main` method using `Scanner` or `BufferedReader`.
+12. "test_cases": A list of 6-10 objects, following this specific flow:
+    - **Case 1-2 (Public):** Standard examples from the description ("is_public": true).
+    - **Case 3-4 (Edge Cases):** Min/Max constraints, empty inputs, negatives ("is_public": false).
+    - **Case 5-6 (Logic Traps):** Tricky inputs that break greedy/naive solutions ("is_public": false).
+    - **Case 7 (Performance):** Larger input to test time complexity ("is_public": false).
+    example : {
+      "input_data": "7\npush -2\npush 0\npush -3\ngetMin\npop\ntop\ngetMin",
+      "expected_output": "-3\n0\n-2",
+      "is_public": true
+    }
+
+**Important:** - Ensure all strings are properly escaped for JSON (especially newlines `\n`).
+- The Python boilerplate MUST include the reading logic for the specific input format.
+
+Here is the Problem:
+[PASTE YOUR PROBLEM TEXT HERE]
+
+
+----
+
+I have a coding problem: "[INSERT PROBLEM TITLE HERE]".
+Input Format: [INSERT INPUT FORMAT, e.g., "Integer N followed by N integers"]
+
+Generate a JSON list of 6-8 test cases for this problem following this specific logic:
+1. **Case 1-2 (Public):** Simple, standard examples from the problem description. Set "is_public": true.
+2. **Case 3-4 (Edge Cases):** Minimum constraints (e.g., N=0, N=1, empty strings, negative numbers). Set "is_public": false.
+3. **Case 5-6 (Logic Traps):** Tricky inputs that often break greedy approaches or naive solutions. Set "is_public": false.
+4. **Case 7 (Performance):** A reasonably large input (not too huge to crash the text window, but complex enough).
+
+**Format Rules:**
+- "input_data": Must be the EXACT raw string needed for stdin (use \n for newlines).
+- "expected_output": The exact raw string expected on stdout.
+- Output ONLY the JSON list.
+
+Example structure:
+[
+  { "input_data": "3\n1 2 3", "expected_output": "6", "is_public": true },
+  { "input_data": "0\n", "expected_output": "0", "is_public": false }
+]

@@ -1,0 +1,993 @@
+[
+  {
+    "id": 70,
+    "title": "Climbing Stairs",
+    "description": "You are climbing a staircase. It takes **n** steps to reach the top. Each time you can either climb **1** or **2** steps. In how many distinct ways can you climb to the top?\n\nExample:\nInput: n = 2\nOutput: 2\nExplanation: There are two ways to climb to the top.\n1. 1 step + 1 step\n2. 2 steps",
+    "input_format": "A single integer n.",
+    "output_format": "Print a single integer representing the number of distinct ways.",
+    "difficulty": "Easy",
+    "tags": [
+      "dp"
+    ],
+    "solution": "### Observations\nThis is a classic dynamic programming problem. To reach step `i`, you could have come from step `i-1` (by taking 1 step) or step `i-2` (by taking 2 steps).\n\n### Approach\n1.  **Base Cases:** If `n=1`, there is 1 way. If `n=2`, there are 2 ways.\n2.  **Recurrence:** `dp[i] = dp[i-1] + dp[i-2]`.\n3.  **Optimization:** Since we only need the last two values, we can use two variables instead of an array.\n\n### Complexity Analysis\n- **Time:** O(n) - Single loop.\n- **Space:** O(1) - Using constant variables.\n\n### Code Logic\n**Python:**\n```python\nif n <= 2: return n\na, b = 1, 2\nfor _ in range(3, n + 1):\n    a, b = b, a + b\nreturn b\n```\n**Java:**\n```java\nif (n <= 2) return n;\nint a = 1, b = 2;\nfor (int i = 3; i <= n; i++) {\n    int temp = a + b;\n    a = b;\n    b = temp;\n}\nreturn b;\n```",
+    "hints": [
+      "Think about the last step you took to reach step n.",
+      "If you are at step n, you could have come from n-1 or n-2.",
+      "Does this look like the Fibonacci sequence?"
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    n = int(input_data[0])\n    # Write your solution here\n    # print(result)\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (scanner.hasNextInt()) {\n            int n = scanner.nextInt();\n            // Write your solution here\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "2",
+        "expected_output": "2",
+        "is_public": true
+      },
+      {
+        "input_data": "3",
+        "expected_output": "3",
+        "is_public": true
+      },
+      {
+        "input_data": "1",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "45",
+        "expected_output": "1836311903",
+        "is_public": false
+      },
+      {
+        "input_data": "0",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "4",
+        "expected_output": "5",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 322,
+    "title": "Coin Change",
+    "description": "You are given an integer array **coins** representing coins of different denominations and an integer **amount** representing a total amount of money.\n\nReturn the *fewest number of coins* that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return **-1**.",
+    "input_format": "First line: Integer N (number of coin types)\nSecond line: N integers separated by space (the coins)\nThird line: Integer amount",
+    "output_format": "Print a single integer representing the minimum coins or -1.",
+    "difficulty": "Medium",
+    "tags": [
+      "dp",
+      "array"
+    ],
+    "solution": "### Observations\nWe need to find the minimum items to sum to a target. This suggests a Breadth-First Search (BFS) or Dynamic Programming.\n\n### Approach\n1.  **DP Definition:** Let `dp[i]` be the minimum coins needed for amount `i`.\n2.  **Initialization:** Set `dp[0] = 0` and all other `dp` values to infinity.\n3.  **Transition:** For each coin `c` and amount `i` from `c` to `amount`: `dp[i] = min(dp[i], dp[i - c] + 1)`.\n4.  **Result:** If `dp[amount]` is still infinity, return -1.\n\n### Complexity Analysis\n- **Time:** O(S * n) where S is the amount and n is the number of coins.\n- **Space:** O(S) for the DP array.\n\n### Code Logic\n**Python:**\n```python\ndp = [float('inf')] * (amount + 1)\ndp[0] = 0\nfor coin in coins:\n    for x in range(coin, amount + 1):\n        dp[x] = min(dp[x], dp[x - coin] + 1)\nreturn dp[amount] if dp[amount] != float('inf') else -1\n```",
+    "hints": [
+      "Can you compute the answer for amount x if you know the answer for x - coin?",
+      "Use an array where index i stores the min coins for amount i.",
+      "Initialize the array with a value larger than any possible answer."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        coins = [int(next(iterator)) for _ in range(n)]\n        amount = int(next(iterator))\n        # Write solution here\n        # print(result)\n    except StopIteration:\n        pass\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNextInt()) return;\n        int n = scanner.nextInt();\n        int[] coins = new int[n];\n        for(int i=0; i<n; i++) coins[i] = scanner.nextInt();\n        int amount = scanner.nextInt();\n        // Write solution here\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "3\n1 2 5\n11",
+        "expected_output": "3",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n2\n3",
+        "expected_output": "-1",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n1\n0",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "3\n1 2 5\n100",
+        "expected_output": "20",
+        "is_public": false
+      },
+      {
+        "input_data": "2\n1 2147483647\n2",
+        "expected_output": "2",
+        "is_public": false
+      },
+      {
+        "input_data": "3\n186 419 83\n6249",
+        "expected_output": "20",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 300,
+    "title": "Longest Increasing Subsequence",
+    "description": "Given an integer array **nums**, return the length of the longest strictly increasing subsequence.\n\nA subsequence is a sequence that can be derived from an array by deleting some or no elements without changing the order of the remaining elements.",
+    "input_format": "First line: Integer N (size of array)\nSecond line: N integers separated by space",
+    "output_format": "Print a single integer representing the length.",
+    "difficulty": "Medium",
+    "tags": [
+      "dp",
+      "binary_search",
+      "array"
+    ],
+    "solution": "### Observations\nA naive DP is O(N^2). However, we can build the subsequence intelligently.\n\n### Approach\n1.  **Patience Sorting / Binary Search:** Maintain a list `tails` where `tails[i]` is the smallest tail of all increasing subsequences of length `i+1`.\n2.  Iterate through `x` in `nums`.\n3.  If `x` is larger than all tails, append it.\n4.  Else, update the smallest tail `>= x` with `x` to allow for longer future sequences.\n\n### Complexity Analysis\n- **Time:** O(N log N) using binary search.\n- **Space:** O(N) for the tails array.\n\n### Code Logic\n**Python:**\n```python\ntails = []\nfor x in nums:\n    import bisect\n    idx = bisect.bisect_left(tails, x)\n    if idx < len(tails):\n        tails[idx] = x\n    else:\n        tails.append(x)\nreturn len(tails)\n```",
+    "hints": [
+      "O(N^2) DP: dp[i] = max(dp[j]) + 1 for j < i and nums[j] < nums[i].",
+      "Can you improve the search for the previous element using Binary Search?",
+      "Try maintaining a list of 'smallest ending elements' for different lengths."
+    ],
+    "boilerplate_python": "import sys\nimport bisect\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    n = int(input_data[0])\n    nums = [int(x) for x in input_data[1:]]\n    # Write solution here\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNextInt()) return;\n        int n = scanner.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = scanner.nextInt();\n        // Write solution here\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "6\n10 9 2 5 3 7 101 18",
+        "expected_output": "4",
+        "is_public": true
+      },
+      {
+        "input_data": "6\n0 1 0 3 2 3",
+        "expected_output": "4",
+        "is_public": true
+      },
+      {
+        "input_data": "7\n7 7 7 7 7 7 7",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "1\n10",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "8\n4 10 4 3 8 9 2 10",
+        "expected_output": "4",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n1 2 3 4 5",
+        "expected_output": "5",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 198,
+    "title": "House Robber",
+    "description": "You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed, the only constraint stopping you is that adjacent houses have security systems connected and **it will automatically contact the police if two adjacent houses were broken into on the same night**.\n\nGiven an integer array **nums** representing the amount of money of each house, return the maximum amount of money you can rob tonight without alerting the police.",
+    "input_format": "First line: Integer N\nSecond line: N integers (money in each house)",
+    "output_format": "Print the maximum money possible.",
+    "difficulty": "Medium",
+    "tags": [
+      "dp",
+      "array"
+    ],
+    "solution": "### Observations\nAt any house `i`, you have two choices: rob it (and add to max from `i-2`) or skip it (and take max from `i-1`).\n\n### Approach\n1.  **DP State:** `dp[i]` = max money at house `i`.\n2.  **Recurrence:** `dp[i] = max(dp[i-1], nums[i] + dp[i-2])`.\n3.  **Space Optimization:** We only need the previous two values.\n\n### Complexity Analysis\n- **Time:** O(N)\n- **Space:** O(1)\n\n### Code Logic\n**Python:**\n```python\nrob1, rob2 = 0, 0\nfor n in nums:\n    temp = max(n + rob1, rob2)\n    rob1 = rob2\n    rob2 = temp\nreturn rob2\n```",
+    "hints": [
+      "If you rob house i, you cannot rob house i-1.",
+      "Max money at index i is max(nums[i] + max_at_i-2, max_at_i-1).",
+      "Can you do this without an array?"
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    n = int(input_data[0])\n    nums = [int(x) for x in input_data[1:]]\n    # Write solution here\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNextInt()) return;\n        int n = scanner.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = scanner.nextInt();\n        // Write solution here\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "4\n1 2 3 1",
+        "expected_output": "4",
+        "is_public": true
+      },
+      {
+        "input_data": "5\n2 7 9 3 1",
+        "expected_output": "12",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n5",
+        "expected_output": "5",
+        "is_public": false
+      },
+      {
+        "input_data": "2\n1 1",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "6\n0 0 0 0 0 0",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "4\n2 1 1 2",
+        "expected_output": "4",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 62,
+    "title": "Unique Paths",
+    "description": "There is a robot on an **m x n** grid. The robot is initially located at the top-left corner (i.e., **grid[0][0]**). The robot tries to move to the bottom-right corner (i.e., **grid[m - 1][n - 1]**). The robot can only move either **down** or **right** at any point in time.\n\nGiven the two integers **m** and **n**, return the number of unique paths that the robot can take to reach the bottom-right corner.",
+    "input_format": "One line containing two integers: m n",
+    "output_format": "Print the total number of unique paths.",
+    "difficulty": "Medium",
+    "tags": [
+      "dp",
+      "array"
+    ],
+    "solution": "### Observations\nThis is a grid traversal problem. To reach cell `(i, j)`, you must come from `(i-1, j)` or `(i, j-1)`.\n\n### Approach\n1.  **DP Array:** Create a 1D row array initialized to 1s (representing the first row).\n2.  **Iterate:** For each subsequent row, update the array: `row[j] = row[j] + row[j-1]` (current cell = cell above + cell left).\n3.  Alternatively, use the Combinatorics formula: `(m+n-2) Choose (m-1)`.\n\n### Complexity Analysis\n- **Time:** O(m * n) for DP, or O(m) for Math.\n- **Space:** O(n) for DP.\n\n### Code Logic\n**Python:**\n```python\nrow = [1] * n\nfor i in range(m - 1):\n    new_row = [1] * n\n    for j in range(1, n):\n        new_row[j] = new_row[j-1] + row[j]\n    row = new_row\nreturn row[-1]\n```",
+    "hints": [
+      "The robot can only move Down or Right.",
+      "Cell (i,j) is reachable from (i-1,j) and (i,j-1).",
+      "For the first row and first column, there is only 1 way."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    m = int(input_data[0])\n    n = int(input_data[1])\n    # Write solution here\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNextInt()) return;\n        int m = scanner.nextInt();\n        int n = scanner.nextInt();\n        // Write solution here\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "3 7",
+        "expected_output": "28",
+        "is_public": true
+      },
+      {
+        "input_data": "3 2",
+        "expected_output": "3",
+        "is_public": true
+      },
+      {
+        "input_data": "1 1",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "10 10",
+        "expected_output": "48620",
+        "is_public": false
+      },
+      {
+        "input_data": "23 12",
+        "expected_output": "193536720",
+        "is_public": false
+      },
+      {
+        "input_data": "1 10",
+        "expected_output": "1",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 1143,
+    "title": "Longest Common Subsequence",
+    "description": "Given two strings **text1** and **text2**, return the length of their longest common subsequence. If there is no common subsequence, return 0.\n\nA subsequence of a string is a new string generated from the original string with some characters (can be none) deleted without changing the relative order of the remaining characters.",
+    "input_format": "First line: String text1\nSecond line: String text2",
+    "output_format": "Print a single integer.",
+    "difficulty": "Medium",
+    "tags": [
+      "dp",
+      "string"
+    ],
+    "solution": "### Observations\nWe are comparing two strings. The state must depend on the indices `i` of `text1` and `j` of `text2`.\n\n### Approach\n1.  **DP Table:** `dp[i][j]` represents the LCS of `text1[0...i-1]` and `text2[0...j-1]`.\n2.  **Match:** If `text1[i-1] == text2[j-1]`, then `dp[i][j] = 1 + dp[i-1][j-1]`.\n3.  **No Match:** Else, `dp[i][j] = max(dp[i-1][j], dp[i][j-1])`.\n\n### Complexity Analysis\n- **Time:** O(N * M)\n- **Space:** O(N * M)\n\n### Code Logic\n**Python:**\n```python\nm, n = len(text1), len(text2)\ndp = [[0] * (n + 1) for _ in range(m + 1)]\nfor i in range(1, m + 1):\n    for j in range(1, n + 1):\n        if text1[i - 1] == text2[j - 1]:\n            dp[i][j] = dp[i - 1][j - 1] + 1\n        else:\n            dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])\nreturn dp[m][n]\n```",
+    "hints": [
+      "Try dynamic programming. DP[i][j] represents the LCS of text1[0..i] and text2[0..j].",
+      "If characters match, you add 1 to the result of the previous indices.",
+      "If they don't match, you propagate the maximum from removing a char from either string."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    text1 = input_data[0]\n    text2 = input_data[1]\n    # Write solution here\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNext()) return;\n        String text1 = scanner.next();\n        String text2 = scanner.next();\n        // Write solution here\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "abcde\nace",
+        "expected_output": "3",
+        "is_public": true
+      },
+      {
+        "input_data": "abc\nabc",
+        "expected_output": "3",
+        "is_public": true
+      },
+      {
+        "input_data": "abc\ndef",
+        "expected_output": "0",
+        "is_public": true
+      },
+      {
+        "input_data": "a\na",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "bsbininm\njmjkbkjkv",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "ezupkr\nubmrapg",
+        "expected_output": "2",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 139,
+    "title": "Word Break",
+    "description": "Given a string **s** and a dictionary of strings **wordDict**, return true if **s** can be segmented into a space-separated sequence of one or more dictionary words.\n\nNote that the same word in the dictionary may be reused multiple times in the segmentation.",
+    "input_format": "First line: String s\nSecond line: Integer N (dictionary size)\nThird line: N strings (dictionary words)",
+    "output_format": "Print true or false.",
+    "difficulty": "Medium",
+    "tags": [
+      "dp",
+      "trie",
+      "string"
+    ],
+    "solution": "### Observations\nWe need to find split points such that every substring fits in the dictionary.\n\n### Approach\n1.  **DP State:** `dp[i]` is true if `s[0...i]` can be segmented.\n2.  **Transition:** `dp[i] = true` if there exists `j < i` such that `dp[j]` is true AND `s[j:i]` is in `wordDict`.\n3.  **Base Case:** `dp[0] = true` (empty string).\n\n### Complexity Analysis\n- **Time:** O(N^2) where N is string length.\n- **Space:** O(N)\n\n### Code Logic\n**Python:**\n```python\ndp = [False] * (len(s) + 1)\ndp[0] = True\nword_set = set(wordDict)\nfor i in range(1, len(s) + 1):\n    for j in range(i):\n        if dp[j] and s[j:i] in word_set:\n            dp[i] = True\n            break\nreturn dp[len(s)]\n```",
+    "hints": [
+      "Use a boolean array dp where dp[i] indicates if substring s[0..i] is valid.",
+      "Check all valid previous break points j for current index i.",
+      "Using a Set for the dictionary gives O(1) lookups."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    iterator = iter(input_data)\n    try:\n        s = next(iterator)\n        n = int(next(iterator))\n        wordDict = [next(iterator) for _ in range(n)]\n        # Write solution here\n    except StopIteration:\n        pass\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNext()) return;\n        String s = scanner.next();\n        int n = scanner.nextInt();\n        List<String> wordDict = new ArrayList<>();\n        for(int i=0; i<n; i++) wordDict.add(scanner.next());\n        // Write solution here\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "leetcode\n2\nleet code",
+        "expected_output": "true",
+        "is_public": true
+      },
+      {
+        "input_data": "applepenapple\n2\napple pen",
+        "expected_output": "true",
+        "is_public": true
+      },
+      {
+        "input_data": "catsandog\n5\ncats dog sand and cat",
+        "expected_output": "false",
+        "is_public": true
+      },
+      {
+        "input_data": "a\n1\na",
+        "expected_output": "true",
+        "is_public": false
+      },
+      {
+        "input_data": "a\n1\nb",
+        "expected_output": "false",
+        "is_public": false
+      },
+      {
+        "input_data": "aaaaaaa\n2\naaaa aaa",
+        "expected_output": "true",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 416,
+    "title": "Partition Equal Subset Sum",
+    "description": "Given an integer array **nums**, return true if you can partition the array into two subsets such that the sum of the elements in both subsets is equal.",
+    "input_format": "First line: Integer N\nSecond line: N integers",
+    "output_format": "Print true or false.",
+    "difficulty": "Medium",
+    "tags": [
+      "dp",
+      "array"
+    ],
+    "solution": "### Observations\nIf two subsets have equal sum, the total sum must be even. Each subset must sum to `Total / 2`.\n\n### Approach\n1.  Calculate `total_sum`. If odd, return False.\n2.  Target = `total_sum // 2`.\n3.  This becomes the **0/1 Knapsack Problem**: Can we pick elements to sum exactly to `Target`?\n4.  **DP:** `dp[i]` is true if sum `i` is achievable.\n\n### Complexity Analysis\n- **Time:** O(N * Target)\n- **Space:** O(Target)\n\n### Code Logic\n**Python:**\n```python\ntotal = sum(nums)\nif total % 2 != 0: return False\ntarget = total // 2\ndp = {0}\nfor n in nums:\n    dp.update({v + n for v in dp if v + n <= target})\nreturn target in dp\n```",
+    "hints": [
+      "Total sum must be even.",
+      "The problem reduces to finding a subset with sum equal to Total / 2.",
+      "Use a boolean DP array or a Set to track reachable sums."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    n = int(input_data[0])\n    nums = [int(x) for x in input_data[1:]]\n    # Write solution here\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNextInt()) return;\n        int n = scanner.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = scanner.nextInt();\n        // Write solution here\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "4\n1 5 11 5",
+        "expected_output": "true",
+        "is_public": true
+      },
+      {
+        "input_data": "4\n1 2 3 5",
+        "expected_output": "false",
+        "is_public": true
+      },
+      {
+        "input_data": "2\n1 1",
+        "expected_output": "true",
+        "is_public": false
+      },
+      {
+        "input_data": "1\n2",
+        "expected_output": "false",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n2 2 1 1 1",
+        "expected_output": "false",
+        "is_public": false
+      },
+      {
+        "input_data": "3\n10 10 20",
+        "expected_output": "true",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 494,
+    "title": "Target Sum",
+    "description": "You are given an integer array **nums** and an integer **target**.\nYou want to build an expression out of nums by adding one of the symbols '+' and '-' before each integer in nums and then concatenating all the integers.\n\nReturn the number of different expressions that you can build, which evaluates to **target**.",
+    "input_format": "First line: Integer N\nSecond line: N integers (nums)\nThird line: Integer target",
+    "output_format": "Print the count of valid expressions.",
+    "difficulty": "Medium",
+    "tags": [
+      "dp",
+      "backtracking"
+    ],
+    "solution": "### Observations\nLet `P` be positives and `N` be negatives. `Sum(P) - Sum(N) = target`. Also `Sum(P) + Sum(N) = total`. Adding equations: `2 * Sum(P) = total + target`. \n\n### Approach\n1.  Find `S = (total + target) / 2`. If `total + target` is odd or negative, return 0.\n2.  Problem becomes: Find number of subsets with sum `S`.\n3.  **DP:** `dp[i]` = count of ways to get sum `i`.\n\n### Complexity Analysis\n- **Time:** O(N * S)\n- **Space:** O(S)\n\n### Code Logic\n**Python:**\n```python\ntotal = sum(nums)\nif (total + target) < 0 or (total + target) % 2 == 1: return 0\ns = (total + target) // 2\ndp = [0] * (s + 1)\ndp[0] = 1\nfor n in nums:\n    for i in range(s, n - 1, -1):\n        dp[i] += dp[i - n]\nreturn dp[s]\n```",
+    "hints": [
+      "Think about it as partitioning the array into two subsets: P (positives) and N (negatives).",
+      "Sum(P) - Sum(N) = Target.",
+      "This transforms the problem into finding a subset with a specific sum."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    n = int(input_data[0])\n    nums = [int(input_data[i]) for i in range(1, n + 1)]\n    target = int(input_data[n + 1])\n    # Write solution here\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNextInt()) return;\n        int n = scanner.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = scanner.nextInt();\n        int target = scanner.nextInt();\n        // Write solution here\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "5\n1 1 1 1 1\n3",
+        "expected_output": "5",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n1\n1",
+        "expected_output": "1",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n1\n2",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "2\n1 0\n1",
+        "expected_output": "2",
+        "is_public": false
+      },
+      {
+        "input_data": "4\n1 2 3 4\n0",
+        "expected_output": "2",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n1 1 1 1 1\n-5",
+        "expected_output": "1",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 2111,
+    "title": "Minimum Operations to Make the Array K-Increasing",
+    "description": "You are given a 0-indexed array **arr** of **n** positive integers, and a positive integer **k**. The array **arr** is called **K-increasing** if `arr[i-k] <= arr[i]` for every index `i >= k`. Return the minimum number of operations to make the array K-increasing (an operation is replacing an element with any positive integer).",
+    "input_format": "First line: Integer N\nSecond line: N integers (arr)\nThird line: Integer k",
+    "output_format": "Print single integer (minimum operations).",
+    "difficulty": "Hard",
+    "tags": [
+      "array",
+      "binary_search"
+    ],
+    "solution": "### Observations\nThe condition `arr[i-k] <= arr[i]` implies that `arr[i], arr[i+k], arr[i+2k]...` must be non-decreasing. This breaks the array into `k` independent subsequences.\n\n### Approach\n1.  For each offset `i` from `0` to `k-1`, collect the subsequence `arr[i], arr[i+k], arr[i+2k]...`.\n2.  For this subsequence to be non-decreasing with minimum changes, we want to **keep** the Longest Increasing Subsequence (LIS) and change the rest.\n3.  Operations for this subsequence = `Length_of_subsequence - LIS_length`.\n4.  Sum operations for all `k` groups.\n\n### Complexity Analysis\n- **Time:** O(N log N) due to LIS.\n- **Space:** O(N) to store subsequences/LIS structure.\n\n### Code Logic\n**Python:**\n```python\nimport bisect\ndef get_lis(sub):\n    tails = []\n    for x in sub:\n        idx = bisect.bisect_right(tails, x)\n        if idx < len(tails): tails[idx] = x\n        else: tails.append(x)\n    return len(tails)\n\ntotal_ops = 0\nfor i in range(k):\n    sub = arr[i::k]\n    total_ops += len(sub) - get_lis(sub)\nreturn total_ops\n```",
+    "hints": [
+      "The problem decouples into k independent LIS problems.",
+      "Consider indices i, i+k, i+2k... as a separate array.",
+      "We want to keep the maximum number of elements in their relative order (LIS)."
+    ],
+    "boilerplate_python": "import sys\nimport bisect\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    n = int(input_data[0])\n    arr = [int(input_data[i]) for i in range(1, n + 1)]\n    k = int(input_data[n + 1])\n    # Write solution here\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNextInt()) return;\n        int n = scanner.nextInt();\n        int[] arr = new int[n];\n        for(int i=0; i<n; i++) arr[i] = scanner.nextInt();\n        int k = scanner.nextInt();\n        // Write solution here\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "6\n5 4 3 2 1 1\n1",
+        "expected_output": "4",
+        "is_public": true
+      },
+      {
+        "input_data": "6\n4 1 5 2 6 2\n2",
+        "expected_output": "0",
+        "is_public": true
+      },
+      {
+        "input_data": "6\n4 1 5 2 6 2\n3",
+        "expected_output": "2",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n10\n1",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "4\n1 1 1 1\n1",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "8\n10 20 30 5 10 15 2 3\n2",
+        "expected_output": "4",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 329,
+    "title": "Longest Increasing Path in a Matrix",
+    "description": "Given an **m x n** integers **matrix**, return the length of the longest increasing path.\n\nFrom each cell, you can either move in four directions: left, right, up, or down. You may not move diagonally or move outside the boundary.",
+    "input_format": "First line: m n\nNext m lines: n integers per line",
+    "output_format": "Print integer length.",
+    "difficulty": "Hard",
+    "tags": [
+      "dp",
+      "graph",
+      "traversal"
+    ],
+    "solution": "### Observations\nThis is a graph problem where edges go from smaller to larger values (DAG). We need the longest path in a DAG.\n\n### Approach\n1.  **DFS + Memoization:** `dfs(r, c)` returns the longest path starting at `(r, c)`.\n2.  Check all 4 neighbors. If neighbor `val > current`, `res = max(res, 1 + dfs(neighbor))`.\n3.  Store results in a `memo` table to avoid re-computing.\n\n### Complexity Analysis\n- **Time:** O(m * n)\n- **Space:** O(m * n)\n\n### Code Logic\n**Python:**\n```python\nmemo = {}\ndef dfs(r, c):\n    if (r, c) in memo: return memo[(r, c)]\n    res = 1\n    for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:\n        nr, nc = r + dr, c + dc\n        if 0 <= nr < m and 0 <= nc < n and matrix[nr][nc] > matrix[r][c]:\n            res = max(res, 1 + dfs(nr, nc))\n    memo[(r, c)] = res\n    return res\nreturn max(dfs(r, c) for r in range(m) for c in range(n))\n```",
+    "hints": [
+      "Naive DFS is too slow.",
+      "Can we cache the result for each cell? (Memoization)",
+      "The graph is a DAG (Directed Acyclic Graph) because values must strictly increase."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    m = int(input_data[0])\n    n = int(input_data[1])\n    matrix = []\n    curr = 2\n    for _ in range(m):\n        row = [int(input_data[curr + i]) for i in range(n)]\n        matrix.append(row)\n        curr += n\n    # Write solution here\n\nif __name__ == '__main__':\n    sys.setrecursionlimit(2000)\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNextInt()) return;\n        int m = scanner.nextInt();\n        int n = scanner.nextInt();\n        int[][] matrix = new int[m][n];\n        for(int i=0; i<m; i++)\n            for(int j=0; j<n; j++)\n                matrix[i][j] = scanner.nextInt();\n        // Write solution here\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "3 3\n9 9 4\n6 6 8\n2 1 1",
+        "expected_output": "4",
+        "is_public": true
+      },
+      {
+        "input_data": "3 3\n3 4 5\n3 2 6\n2 2 1",
+        "expected_output": "4",
+        "is_public": true
+      },
+      {
+        "input_data": "1 1\n1",
+        "expected_output": "1",
+        "is_public": true
+      },
+      {
+        "input_data": "2 2\n1 2\n4 3",
+        "expected_output": "4",
+        "is_public": false
+      },
+      {
+        "input_data": "2 2\n5 5\n5 5",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "3 1\n3\n2\n1",
+        "expected_output": "1",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 516,
+    "title": "Longest Palindromic Subsequence",
+    "description": "Given a string **s**, find the longest palindromic subsequence's length in **s**.\n\nA subsequence is a sequence that can be derived from another sequence by deleting some or no elements without changing the order of the remaining elements.",
+    "input_format": "Single string s",
+    "output_format": "Print integer length.",
+    "difficulty": "Medium",
+    "tags": [
+      "dp",
+      "string"
+    ],
+    "solution": "### Observations\nIf `s[i] == s[j]`, they can form the boundaries of a palindrome. The length is `2 + LPS(i+1, j-1)`. If not, we discard one.\n\n### Approach\n1.  **DP Table:** `dp[i][j]` is LPS of substring `s[i...j]`.\n2.  **State Transition:**\n    - If `s[i] == s[j]`: `dp[i][j] = dp[i+1][j-1] + 2`.\n    - Else: `dp[i][j] = max(dp[i+1][j], dp[i][j-1])`.\n3.  **Order:** Fill diagonal first, then expand length.\n\n### Complexity Analysis\n- **Time:** O(N^2)\n- **Space:** O(N^2) or O(N) optimized.\n\n### Code Logic\n**Python:**\n```python\nn = len(s)\ndp = [[0] * n for _ in range(n)]\nfor i in range(n - 1, -1, -1):\n    dp[i][i] = 1\n    for j in range(i + 1, n):\n        if s[i] == s[j]:\n            dp[i][j] = dp[i + 1][j - 1] + 2\n        else:\n            dp[i][j] = max(dp[i + 1][j], dp[i][j - 1])\nreturn dp[0][n - 1]\n```",
+    "hints": [
+      "dp[i][j] represents the answer for substring s[i..j].",
+      "Base case: dp[i][i] = 1.",
+      "Iterate length from 2 to N, or i backwards from N-1 to 0."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    s = input_data[0]\n    # Write solution here\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNext()) return;\n        String s = scanner.next();\n        // Write solution here\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "bbbab",
+        "expected_output": "4",
+        "is_public": true
+      },
+      {
+        "input_data": "cbbd",
+        "expected_output": "2",
+        "is_public": true
+      },
+      {
+        "input_data": "a",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "abcde",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "aaaaa",
+        "expected_output": "5",
+        "is_public": false
+      },
+      {
+        "input_data": "abacaba",
+        "expected_output": "7",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 72,
+    "title": "Edit Distance",
+    "description": "Given two strings **word1** and **word2**, return the minimum number of operations required to convert **word1** to **word2**.\n\nYou have the following three operations permitted on a word:\n* Insert a character\n* Delete a character\n* Replace a character",
+    "input_format": "First line: String word1\nSecond line: String word2",
+    "output_format": "Print a single integer.",
+    "difficulty": "Hard",
+    "tags": [
+      "dp",
+      "string"
+    ],
+    "solution": "### Observations\nWe need to transform a prefix of `word1` to a prefix of `word2`. The operations (insert, delete, replace) map to transitions in a 2D grid.\n\n### Approach\n1.  **DP State:** `dp[i][j]` is the min operations to convert `word1[0...i-1]` to `word2[0...j-1]`.\n2.  **Base Cases:** `dp[i][0] = i` (delete all), `dp[0][j] = j` (insert all).\n3.  **Transitions:**\n    - If `word1[i-1] == word2[j-1]`: `dp[i][j] = dp[i-1][j-1]` (no op).\n    - Else: `dp[i][j] = 1 + min(dp[i-1][j] (del), dp[i][j-1] (ins), dp[i-1][j-1] (rep))`.\n\n### Complexity Analysis\n- **Time:** O(M * N)\n- **Space:** O(M * N)\n\n### Code Logic\n**Python:**\n```python\nm, n = len(word1), len(word2)\ndp = [[0] * (n + 1) for _ in range(m + 1)]\nfor i in range(m + 1): dp[i][0] = i\nfor j in range(n + 1): dp[0][j] = j\nfor i in range(1, m + 1):\n    for j in range(1, n + 1):\n        if word1[i - 1] == word2[j - 1]:\n            dp[i][j] = dp[i - 1][j - 1]\n        else:\n            dp[i][j] = 1 + min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1])\nreturn dp[m][n]\n```",
+    "hints": [
+      "If characters match, no operation is needed.",
+      "If they don't match, consider the cost of Insert, Delete, and Replace (all cost 1).",
+      "dp[i][j] depends on left, top, and top-left neighbors."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    word1 = input_data[0]\n    word2 = input_data[1]\n    # Write solution here\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNext()) return;\n        String word1 = scanner.next();\n        String word2 = scanner.next();\n        // Write solution here\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "horse\nros",
+        "expected_output": "3",
+        "is_public": true
+      },
+      {
+        "input_data": "intention\nexecution",
+        "expected_output": "5",
+        "is_public": true
+      },
+      {
+        "input_data": "a\na",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "abc\n\n",
+        "expected_output": "3",
+        "is_public": false
+      },
+      {
+        "input_data": "zoologicoarchaeologist\nzoogeologist",
+        "expected_output": "10",
+        "is_public": false
+      },
+      {
+        "input_data": "plasma\naltruism",
+        "expected_output": "6",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 1547,
+    "title": "Minimum Cost to Cut a Stick",
+    "description": "Given a wooden stick of length **n** units. The stick is labeled from 0 to n.\nGiven an integer array **cuts** where **cuts[i]** denotes a position you should perform a cut at.\n\nYou should perform the cuts in order, you can change the order of the cuts as you wish.\nThe cost of one cut is the length of the stick to be cut, the total cost is the sum of costs of all cuts. Return the minimum total cost of the cuts.",
+    "input_format": "First line: Integer n\nSecond line: Integer M (number of cuts)\nThird line: M integers (cuts array)",
+    "output_format": "Print single integer (min cost).",
+    "difficulty": "Hard",
+    "tags": [
+      "dp",
+      "array"
+    ],
+    "solution": "### Observations\nThe cost depends on the length of the current segment. If we cut at `k`, the problem splits into `left...k` and `k...right`.\n\n### Approach\n1.  **Preprocessing:** Add `0` and `n` to the `cuts` array and sort it.\n2.  **DP State:** `dp[i][j]` is min cost to cut the stick between sorted index `i` and `j`.\n3.  **Transition:** `dp[i][j] = (cuts[j] - cuts[i]) + min(dp[i][k] + dp[k][j])` for all `k` between `i` and `j`.\n4.  **Base Case:** If `j == i + 1`, cost is 0 (no cuts inside).\n\n### Complexity Analysis\n- **Time:** O(M^3) where M is number of cuts.\n- **Space:** O(M^2)\n\n### Code Logic\n**Python:**\n```python\ncuts = sorted(cuts + [0, n])\nm = len(cuts)\ndp = [[0] * m for _ in range(m)]\nfor length in range(2, m):\n    for i in range(m - length):\n        j = i + length\n        dp[i][j] = min(dp[i][k] + dp[k][j] for k in range(i + 1, j)) + (cuts[j] - cuts[i])\nreturn dp[0][m - 1]\n```",
+    "hints": [
+      "Add 0 and n to the cuts array and sort it.",
+      "Consider a segment defined by cuts[i] and cuts[j].",
+      "Try every possible cut 'k' between i and j as the first cut for this segment."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    n = int(input_data[0])\n    m = int(input_data[1])\n    cuts = [int(input_data[i]) for i in range(2, m + 2)]\n    # Write solution here\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNextInt()) return;\n        int n = scanner.nextInt();\n        int m = scanner.nextInt();\n        int[] cuts = new int[m];\n        for(int i=0; i<m; i++) cuts[i] = scanner.nextInt();\n        // Write solution here\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "7\n4\n1 3 4 5",
+        "expected_output": "16",
+        "is_public": true
+      },
+      {
+        "input_data": "9\n5\n5 6 1 4 2",
+        "expected_output": "22",
+        "is_public": true
+      },
+      {
+        "input_data": "10\n1\n5",
+        "expected_output": "10",
+        "is_public": false
+      },
+      {
+        "input_data": "10\n2\n1 9",
+        "expected_output": "20",
+        "is_public": false
+      },
+      {
+        "input_data": "30\n6\n13 25 18 3 10 1",
+        "expected_output": "82",
+        "is_public": false
+      },
+      {
+        "input_data": "100\n2\n20 50",
+        "expected_output": "220",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 119,
+    "title": "Pascal's Triangle II",
+    "description": "Given an integer **rowIndex**, return the **rowIndex**-th (0-indexed) row of the Pascal's triangle.\n\nIn Pascal's triangle, each number is the sum of the two numbers directly above it.",
+    "input_format": "Single integer rowIndex",
+    "output_format": "Print space-separated integers for that row.",
+    "difficulty": "Easy",
+    "tags": [
+      "array",
+      "dp"
+    ],
+    "solution": "### Observations\nRow `i` can be calculated from row `i-1`. To optimize space, we can update the array in place from right to left.\n\n### Approach\n1.  Initialize array `res = [1]`.\n2.  Loop `i` from 1 to `rowIndex`.\n3.  In inner loop `j`, go from `i-1` down to `1`. Update `res[j] += res[j-1]`.\n4.  Append `1` at the end.\n\n### Complexity Analysis\n- **Time:** O(k^2)\n- **Space:** O(k)\n\n### Code Logic\n**Python:**\n```python\nrow = [1]\nfor _ in range(rowIndex):\n    for j in range(len(row) - 1, 0, -1):\n        row[j] += row[j - 1]\n    row.append(1)\nprint(*(row))\n```",
+    "hints": [
+      "You can generate each row based on the previous one.",
+      "Try using a single array and updating it from back to front to avoid overwriting needed values."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    rowIndex = int(input_data[0])\n    # Write solution here\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNextInt()) return;\n        int rowIndex = scanner.nextInt();\n        // Write solution here\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "3",
+        "expected_output": "1 3 3 1",
+        "is_public": true
+      },
+      {
+        "input_data": "0",
+        "expected_output": "1",
+        "is_public": true
+      },
+      {
+        "input_data": "1",
+        "expected_output": "1 1",
+        "is_public": true
+      },
+      {
+        "input_data": "4",
+        "expected_output": "1 4 6 4 1",
+        "is_public": false
+      },
+      {
+        "input_data": "10",
+        "expected_output": "1 10 45 120 210 252 210 120 45 10 1",
+        "is_public": false
+      },
+      {
+        "input_data": "2",
+        "expected_output": "1 2 1",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 698,
+    "title": "Partition to K Equal Sum Subsets",
+    "description": "Given an integer array **nums** and an integer **k**, return true if it is possible to divide this array into **k** non-empty subsets whose sums are all equal.",
+    "input_format": "First line: Integer N\nSecond line: N integers\nThird line: Integer k",
+    "output_format": "Print true or false.",
+    "difficulty": "Medium",
+    "tags": [
+      "dp",
+      "backtracking"
+    ],
+    "solution": "### Observations\nTotal sum must be divisible by `k`. Each bucket must have sum `target = sum / k`. We need to fill `k` buckets.\n\n### Approach\n1.  Sort `nums` in descending order (optimization to fail fast).\n2.  Use backtracking `backtrack(index, count, current_sum)`.\n3.  Try to place `nums[index]` into the current bucket. If `current_sum == target`, move to next bucket.\n4.  Use a `visited` array (or bitmask) to mark used numbers.\n\n### Complexity Analysis\n- **Time:** O(k * 2^N) generally, but pruning helps.\n- **Space:** O(N) for recursion stack.\n\n### Code Logic\n**Python:**\n```python\ntotal = sum(nums)\nif total % k != 0: return False\ntarget = total // k\nnums.sort(reverse=True)\nvisited = [False] * len(nums)\n\ndef backtrack(i, k, curr_sum):\n    if k == 0: return True\n    if curr_sum == target:\n        return backtrack(0, k - 1, 0)\n    \n    for j in range(i, len(nums)):\n        if visited[j] or curr_sum + nums[j] > target: continue\n        visited[j] = True\n        if backtrack(j + 1, k, curr_sum + nums[j]): return True\n        visited[j] = False\n        if curr_sum == 0: return False\n    return False\n\nreturn backtrack(0, k, 0)\n```",
+    "hints": [
+      "Sum of elements must be divisible by k.",
+      "Sort the array descending to try larger elements first.",
+      "If you successfully fill one bucket, recursively try to fill the next k-1 buckets."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    n = int(input_data[0])\n    nums = [int(input_data[i]) for i in range(1, n + 1)]\n    k = int(input_data[n + 1])\n    # Write solution here\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNextInt()) return;\n        int n = scanner.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = scanner.nextInt();\n        int k = scanner.nextInt();\n        // Write solution here\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "7\n4 3 2 3 5 2 1\n4",
+        "expected_output": "true",
+        "is_public": true
+      },
+      {
+        "input_data": "4\n1 2 3 4\n3",
+        "expected_output": "false",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n2\n2",
+        "expected_output": "false",
+        "is_public": false
+      },
+      {
+        "input_data": "4\n1 1 1 1\n4",
+        "expected_output": "true",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n4 4 4 4 4\n4",
+        "expected_output": "false",
+        "is_public": false
+      },
+      {
+        "input_data": "9\n1 1 1 1 1 1 1 1 1\n3",
+        "expected_output": "true",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 902,
+    "title": "Numbers At Most N Given Digit Set",
+    "description": "Given an array of **digits** which is sorted in non-decreasing order. You can write numbers using each **digits[i]** as many times as you want. For example, if **digits = ['1','3','5']**, we may write numbers such as '13', '551', '1351315'.\n\nReturn the number of positive integers that can be generated that are less than or equal to a given integer **n**.",
+    "input_format": "First line: Integer M (size of digits)\nSecond line: M strings (the digits)\nThird line: Integer n",
+    "output_format": "Print single integer.",
+    "difficulty": "Hard",
+    "tags": [
+      "dp",
+      "math",
+      "binary_search"
+    ],
+    "solution": "### Observations\nWe need to count numbers with length `< len(n)` and numbers with length `== len(n)` that are smaller or equal.\n\n### Approach\n1.  **Shorter Numbers:** If `n` has `L` digits, any number with `1` to `L-1` digits made from the set is valid. For length `k`, count is `|digits|^k`. Sum these up.\n2.  **Same Length:** Iterate through digits of `n` from left to right.\n    - For current digit `d`, count how many allowed digits are `< d`. Each gives `|digits|^(remaining_len)` combos.\n    - If `d` is in allowed digits, continue to next position.\n    - If `d` is not in allowed, stop.\n\n### Complexity Analysis\n- **Time:** O(log N)\n- **Space:** O(1)\n\n### Code Logic\n**Python:**\n```python\nS = str(n)\nL = len(S)\ncount = 0\n# Shorter lengths\nfor i in range(1, L):\n    count += len(digits) ** i\n\n# Same length\nfor i, ch in enumerate(S):\n    remaining = L - i - 1\n    for digit in digits:\n        if digit < ch:\n            count += len(digits) ** remaining\n        else:\n            if digit == ch:\n                if i == L - 1: count += 1\n                break\n            else: # digit > ch\n                return count\n    else:\n         # If loop finished without break/return, we matched prefix but didn't find equal digit to continue\n         # Actually, logic above handles 'break' on equal. If we never break, we stop early.\n         return count\nreturn count\n```",
+    "hints": [
+      "Count numbers with fewer digits than N separately (geometric series).",
+      "For numbers with the same number of digits, process from left to right.",
+      "If the current digit in N is 'd', you can use any digit in your set smaller than 'd' followed by ANY combination of digits."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    m = int(input_data[0])\n    digits = [input_data[i] for i in range(1, m + 1)]\n    n = int(input_data[m + 1])\n    # Write solution here\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNextInt()) return;\n        int m = scanner.nextInt();\n        String[] digits = new String[m];\n        for(int i=0; i<m; i++) digits[i] = scanner.next();\n        int n = scanner.nextInt();\n        // Write solution here\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "3\n1 3 5\n100",
+        "expected_output": "20",
+        "is_public": true
+      },
+      {
+        "input_data": "3\n1 4 9\n1000000000",
+        "expected_output": "29523",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n7\n8",
+        "expected_output": "1",
+        "is_public": true
+      },
+      {
+        "input_data": "3\n3 4 8\n4",
+        "expected_output": "2",
+        "is_public": false
+      },
+      {
+        "input_data": "2\n1 2\n10",
+        "expected_output": "2",
+        "is_public": false
+      },
+      {
+        "input_data": "3\n5 6 7\n50",
+        "expected_output": "4",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 337,
+    "title": "House Robber III",
+    "description": "The thief has found himself a new place for his thievery again. There is only one entrance to this area, called the **root**.\n\nBesides the root, each house has one and only one parent house. After a tour, the smart thief realized that all houses in this place form a **binary tree**. It will automatically contact the police if **two directly-linked houses were broken into on the same night**.\n\nGiven the **root** of the binary tree, return the maximum amount of money the thief can rob without alerting the police.",
+    "input_format": "Space-separated string representing Level Order Traversal (e.g., '3 2 3 null 3 null 1').",
+    "output_format": "Print single integer.",
+    "difficulty": "Medium",
+    "tags": [
+      "dp",
+      "tree",
+      "traversal"
+    ],
+    "solution": "### Observations\nFor any node, we have two choices: rob it (cannot rob children) or don't rob it (can rob children).\n\n### Approach\n1.  **DFS Function:** `dfs(node)` returns a pair `[with_root, without_root]`.\n2.  `with_root = node.val + left[1] + right[1]`.\n3.  `without_root = max(left) + max(right)`.\n4.  **Base Case:** If node is null, return `[0, 0]`.\n\n### Complexity Analysis\n- **Time:** O(N)\n- **Space:** O(Height) for recursion.\n\n### Code Logic\n**Python:**\n```python\ndef dfs(node):\n    if not node: return (0, 0)\n    left = dfs(node.left)\n    right = dfs(node.right)\n    rob = node.val + left[1] + right[1]\n    not_rob = max(left) + max(right)\n    return (rob, not_rob)\nprint(max(dfs(root)))\n```",
+    "hints": [
+      "Use post-order traversal (bottom-up).",
+      "Return two values for each node: max money if robbed, and max money if NOT robbed.",
+      "If you rob the current node, you cannot rob its children."
+    ],
+    "boilerplate_python": "import sys\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef build_tree(nodes):\n    if not nodes or nodes[0] == 'null': return None\n    root = TreeNode(int(nodes[0]))\n    queue = [root]\n    i = 1\n    while i < len(nodes):\n        curr = queue.pop(0)\n        if i < len(nodes) and nodes[i] != 'null':\n            curr.left = TreeNode(int(nodes[i]))\n            queue.append(curr.left)\n        i += 1\n        if i < len(nodes) and nodes[i] != 'null':\n            curr.right = TreeNode(int(nodes[i]))\n            queue.append(curr.right)\n        i += 1\n    return root\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    root = build_tree(input_data)\n    # Write solution here using 'root'\n    # print(result)\n\nif __name__ == '__main__':\n    sys.setrecursionlimit(2000)\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\nclass TreeNode {\n    int val;\n    TreeNode left;\n    TreeNode right;\n    TreeNode(int x) { val = x; }\n}\n\npublic class Solution {\n    public static TreeNode buildTree(String[] nodes) {\n        if (nodes.length == 0 || nodes[0].equals(\"null\")) return null;\n        TreeNode root = new TreeNode(Integer.parseInt(nodes[0]));\n        Queue<TreeNode> q = new LinkedList<>();\n        q.add(root);\n        int i = 1;\n        while (i < nodes.length) {\n            TreeNode curr = q.poll();\n            if (i < nodes.length && !nodes[i].equals(\"null\")) {\n                curr.left = new TreeNode(Integer.parseInt(nodes[i]));\n                q.add(curr.left);\n            }\n            i++;\n            if (i < nodes.length && !nodes[i].equals(\"null\")) {\n                curr.right = new TreeNode(Integer.parseInt(nodes[i]));\n                q.add(curr.right);\n            }\n            i++;\n        }\n        return root;\n    }\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNext()) return;\n        String line = scanner.nextLine();\n        String[] nodes = line.split(\"\\\\s+\");\n        TreeNode root = buildTree(nodes);\n        // Write solution here\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "3 2 3 null 3 null 1",
+        "expected_output": "7",
+        "is_public": true
+      },
+      {
+        "input_data": "3 4 5 1 3 null 1",
+        "expected_output": "9",
+        "is_public": true
+      },
+      {
+        "input_data": "1",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "4 1 null 2 null 3",
+        "expected_output": "7",
+        "is_public": false
+      },
+      {
+        "input_data": "2 1 3 null 4",
+        "expected_output": "7",
+        "is_public": false
+      },
+      {
+        "input_data": "10 1 1 10 10 1 1",
+        "expected_output": "30",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 53,
+    "title": "Maximum Subarray",
+    "description": "Given an integer array **nums**, find the subarray with the largest sum, and return its sum.",
+    "input_format": "First line: Integer N\nSecond line: N integers",
+    "output_format": "Print single integer.",
+    "difficulty": "Easy",
+    "tags": [
+      "array",
+      "dp"
+    ],
+    "solution": "### Observations\nIf the current running sum becomes negative, it's better to reset it to 0 because adding a negative prefix will only decrease the sum of a future subarray.\n\n### Approach\n**Kadane's Algorithm:**\n1.  Initialize `max_so_far` to `nums[0]` and `current_max` to `nums[0]`.\n2.  Iterate through the array from index 1.\n3.  `current_max = max(nums[i], current_max + nums[i])`.\n4.  `max_so_far = max(max_so_far, current_max)`.\n\n### Complexity Analysis\n- **Time:** O(N)\n- **Space:** O(1)\n\n### Code Logic\n**Python:**\n```python\ncur, max_sum = 0, -float('inf')\nfor x in nums:\n    cur = max(x, cur + x)\n    max_sum = max(max_sum, cur)\nreturn max_sum\n```",
+    "hints": [
+      "If the sum of a subarray is negative, it cannot contribute to the maximum sum of a larger subarray starting after it.",
+      "Maintain a running sum. If it drops below zero, reset it.",
+      "Track the maximum sum encountered so far."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    n = int(input_data[0])\n    nums = [int(x) for x in input_data[1:]]\n    # Write solution here\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNextInt()) return;\n        int n = scanner.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = scanner.nextInt();\n        // Write solution here\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "9\n-2 1 -3 4 -1 2 1 -5 4",
+        "expected_output": "6",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n1",
+        "expected_output": "1",
+        "is_public": true
+      },
+      {
+        "input_data": "5\n5 4 -1 7 8",
+        "expected_output": "23",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n-5",
+        "expected_output": "-5",
+        "is_public": false
+      },
+      {
+        "input_data": "4\n-1 -2 -3 -4",
+        "expected_output": "-1",
+        "is_public": false
+      },
+      {
+        "input_data": "3\n10 -1 5",
+        "expected_output": "14",
+        "is_public": false
+      }
+    ]
+  }
+]
