@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mountain Coder</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div id="view-dashboard">
+        <h1 style="text-align:center; padding:10px;">🏔️ Mountain Coder</h1>
+        <div id="cards-container" class="card-grid"></div>
+    </div>
+
+    <div id="view-editor" class="hidden">
+        <div id="editor-container">
+            <div id="left-pane" class="pane">
+                <button onclick="loadDashboard()" style="background:#444; margin-bottom:10px;">← Back</button>
+                <h2 id="q-title">Title</h2>
+                <p id="q-desc" style="line-height:1.6; opacity:0.8;">Description...</p>
+                <div id="q-examples" style="background:#111; padding:10px; margin:10px 0; font-family:monospace;"></div>
+                <details>
+                    <summary style="cursor:pointer; color:#0e639c;">Show Hints</summary>
+                    <ul id="q-hints"></ul>
+                </details>
+                <div style="margin-top:20px;">
+                    <label>Language: </label>
+                    <select id="lang-select" onchange="changeLanguage()">
+                        <option value="python">Python</option>
+                        <option value="java">Java</option>
+                    </select>
+                </div>
+            </div>
+            <div id="right-pane">
+                <div id="monaco-editor"></div>
+                <div id="output-panel">Ready to code...</div>
+                <div style="background:var(--panel); padding:10px; text-align:right;">
+                    <button onclick="submitCode()">Run & Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/vs/loader.js"></script>
+    <script src="/static/app.js"></script>
+</body>
+</html>

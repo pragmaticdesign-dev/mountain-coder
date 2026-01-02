@@ -1,0 +1,18 @@
+:root { --bg: #1e1e1e; --panel: #252526; --text: #cccccc; --accent: #0e639c; }
+body { margin: 0; font-family: sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
+.hidden { display: none !important; }
+
+/* Dashboard */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; padding: 2rem; }
+.card { background: var(--panel); padding: 1.5rem; border: 1px solid #333; cursor: pointer; transition: 0.2s; }
+.card:hover { border-color: var(--accent); transform: translateY(-3px); }
+
+/* Editor View */
+#editor-container { display: flex; height: 100vh; }
+.pane { padding: 1rem; border-right: 1px solid #333; overflow-y: auto; }
+#left-pane { width: 35%; background: var(--panel); }
+#right-pane { width: 65%; display: flex; flex-direction: column; padding: 0; }
+#monaco-editor { flex: 1; }
+#output-panel { height: 150px; background: #111; padding: 10px; font-family: monospace; border-top: 1px solid #444; }
+button { background: var(--accent); color: white; border: none; padding: 8px 16px; cursor: pointer; margin-top: 10px; }
+select { background: #333; color: white; padding: 5px; border: 1px solid #444; }

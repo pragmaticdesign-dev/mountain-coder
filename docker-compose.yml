@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  mountain-coder:
+    build: .
+    container_name: mountain_coder
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./my_data:/app/data
