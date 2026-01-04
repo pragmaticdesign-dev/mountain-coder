@@ -1,0 +1,244 @@
+[
+  {
+    "id": 1125,
+    "title": "Smallest Sufficient Team",
+    "description": "In a project, you have a list of required skills **req_skills**, and a list of people. The **i-th** person is represented by a list of skills, **people[i]**, that they have.\n\nConsider a sufficient team: a set of people such that for every required skill in **req_skills**, there is at least one person in the team who has that skill. We want to find a sufficient team of the smallest possible size. It is guaranteed that a sufficient team exists.\n\nReturn the list of indices of the people in the smallest sufficient team. You may return the answer in any order.",
+    "input_format": "First line: An integer **N** (number of required skills).\nSecond line: **N** space-separated strings (the required skills).\nThird line: An integer **M** (number of people).\nNext **M** lines: An integer **K** followed by **K** space-separated strings (skills of the person).",
+    "output_format": "A single line containing space-separated integers representing the indices of the people in the team.",
+    "difficulty": "Hard",
+    "tags": [
+      "dp",
+      "array",
+      "bit-manipulation"
+    ],
+    "solution": "### Observations\nSince **N** is small (up to 16), we can represent the set of covered skills using a **bitmask**. This suggests a Dynamic Programming approach where states are defined by the mask of skills acquired.\n\n### Approach\n1. **Mapping:** Map each skill string to an index `0` to `N-1`. Convert each person's skills into a bitmask integer.\n2. **DP State:** `dp[mask]` stores the smallest team (list of indices) to satisfy the skill set `mask`. Initialize `dp[0]` as an empty list and all other states as infinity (or None).\n3. **Transitions:** Iterate through every existing reachable mask in the DP table. For each person `i` with skill mask `p_mask`, calculate the new state: `new_mask = curr_mask | p_mask`. If the new team size is smaller than the existing `dp[new_mask]`, update it.\n4. **Optimization:** To avoid processing the same person for the same mask multiple times incorrectly, we can iterate through people first, then through the current dictionary of masks.\n\n### Complexity Analysis\n- **Time:** $O(M \\cdot 2^N)$. For each person, we iterate through all possible reachable masks (at most $2^N$).\n- **Space:** $O(2^N \\cdot N)$ to store the team indices for each mask.\n\n### Code Logic\n```python\n# Core logic inside solve\ndp = {0: []}\nfor i, p_mask in enumerate(people_masks):\n    for skill_mask, team in list(dp.items()):\n        new_mask = skill_mask | p_mask\n        if new_mask not in dp or len(team) + 1 < len(dp[new_mask]):\n            dp[new_mask] = team + [i]\nreturn dp[(1 << n) - 1]\n```",
+    "hints": [
+      "The number of required skills is small (<= 16). Can you use a bitmask?",
+      "Map each string skill to a unique integer ID from 0 to N-1.",
+      "Represent each person's skill set as an integer bitmask.",
+      "Define dp[mask] as the smallest list of people indices to cover the skills in 'mask'.",
+      "Iterate through every person and update the reachable masks.",
+      "If adding a person to an existing team results in a smaller team for the new mask, update the DP table.",
+      "The final answer is stored in dp[(1 << N) - 1]."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    # Read N\n    try:\n        line1 = sys.stdin.readline()\n        if not line1: return\n        n = int(line1.strip())\n        \n        # Read skills\n        req_skills = sys.stdin.readline().split()\n        skill_map = {skill: i for i, skill in enumerate(req_skills)}\n        \n        # Read M\n        m_line = sys.stdin.readline()\n        if not m_line: return\n        m = int(m_line.strip())\n        people_masks = []\n        \n        for _ in range(m):\n            parts = sys.stdin.readline().split()\n            # parts[0] is count, rest are skills\n            k = int(parts[0])\n            p_skills = parts[1:]\n            mask = 0\n            for s in p_skills:\n                if s in skill_map:\n                    mask |= (1 << skill_map[s])\n            people_masks.append(mask)\n            \n        # TODO: Implement Solution\n        # Output result: print(*result)\n        \n    except ValueError:\n        return\n\nif __name__ == \"__main__\":\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextInt()) return;\n        int n = sc.nextInt();\n        Map<String, Integer> skillMap = new HashMap<>();\n        for (int i = 0; i < n; i++) {\n            skillMap.put(sc.next(), i);\n        }\n        \n        int m = sc.nextInt();\n        int[] peopleMasks = new int[m];\n        for (int i = 0; i < m; i++) {\n            int k = sc.nextInt();\n            int mask = 0;\n            for (int j = 0; j < k; j++) {\n                String s = sc.next();\n                if (skillMap.containsKey(s)) {\n                    mask |= (1 << skillMap.get(s));\n                }\n            }\n            peopleMasks[i] = mask;\n        }\n        \n        // TODO: Implement Logic\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "3\njava nodejs react\n3\n2 java nodejs\n1 nodejs\n1 react",
+        "expected_output": "0 2",
+        "is_public": true
+      },
+      {
+        "input_data": "2\nalgorithms math\n3\n1 algorithms\n1 math\n2 algorithms math",
+        "expected_output": "2",
+        "is_public": true
+      },
+      {
+        "input_data": "1\ncoding\n1\n0",
+        "expected_output": "",
+        "is_public": false
+      },
+      {
+        "input_data": "1\ncoding\n2\n0\n1 coding",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "3\na b c\n3\n2 a b\n2 b c\n2 a c",
+        "expected_output": "0 1",
+        "is_public": false
+      },
+      {
+        "input_data": "3\na b c\n4\n1 a\n1 b\n1 c\n3 a b c",
+        "expected_output": "3",
+        "is_public": false
+      },
+      {
+        "input_data": "5\na b c d e\n5\n5 a b c d e\n1 a\n1 b\n1 c\n1 d",
+        "expected_output": "0",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 1259,
+    "title": "Handshakes That Don't Cross",
+    "description": "You are given an **even** number of people **numPeople** that stand around a circle and each person shakes hands with someone else so that there are **numPeople / 2** handshakes total.\n\nReturn the number of ways these handshakes could occur such that none of the handshakes cross.\n\nSince the answer could be very large, return it modulo **10^9 + 7**.",
+    "input_format": "A single line containing an even integer **numPeople**.",
+    "output_format": "A single integer representing the number of non-crossing ways modulo 10^9 + 7.",
+    "difficulty": "Hard",
+    "tags": [
+      "dp",
+      "math"
+    ],
+    "solution": "### Observations\nIf we pick a person (say person 1) and they shake hands with person **k**, the circle is split into two independent parts: people `[2, k-1]` and people `[k+1, numPeople]`. For the handshakes not to cross, the chord `1-k` must not intersect any other chord. This implies that both sub-groups formed by the split must contain an **even** number of people.\n\n### Approach\n1. **Base Case:** `dp[0] = 1` (0 people = 1 way, the empty set). `dp[2] = 1` (2 people = 1 handshake).\n2. **DP Transition:** To calculate `dp[n]`, fix person 1. They can shake hands with any person `i` where `i` is even (2, 4, ..., n).\n    - If 1 shakes with `i`, the circle splits into `i-2` people on one side and `n-i` people on the other.\n    - Formula: $dp[n] = \\sum (dp[i-2] \\times dp[n-i])$ for all even $i$ from 2 to n.\n3. **Mathematical Insight:** This structure is identical to calculating **Catalan numbers**.\n\n### Complexity Analysis\n- **Time:** $O(N^2)$ using standard DP loops.\n- **Space:** $O(N)$ for the DP array.\n\n### Code Logic\n```python\nmod = 10**9 + 7\ndp = [0] * (num_people + 1)\ndp[0] = 1\nfor i in range(2, num_people + 1, 2):\n    for j in range(0, i, 2):\n        dp[i] = (dp[i] + dp[j] * dp[i - j - 2]) % mod\nreturn dp[num_people]\n```",
+    "hints": [
+      "Think about dynamic programming.",
+      "If person 1 shakes hands with person k, the circle splits into two separate groups.",
+      "The two groups must both have an even number of people.",
+      "Let dp[n] be the number of ways for n people.",
+      "Sum over all possible partners for person 1.",
+      "The recurrence relation is related to Catalan numbers."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    try:\n        line = sys.stdin.readline()\n        if not line: return\n        num_people = int(line.strip())\n        \n        # TODO: Implement Solution\n        # print(result)\n        \n    except ValueError:\n        return\n\nif __name__ == \"__main__\":\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (sc.hasNextInt()) {\n            int numPeople = sc.nextInt();\n            // TODO: Implement Logic\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "4",
+        "expected_output": "2",
+        "is_public": true
+      },
+      {
+        "input_data": "6",
+        "expected_output": "5",
+        "is_public": true
+      },
+      {
+        "input_data": "2",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "8",
+        "expected_output": "14",
+        "is_public": false
+      },
+      {
+        "input_data": "10",
+        "expected_output": "42",
+        "is_public": false
+      },
+      {
+        "input_data": "14",
+        "expected_output": "429",
+        "is_public": false
+      },
+      {
+        "input_data": "100",
+        "expected_output": "504886689",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 834,
+    "title": "Sum of Distances in Tree",
+    "description": "There is an undirected connected tree with **n** nodes labeled from **0** to **n - 1** and **n - 1** edges.\n\nYou are given the integer **n** and the edges of the tree. Return an array **answer** of length **n** where **answer[i]** is the sum of the distances between the **i-th** node and all other nodes in the tree.",
+    "input_format": "First line: An integer **N**.\nNext **N-1** lines: Two integers **u** and **v** representing an edge between node u and node v.",
+    "output_format": "N space-separated integers, where the i-th integer is the sum of distances for node i.",
+    "difficulty": "Hard",
+    "tags": [
+      "dp",
+      "tree",
+      "graph"
+    ],
+    "solution": "### Observations\nCalculating BFS/DFS for every node takes $O(N^2)$, which is too slow for $N=30000$. We need an $O(N)$ approach using the **Re-rooting** technique.\n\n### Approach\n1. **First DFS (Post-order):** Root the tree arbitrarily at 0. For each node `u`, calculate:\n    - `count[u]`: Number of nodes in the subtree of `u`.\n    - `res[u]`: Sum of distances from `u` to all nodes *in its subtree*.\n    - Transition: `res[u] = sum(res[v] + count[v])` for all children `v`.\n2. **Second DFS (Pre-order):** Propagate the answer from parent to child to get the full sum of distances (including nodes outside the subtree).\n    - When moving root from parent `p` to child `u`, nodes in `u`'s subtree get 1 unit closer. Nodes outside `u`'s subtree get 1 unit farther.\n    - Formula: `res[u] = res[p] - count[u] + (N - count[u])`\n\n### Complexity Analysis\n- **Time:** $O(N)$ (Two DFS traversals).\n- **Space:** $O(N)$ for adjacency list and recursion stack.\n\n### Code Logic\n```python\n# DFS 1: Subtree processing\ndef post_order(node, parent):\n    for child in graph[node]:\n        if child != parent:\n            post_order(child, node)\n            count[node] += count[child]\n            res[node] += res[child] + count[child]\n\n# DFS 2: Re-rooting processing\ndef pre_order(node, parent):\n    for child in graph[node]:\n        if child != parent:\n            res[child] = res[node] - count[child] + (n - count[child])\n            pre_order(child, node)\n```",
+    "hints": [
+      "Brute force BFS from each node is O(N^2). Can we optimize?",
+      "Root the tree at node 0 and calculate the answer for node 0 using DFS.",
+      "Store subtree sizes for each node.",
+      "If you know the answer for a parent node, can you calculate the answer for its child in O(1)?",
+      "When moving from parent to child, nodes in the child's subtree become closer, others become farther.",
+      "Use two DFS passes: one for subtree sums, one for re-rooting logic."
+    ],
+    "boilerplate_python": "import sys\n\n# Increase recursion depth for deep trees\nsys.setrecursionlimit(200000)\n\ndef solve():\n    try:\n        line = sys.stdin.readline()\n        if not line: return\n        n = int(line.strip())\n        \n        graph = [[] for _ in range(n)]\n        for _ in range(n - 1):\n            line_edge = sys.stdin.readline()\n            if line_edge:\n                u, v = map(int, line_edge.split())\n                graph[u].append(v)\n                graph[v].append(u)\n            \n        # TODO: Implement Solution\n        # print(*res)\n        \n    except ValueError:\n        return\n\nif __name__ == \"__main__\":\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String line = br.readLine();\n        if (line == null) return;\n        int n = Integer.parseInt(line.trim());\n        \n        List<List<Integer>> graph = new ArrayList<>();\n        for (int i = 0; i < n; i++) graph.add(new ArrayList<>());\n        \n        for (int i = 0; i < n - 1; i++) {\n            String[] parts = br.readLine().split(\" \");\n            int u = Integer.parseInt(parts[0]);\n            int v = Integer.parseInt(parts[1]);\n            graph.get(u).add(v);\n            graph.get(v).add(u);\n        }\n        \n        // TODO: Implement Logic\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "6\n0 1\n0 2\n2 3\n2 4\n2 5",
+        "expected_output": "8 12 6 10 10 10",
+        "is_public": true
+      },
+      {
+        "input_data": "1",
+        "expected_output": "0",
+        "is_public": true
+      },
+      {
+        "input_data": "2\n1 0",
+        "expected_output": "1 1",
+        "is_public": true
+      },
+      {
+        "input_data": "3\n0 1\n1 2",
+        "expected_output": "3 2 3",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n0 1\n1 2\n2 3\n3 4",
+        "expected_output": "10 7 6 7 10",
+        "is_public": false
+      },
+      {
+        "input_data": "4\n0 1\n0 2\n0 3",
+        "expected_output": "3 5 5 5",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n0 1\n0 2\n0 3\n0 4",
+        "expected_output": "4 6 6 6 6",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 233,
+    "title": "Count Digit One",
+    "description": "Given an integer **n**, count the total number of digit **1** appearing in all non-negative integers less than or equal to **n**.",
+    "input_format": "A single line containing the integer **n**.",
+    "output_format": "A single integer representing the count of digit 1.",
+    "difficulty": "Hard",
+    "tags": [
+      "dp",
+      "math"
+    ],
+    "solution": "### Observations\nIterating from 1 to N is $O(N)$, which is too slow for $N=10^9$. We need a **Digit DP** or a mathematical counting approach to count digits based on their positions (units, tens, etc.).\n\n### Approach\nWe process the number digit by digit. For each position `i` (units, tens, hundreds... represented as `1, 10, 100...`), we calculate how many numbers have a '1' at that specific position.\n\nLet `i` be the current position place value. We split `n` into:\n- `high`: The numbers formed by digits to the left of `i`.\n- `cur`: The digit at position `i`.\n- `low`: The numbers formed by digits to the right of `i`.\n\n**Cases:**\n1. **Case cur > 1:** The digit 1 appears `(high + 1) * i` times at this position.\n2. **Case cur == 1:** The digit 1 appears `high * i + low + 1` times at this position.\n3. **Case cur == 0:** The digit 1 appears `high * i` times at this position.\n\n### Complexity Analysis\n- **Time:** $O(\\log_{10} N)$. The number of digits is small (approx 10 for integer limits).\n- **Space:** $O(1)$.\n\n### Code Logic\n```python\ncount = 0\ni = 1\nwhile i <= n:\n    divider = i * 10\n    # Calculation using integer division logic\n    count += (n // divider) * i + min(max(n % divider - i + 1, 0), i)\n    i *= 10\nreturn count\n```",
+    "hints": [
+      "Iterating through all numbers is TLE.",
+      "Count how many times 1 appears at the units place, tens place, hundreds place, etc.",
+      "For the tens place (i=10), how often does the digit 1 occur in blocks of 100?",
+      "Consider the current digit, the higher bits, and the lower bits.",
+      "If the current digit is 0, 1, or >1, the formula changes slightly."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    try:\n        line = sys.stdin.readline()\n        if not line: return\n        n = int(line.strip())\n        \n        # TODO: Implement Solution\n        # print(count)\n        \n    except ValueError:\n        return\n\nif __name__ == \"__main__\":\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (sc.hasNextInt()) {\n            int n = sc.nextInt();\n            // TODO: Implement Logic\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "13",
+        "expected_output": "6",
+        "is_public": true
+      },
+      {
+        "input_data": "0",
+        "expected_output": "0",
+        "is_public": true
+      },
+      {
+        "input_data": "10",
+        "expected_output": "2",
+        "is_public": false
+      },
+      {
+        "input_data": "1",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "100",
+        "expected_output": "21",
+        "is_public": false
+      },
+      {
+        "input_data": "55",
+        "expected_output": "16",
+        "is_public": false
+      },
+      {
+        "input_data": "123456789",
+        "expected_output": "102839524",
+        "is_public": false
+      }
+    ]
+  }
+]

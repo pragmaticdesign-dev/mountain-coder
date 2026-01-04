@@ -1,179 +1,96 @@
+### **Part 1: Data Structures & Algorithms**
 
-### **1. Arrays & Hashing (Foundation & Tricky Cases)**
-
-* **Product of Array Except Self** (Google Favorite) - [Link](https://leetcode.com/problems/product-of-array-except-self/)
-* **Longest Consecutive Sequence** (Union Find/Hashing) - [Link](https://leetcode.com/problems/longest-consecutive-sequence/)
-* **Subarray Sum Equals K** (Prefix Sum + Map) - [Link](https://leetcode.com/problems/subarray-sum-equals-k/)
-* **First Missing Positive** (Cyclic Sort - Hard) - [Link](https://leetcode.com/problems/first-missing-positive/)
-* **Insert Delete GetRandom O(1)** (Design) - [Link](https://leetcode.com/problems/insert-delete-getrandom-o1/)
-* **Next Permutation** (Math/Array logic) - [Link](https://leetcode.com/problems/next-permutation/)
-
-### **2. Two Pointers & Sliding Window**
-
-* **Trapping Rain Water** (Classic Hard) - [Link](https://leetcode.com/problems/trapping-rain-water/)
-* **3Sum** (Essential Medium) - [Link](https://leetcode.com/problems/3sum/)
-* **Container With Most Water** (Greedy Pointer) - [Link](https://leetcode.com/problems/container-with-most-water/)
-* **Minimum Window Substring** (Hard Sliding Window) - [Link](https://leetcode.com/problems/minimum-window-substring/)
-* **Longest Repeating Character Replacement** - [Link](https://leetcode.com/problems/longest-repeating-character-replacement/)
-* **Sliding Window Maximum** (Monotonic Queue) - [Link](https://leetcode.com/problems/sliding-window-maximum/)
-
-### **3. Binary Search (Advanced)**
-
-* **Search in Rotated Sorted Array** - [Link](https://leetcode.com/problems/search-in-rotated-sorted-array/)
-* **Median of Two Sorted Arrays** (Hard - Divide & Conquer) - [Link](https://leetcode.com/problems/median-of-two-sorted-arrays/)
-* **Split Array Largest Sum** (Binary Search on Answer) - [Link](https://leetcode.com/problems/split-array-largest-sum/)
-* **Koko Eating Bananas** (Rate Optimization) - [Link](https://leetcode.com/problems/koko-eating-bananas/)
-* **Find Peak Element** (Logarithmic time on unsorted array) - [Link](https://leetcode.com/problems/find-peak-element/)
-
-### **4. Stack & Monotonic Stack**
-
-* **Largest Rectangle in Histogram** (Hard) - [Link](https://leetcode.com/problems/largest-rectangle-in-histogram/)
-* **Daily Temperatures** - [Link](https://leetcode.com/problems/daily-temperatures/)
-* **Min Stack** (Design) - [Link](https://leetcode.com/problems/min-stack/)
-* **Basic Calculator II** (String parsing) - [Link](https://leetcode.com/problems/basic-calculator-ii/)
-* **Decode String** (Recursion/Stack) - [Link](https://leetcode.com/problems/decode-string/)
-
-### **5. Linked Lists (Design & Manipulation)**
-
-* **Merge k Sorted Lists** (Heap/Divide & Conquer) - [Link](https://leetcode.com/problems/merge-k-sorted-lists/)
-* **Reverse Nodes in k-Group** (Hard) - [Link](https://leetcode.com/problems/reverse-nodes-in-k-group/)
-* **Copy List with Random Pointer** (Deep Copy) - [Link](https://leetcode.com/problems/copy-list-with-random-pointer/)
-* **LRU Cache** (Doubly LL + Map - **Crucial for SSE**) - [Link](https://leetcode.com/problems/lru-cache/)
-* **Reorder List** - [Link](https://leetcode.com/problems/reorder-list/)
-
-### **6. Trees (Binary Trees & BST)**
-
-* **Binary Tree Maximum Path Sum** (Hard Recursion) - [Link](https://leetcode.com/problems/binary-tree-maximum-path-sum/)
-* **Serialize and Deserialize Binary Tree** (Design) - [Link](https://leetcode.com/problems/serialize-and-deserialize-binary-tree/)
-* **Lowest Common Ancestor of a Binary Tree** - [Link](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/)
-* **Validate Binary Search Tree** (Range validation) - [Link](https://leetcode.com/problems/validate-binary-search-tree/)
-* **Construct Binary Tree from Preorder and Inorder Traversal** - [Link](https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/)
-* **Diameter of Binary Tree** - [Link](https://leetcode.com/problems/diameter-of-binary-tree/)
-
-### **7. Tries (Prefix Trees) & Advanced String**
-
-* **Implement Trie (Prefix Tree)** - [Link](https://leetcode.com/problems/implement-trie-prefix-tree/)
-* **Word Search II** (Backtracking + Trie Optimization) - [Link](https://leetcode.com/problems/word-search-ii/)
-* **Design Add and Search Words Data Structure** - [Link](https://leetcode.com/problems/design-add-and-search-words-data-structure/)
-* **Word Break** (DP/Trie) - [Link](https://leetcode.com/problems/word-break/)
-
-### **8. Heaps & Intervals**
-
-* **Find Median from Data Stream** (Two Heaps - Hard) - [Link](https://leetcode.com/problems/find-median-from-data-stream/)
-* **Task Scheduler** (Greedy/Heap) - [Link](https://leetcode.com/problems/task-scheduler/)
-* **Meeting Rooms II** (Chronological ordering/Heap) - [Link](https://leetcode.com/problems/meeting-rooms-ii/)
-* **Merge Intervals** - [Link](https://leetcode.com/problems/merge-intervals/)
-* **Insert Interval** - [Link](https://leetcode.com/problems/insert-interval/)
-
-### **9. Graphs (BFS, DFS, Union Find, Topo Sort)**
-
-*This is the most critical section for Google/Uber.*
-
-* **Number of Islands** (Standard DFS/BFS) - [Link](https://leetcode.com/problems/number-of-islands/)
-* **Rotting Oranges** (Multi-source BFS) - [Link](https://leetcode.com/problems/rotting-oranges/)
-* **Course Schedule II** (Topological Sort / Cycle Detection) - [Link](https://leetcode.com/problems/course-schedule-ii/)
-* **Word Ladder** (BFS Shortest Path) - [Link](https://leetcode.com/problems/word-ladder/)
-* **Longest Increasing Path in a Matrix** (DFS + Memoization) - [Link](https://leetcode.com/problems/longest-increasing-path-in-a-matrix/)
-* **Alien Dictionary** (Topo Sort - Hard) - [Link](https://leetcode.com/problems/alien-dictionary/)
-* **Accounts Merge** (Union Find / DSU) - [Link](https://leetcode.com/problems/accounts-merge/)
-* **Cheapest Flights Within K Stops** (Bellman-Ford / Dijkstra) - [Link](https://leetcode.com/problems/cheapest-flights-within-k-stops/)
-* **Network Delay Time** (Dijkstra) - [Link](https://leetcode.com/problems/network-delay-time/)
-* **Evaluate Division** (Graph construction on fly) - [Link](https://leetcode.com/problems/evaluate-division/)
-
-### **10. Dynamic Programming (1D, 2D, Knapsack)**
-
-* **Coin Change** (Unbounded Knapsack) - [Link](https://leetcode.com/problems/coin-change/)
-* **Longest Increasing Subsequence** (O(nlogn) with Binary Search) - [Link](https://leetcode.com/problems/longest-increasing-subsequence/)
-* **Maximum Product Subarray** (Kadane's Variation) - [Link](https://leetcode.com/problems/maximum-product-of-word-lengths/)
-* **Edit Distance** (2D DP - Hard) - [Link](https://leetcode.com/problems/edit-distance/)
-* **Partition Equal Subset Sum** (0/1 Knapsack) - [Link](https://leetcode.com/problems/partition-equal-subset-sum/)
-* **Longest Common Subsequence** - [Link](https://leetcode.com/problems/longest-common-subsequence/)
-* **Best Time to Buy and Sell Stock IV** (State Machine) - [Link](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/)
-* **Burst Balloons** (Matrix Chain Multiplication / Interval DP) - [Link](https://leetcode.com/problems/burst-balloons/)
-* **Regular Expression Matching** (Complex Parsing) - [Link](https://leetcode.com/problems/regular-expression-matching/)
-
-### **11. Backtracking**
-
-* **Permutations** - [Link](https://leetcode.com/problems/permutations/)
-* **Subsets** - [Link](https://leetcode.com/problems/subsets/)
-* **N-Queens** (Hard) - [Link](https://leetcode.com/problems/n-queens/)
-* **Sudoku Solver** - [Link](https://leetcode.com/problems/sudoku-solver/)
-
-### **12. Advanced Structures (Segment Trees / Bit Manipulation / Geometry)**
-
-* **Range Sum Query - Mutable** (Segment Tree / BIT) - [Link](https://leetcode.com/problems/range-sum-query-mutable/)
-* **Count of Smaller Numbers After Self** (Merge Sort / Segment Tree) - [Link](https://leetcode.com/problems/count-of-smaller-numbers-after-self/)
-* **The Skyline Problem** (Sweep Line + Heap/SegTree) - [Link](https://leetcode.com/problems/the-skyline-problem/)
-* **Single Number II** (Bitwise Logic) - [Link](https://leetcode.com/problems/single-number-ii/)
-* **Sum of Two Integers** (Bitwise Adder) - [Link](https://leetcode.com/problems/sum-of-two-integers/)
-* **Max Points on a Line** (Geometry / Hashing) - [Link](https://leetcode.com/problems/max-points-on-a-line/)
-
---
-### **Prime Numbers, Sieve & GCD**
-
-1. **Count Primes (Sieve of Eratosthenes)**
-* [LeetCode 204: Count Primes](https://leetcode.com/problems/count-primes/)
+* Arrays & Hashing -> Product of Array Except Self (Google Favorite) [https://leetcode.com/problems/product-of-array-except-self/](https://leetcode.com/problems/product-of-array-except-self/)
+* Arrays & Hashing -> Longest Consecutive Sequence (Union Find/Hashing) [https://leetcode.com/problems/longest-consecutive-sequence/](https://leetcode.com/problems/longest-consecutive-sequence/)
+* Arrays & Hashing -> Subarray Sum Equals K (Prefix Sum + Map) [https://leetcode.com/problems/subarray-sum-equals-k/](https://leetcode.com/problems/subarray-sum-equals-k/)
+* Arrays & Hashing -> First Missing Positive (Cyclic Sort - Hard) [https://leetcode.com/problems/first-missing-positive/](https://leetcode.com/problems/first-missing-positive/)
+* Arrays & Hashing -> Insert Delete GetRandom O(1) (Design) [https://leetcode.com/problems/insert-delete-getrandom-o1/](https://leetcode.com/problems/insert-delete-getrandom-o1/)
+* Arrays & Hashing -> Next Permutation (Math/Array logic) [https://leetcode.com/problems/next-permutation/](https://leetcode.com/problems/next-permutation/)
+* Two Pointers & Sliding Window -> Trapping Rain Water (Classic Hard) [https://leetcode.com/problems/trapping-rain-water/](https://leetcode.com/problems/trapping-rain-water/)
+* Two Pointers & Sliding Window -> 3Sum (Essential Medium) [https://leetcode.com/problems/3sum/](https://leetcode.com/problems/3sum/)
+* Two Pointers & Sliding Window -> Container With Most Water (Greedy Pointer) [https://leetcode.com/problems/container-with-most-water/](https://leetcode.com/problems/container-with-most-water/)
+* Two Pointers & Sliding Window -> Minimum Window Substring (Hard Sliding Window) [https://leetcode.com/problems/minimum-window-substring/](https://leetcode.com/problems/minimum-window-substring/)
+* Two Pointers & Sliding Window -> Longest Repeating Character Replacement [https://leetcode.com/problems/longest-repeating-character-replacement/](https://leetcode.com/problems/longest-repeating-character-replacement/)
+* Two Pointers & Sliding Window -> Sliding Window Maximum (Monotonic Queue) [https://leetcode.com/problems/sliding-window-maximum/](https://leetcode.com/problems/sliding-window-maximum/)
+* Binary Search -> Search in Rotated Sorted Array [https://leetcode.com/problems/search-in-rotated-sorted-array/](https://leetcode.com/problems/search-in-rotated-sorted-array/)
+* Binary Search -> Median of Two Sorted Arrays (Hard - Divide & Conquer) [https://leetcode.com/problems/median-of-two-sorted-arrays/](https://leetcode.com/problems/median-of-two-sorted-arrays/)
+* Binary Search -> Split Array Largest Sum (Binary Search on Answer) [https://leetcode.com/problems/split-array-largest-sum/](https://leetcode.com/problems/split-array-largest-sum/)
+* Binary Search -> Koko Eating Bananas (Rate Optimization) [https://leetcode.com/problems/koko-eating-bananas/](https://leetcode.com/problems/koko-eating-bananas/)
+* Binary Search -> Find Peak Element (Logarithmic time on unsorted array) [https://leetcode.com/problems/find-peak-element/](https://leetcode.com/problems/find-peak-element/)
+* Stack & Monotonic Stack -> Largest Rectangle in Histogram (Hard) [https://leetcode.com/problems/largest-rectangle-in-histogram/](https://leetcode.com/problems/largest-rectangle-in-histogram/)
+* Stack & Monotonic Stack -> Daily Temperatures [https://leetcode.com/problems/daily-temperatures/](https://leetcode.com/problems/daily-temperatures/)
+* Stack & Monotonic Stack -> Min Stack (Design) [https://leetcode.com/problems/min-stack/](https://leetcode.com/problems/min-stack/)
+* Stack & Monotonic Stack -> Basic Calculator II (String parsing) [https://leetcode.com/problems/basic-calculator-ii/](https://leetcode.com/problems/basic-calculator-ii/)
+* Stack & Monotonic Stack -> Decode String (Recursion/Stack) [https://leetcode.com/problems/decode-string/](https://leetcode.com/problems/decode-string/)
+* Linked Lists -> Merge k Sorted Lists (Heap/Divide & Conquer) [https://leetcode.com/problems/merge-k-sorted-lists/](https://leetcode.com/problems/merge-k-sorted-lists/)
+* Linked Lists -> Reverse Nodes in k-Group (Hard) [https://leetcode.com/problems/reverse-nodes-in-k-group/](https://leetcode.com/problems/reverse-nodes-in-k-group/)
+* Linked Lists -> Copy List with Random Pointer (Deep Copy) [https://leetcode.com/problems/copy-list-with-random-pointer/](https://leetcode.com/problems/copy-list-with-random-pointer/)
+* Linked Lists -> LRU Cache (Doubly LL + Map - Crucial for SSE) [https://leetcode.com/problems/lru-cache/](https://leetcode.com/problems/lru-cache/)
+* Linked Lists -> Reorder List [https://leetcode.com/problems/reorder-list/](https://leetcode.com/problems/reorder-list/)
+* Trees -> Binary Tree Maximum Path Sum (Hard Recursion) [https://leetcode.com/problems/binary-tree-maximum-path-sum/](https://leetcode.com/problems/binary-tree-maximum-path-sum/)
+* Trees -> Serialize and Deserialize Binary Tree (Design) [https://leetcode.com/problems/serialize-and-deserialize-binary-tree/](https://leetcode.com/problems/serialize-and-deserialize-binary-tree/)
+* Trees -> Lowest Common Ancestor of a Binary Tree [https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/)
+* Trees -> Validate Binary Search Tree (Range validation) [https://leetcode.com/problems/validate-binary-search-tree/](https://leetcode.com/problems/validate-binary-search-tree/)
+* Trees -> Construct Binary Tree from Preorder and Inorder Traversal [https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/](https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/)
+* Trees -> Diameter of Binary Tree [https://leetcode.com/problems/diameter-of-binary-tree/](https://leetcode.com/problems/diameter-of-binary-tree/)
+* Tries & Advanced String -> Implement Trie (Prefix Tree) [https://leetcode.com/problems/implement-trie-prefix-tree/](https://leetcode.com/problems/implement-trie-prefix-tree/)
+* Tries & Advanced String -> Word Search II (Backtracking + Trie Optimization) [https://leetcode.com/problems/word-search-ii/](https://leetcode.com/problems/word-search-ii/)
+* Tries & Advanced String -> Design Add and Search Words Data Structure [https://leetcode.com/problems/design-add-and-search-words-data-structure/](https://leetcode.com/problems/design-add-and-search-words-data-structure/)
+* Tries & Advanced String -> Word Break (DP/Trie) [https://leetcode.com/problems/word-break/](https://leetcode.com/problems/word-break/)
+* Heaps & Intervals -> Find Median from Data Stream (Two Heaps - Hard) [https://leetcode.com/problems/find-median-from-data-stream/](https://leetcode.com/problems/find-median-from-data-stream/)
+* Heaps & Intervals -> Task Scheduler (Greedy/Heap) [https://leetcode.com/problems/task-scheduler/](https://leetcode.com/problems/task-scheduler/)
+* Heaps & Intervals -> Meeting Rooms II (Chronological ordering/Heap) [https://leetcode.com/problems/meeting-rooms-ii/](https://leetcode.com/problems/meeting-rooms-ii/)
+* Heaps & Intervals -> Merge Intervals [https://leetcode.com/problems/merge-intervals/](https://leetcode.com/problems/merge-intervals/)
+* Heaps & Intervals -> Insert Interval [https://leetcode.com/problems/insert-interval/](https://leetcode.com/problems/insert-interval/)
+* Graphs -> Number of Islands (Standard DFS/BFS) [https://leetcode.com/problems/number-of-islands/](https://leetcode.com/problems/number-of-islands/)
+* Graphs -> Rotting Oranges (Multi-source BFS) [https://leetcode.com/problems/rotting-oranges/](https://leetcode.com/problems/rotting-oranges/)
+* Graphs -> Course Schedule II (Topological Sort / Cycle Detection) [https://leetcode.com/problems/course-schedule-ii/](https://leetcode.com/problems/course-schedule-ii/)
+* Graphs -> Word Ladder (BFS Shortest Path) [https://leetcode.com/problems/word-ladder/](https://leetcode.com/problems/word-ladder/)
+* Graphs -> Longest Increasing Path in a Matrix (DFS + Memoization) [https://leetcode.com/problems/longest-increasing-path-in-a-matrix/](https://leetcode.com/problems/longest-increasing-path-in-a-matrix/)
+* Graphs -> Alien Dictionary (Topo Sort - Hard) [https://leetcode.com/problems/alien-dictionary/](https://leetcode.com/problems/alien-dictionary/)
+* Graphs -> Accounts Merge (Union Find / DSU) [https://leetcode.com/problems/accounts-merge/](https://leetcode.com/problems/accounts-merge/)
+* Graphs -> Cheapest Flights Within K Stops (Bellman-Ford / Dijkstra) [https://leetcode.com/problems/cheapest-flights-within-k-stops/](https://leetcode.com/problems/cheapest-flights-within-k-stops/)
+* Graphs -> Network Delay Time (Dijkstra) [https://leetcode.com/problems/network-delay-time/](https://leetcode.com/problems/network-delay-time/)
+* Graphs -> Evaluate Division (Graph construction on fly) [https://leetcode.com/problems/evaluate-division/](https://leetcode.com/problems/evaluate-division/)
+* Dynamic Programming -> Coin Change (Unbounded Knapsack) [https://leetcode.com/problems/coin-change/](https://leetcode.com/problems/coin-change/)
+* Dynamic Programming -> Longest Increasing Subsequence (O(nlogn) with Binary Search) [https://leetcode.com/problems/longest-increasing-subsequence/](https://leetcode.com/problems/longest-increasing-subsequence/)
+* Dynamic Programming -> Maximum Product Subarray (Kadane's Variation) [https://leetcode.com/problems/maximum-product-of-word-lengths/](https://leetcode.com/problems/maximum-product-of-word-lengths/)
+* Dynamic Programming -> Edit Distance (2D DP - Hard) [https://leetcode.com/problems/edit-distance/](https://leetcode.com/problems/edit-distance/)
+* Dynamic Programming -> Partition Equal Subset Sum (0/1 Knapsack) [https://leetcode.com/problems/partition-equal-subset-sum/](https://leetcode.com/problems/partition-equal-subset-sum/)
+* Dynamic Programming -> Longest Common Subsequence [https://leetcode.com/problems/longest-common-subsequence/](https://leetcode.com/problems/longest-common-subsequence/)
+* Dynamic Programming -> Best Time to Buy and Sell Stock IV (State Machine) [https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/)
+* Dynamic Programming -> Burst Balloons (Matrix Chain Multiplication / Interval DP) [https://leetcode.com/problems/burst-balloons/](https://leetcode.com/problems/burst-balloons/)
+* Dynamic Programming -> Regular Expression Matching (Complex Parsing) [https://leetcode.com/problems/regular-expression-matching/](https://leetcode.com/problems/regular-expression-matching/)
+* Backtracking -> Permutations [https://leetcode.com/problems/permutations/](https://leetcode.com/problems/permutations/)
+* Backtracking -> Subsets [https://leetcode.com/problems/subsets/](https://leetcode.com/problems/subsets/)
+* Backtracking -> N-Queens (Hard) [https://leetcode.com/problems/n-queens/](https://leetcode.com/problems/n-queens/)
+* Backtracking -> Sudoku Solver [https://leetcode.com/problems/sudoku-solver/](https://leetcode.com/problems/sudoku-solver/)
+* Advanced Structures -> Range Sum Query - Mutable (Segment Tree / BIT) [https://leetcode.com/problems/range-sum-query-mutable/](https://leetcode.com/problems/range-sum-query-mutable/)
+* Advanced Structures -> Count of Smaller Numbers After Self (Merge Sort / Segment Tree) [https://leetcode.com/problems/count-of-smaller-numbers-after-self/](https://leetcode.com/problems/count-of-smaller-numbers-after-self/)
+* Advanced Structures -> The Skyline Problem (Sweep Line + Heap/SegTree) [https://leetcode.com/problems/the-skyline-problem/](https://leetcode.com/problems/the-skyline-problem/)
+* Advanced Structures -> Single Number II (Bitwise Logic) [https://leetcode.com/problems/single-number-ii/](https://leetcode.com/problems/single-number-ii/)
+* Advanced Structures -> Sum of Two Integers (Bitwise Adder) [https://leetcode.com/problems/sum-of-two-integers/](https://leetcode.com/problems/sum-of-two-integers/)
+* Advanced Structures -> Max Points on a Line (Geometry / Hashing) [https://leetcode.com/problems/max-points-on-a-line/](https://leetcode.com/problems/max-points-on-a-line/)
+* DP with Bitmasking -> Smallest Sufficient Team [https://leetcode.com/problems/smallest-sufficient-team/](https://leetcode.com/problems/smallest-sufficient-team/)
+* Math (Catalan Number) -> Handshakes That Don't Cross [https://leetcode.com/problems/handshakes-that-dont-cross/](https://leetcode.com/problems/handshakes-that-dont-cross/)
+* DP on Tree -> Sum of Distances in Tree [https://leetcode.com/problems/sum-of-distances-in-tree/](https://leetcode.com/problems/sum-of-distances-in-tree/)
+* Digit DP -> Count Digit One [https://leetcode.com/problems/count-digit-one/](https://www.google.com/search?q=https://leetcode.com/problems/count-digit-one/)
 
 
-2. **Greatest Common Divisor of Strings**
+### **Part 2: Math & Probability**
 
-* [LeetCode 1071: Greatest Common Divisor of Strings](https://leetcode.com/problems/greatest-common-divisor-of-strings/)
-
-
-3. **Distinct Prime Factors of Product of Array**
- [LeetCode 2523: Closest Prime Numbers in Range](https://leetcode.com/problems/closest-prime-numbers-in-range/) (Or similar factorization problem like [2521](https://leetcode.com/problems/distinct-prime-factors-of-product-of-array/))
-
-
-### **Modular Arithmetic & Combinatorics**
-
-4. **Continuous Subarray Sum (Modular Arithmetic)**
-* [LeetCode 523: Continuous Subarray Sum](https://leetcode.com/problems/continuous-subarray-sum/)
-
-
-5. **Subarray Sums Divisible by K**
-* [LeetCode 974: Subarray Sums Divisible by K](https://leetcode.com/problems/subarray-sums-divisible-by-k/)
-
-
-6. **Unique Paths**
-* [LeetCode 62: Unique Paths](https://leetcode.com/problems/unique-paths/)
-
-
-7. **Poor Pigs**
-* [LeetCode 458: Poor Pigs](https://leetcode.com/problems/poor-pigs/)
-
-
-
-### **XOR & Bit Manipulation**
-
-8. **Single Number III**
-* [LeetCode 260: Single Number III](https://leetcode.com/problems/single-number-iii/)
-
-
-9. **Maximum XOR of Two Numbers in an Array**
-* [LeetCode 421: Maximum XOR of Two Numbers in an Array](https://leetcode.com/problems/maximum-xor-of-two-numbers-in-an-array/)
-
-
-10. **Sum of Two Integers**
-* [LeetCode 371: Sum of Two Integers](https://leetcode.com/problems/sum-of-two-integers/)
-
-
-
-### **Probability & Sampling**
-11. **Random Pick with Weight**
-* [LeetCode 528: Random Pick with Weight](https://leetcode.com/problems/random-pick-with-weight/)
-
-
-12. **Implement Rand10() Using Rand7()**
-* [LeetCode 470: Implement Rand10() Using Rand7()](https://leetcode.com/problems/implement-rand10-using-rand7/)
-
-
-### **Advanced Math / Hard**
-13. **Max Points on a Line**
-* [LeetCode 149: Max Points on a Line](https://leetcode.com/problems/max-points-on-a-line/)
-
-14. **Super Egg Drop**
-* [LeetCode 887: Super Egg Drop](https://leetcode.com/problems/super-egg-drop/)
-
-15. **Pow(x, n)**
-* [LeetCode 50: Pow(x, n)](https://leetcode.com/problems/powx-n/)
-
+* Prime Numbers & GCD -> Count Primes (Sieve of Eratosthenes) [https://leetcode.com/problems/count-primes/](https://leetcode.com/problems/count-primes/)
+* Prime Numbers & GCD -> Greatest Common Divisor of Strings [https://leetcode.com/problems/greatest-common-divisor-of-strings/](https://leetcode.com/problems/greatest-common-divisor-of-strings/)
+* Prime Numbers & GCD -> Distinct Prime Factors (Closest Prime Numbers) [https://leetcode.com/problems/closest-prime-numbers-in-range/](https://leetcode.com/problems/closest-prime-numbers-in-range/)
+* Modular Arithmetic & Combinatorics -> Continuous Subarray Sum (Modular Arithmetic) [https://leetcode.com/problems/continuous-subarray-sum/](https://leetcode.com/problems/continuous-subarray-sum/)
+* Modular Arithmetic & Combinatorics -> Subarray Sums Divisible by K [https://leetcode.com/problems/subarray-sums-divisible-by-k/](https://leetcode.com/problems/subarray-sums-divisible-by-k/)
+* Modular Arithmetic & Combinatorics -> Unique Paths [https://leetcode.com/problems/unique-paths/](https://leetcode.com/problems/unique-paths/)
+* Modular Arithmetic & Combinatorics -> Poor Pigs [https://leetcode.com/problems/poor-pigs/](https://leetcode.com/problems/poor-pigs/)
+* XOR & Bit Manipulation -> Single Number III [https://leetcode.com/problems/single-number-iii/](https://leetcode.com/problems/single-number-iii/)
+* XOR & Bit Manipulation -> Maximum XOR of Two Numbers in an Array [https://leetcode.com/problems/maximum-xor-of-two-numbers-in-an-array/](https://leetcode.com/problems/maximum-xor-of-two-numbers-in-an-array/)
+* XOR & Bit Manipulation -> Sum of Two Integers [https://leetcode.com/problems/sum-of-two-integers/](https://leetcode.com/problems/sum-of-two-integers/)
+* Probability & Sampling -> Random Pick with Weight [https://leetcode.com/problems/random-pick-with-weight/](https://leetcode.com/problems/random-pick-with-weight/)
+* Probability & Sampling -> Implement Rand10() Using Rand7() [https://leetcode.com/problems/implement-rand10-using-rand7/](https://leetcode.com/problems/implement-rand10-using-rand7/)
+* Advanced Math / Hard -> Max Points on a Line [https://leetcode.com/problems/max-points-on-a-line/](https://leetcode.com/problems/max-points-on-a-line/)
+* Advanced Math / Hard -> Super Egg Drop [https://leetcode.com/problems/super-egg-drop/](https://leetcode.com/problems/super-egg-drop/)
+* Advanced Math / Hard -> Pow(x, n) [https://leetcode.com/problems/powx-n/](https://leetcode.com/problems/powx-n/)
