@@ -31,6 +31,52 @@ It features a **"Serverless-State" architecture**, meaning your progress, code h
 
 ---
 
+### ✨ Features Overview
+
+#### 1. 📊 Interactive Dashboard & Discovery
+
+* **Curated Study Plans:** Browse "Cards" (e.g., "Top 100 Questions") that group essential problems together.
+* **Smart Filtering:** Instantly filter questions by **Topic** (Arrays, Trees, DP, etc.) or **Difficulty** (Easy, Medium, Hard).
+* **Global Search:** Real-time search bar to find problems by title or keywords.
+* **Visual Progress Indicators:** See at a glance which study plans you are actively working on.
+
+#### 2. 💻 Full-Featured Coding Workspace (IDE)
+
+* **Professional Editor:** Integrated **Monaco Editor** (the engine powering VS Code) with syntax highlighting, auto-indentation, and line numbers.
+* **Multi-Language Support:** First-class support for **Python 3** and **Java 17**.
+* **Tabbed Interface:**
+* **📖 Description:** Clean Markdown rendering with **MathJax** support for complex mathematical formulas.
+* **💡 Hints:** Stuck? Reveal progressive hints without spoiling the solution.
+* **📝 Engineering Notebook:** A dedicated scratchpad for pseudocode, complexity analysis, or thoughts. **Auto-saved locally.**
+* **🔓 Solution:** Access the official solution approach when needed.
+
+
+* **Customizable Layout:** Resizable panes and distraction-free dark mode interface.
+
+#### 3. ⚡ "Serverless-State" & Local Persistence
+
+* **Auto-Save Everywhere:** Never lose your work. Your code and notes are automatically saved to your browser's Local Storage as you type.
+* **Offline Progress Tracking:** The app tracks your "Solved" ✅ and "Attempted" ⚠️ status locally—no account creation or server login required.
+* **Code History:** Remembers your last solution for every problem, allowing you to pick up exactly where you left off.
+
+#### 4. 🚀 Execution & Judging Engine
+
+* **One-Click Run & Submit:**
+* **Run Code (`Ctrl + Enter`):** Test your logic against a sample case or **Custom Input**.
+* **Submit (`Ctrl + Shift + Enter`):** Validate your solution against a suite of hidden test cases.
+
+
+* **Detailed Feedback:** Receive instant feedback on **Status** (Accepted/Wrong Answer), **Runtime** (in ms), and specific **Test Case Failures** (Expected vs. Actual output).
+* **Secure Sandbox:** All code executes inside isolated Docker containers, ensuring safety and consistency.
+* **Reset Functionality:** One-click "Reset to Boilerplate" to start fresh on any problem.
+
+#### 5. 🛠️ Developer Experience
+
+* **Keyboard Shortcuts:** Pro-style shortcuts for running and submitting code without leaving the keyboard.
+* **Zero-Config Setup:** Fully Dockerized. Run `docker-compose up` and the database seeds itself automatically.
+* **Hot-Reload Frontend:** Lightweight vanilla JavaScript architecture means the UI is snappy and responsive.
+
+
 ## 🛠️ Tech Stack
 
 * **Frontend:** Vanilla JavaScript (ES6+), CSS3 Variables (Dark Mode), Monaco Editor.
