@@ -113,7 +113,23 @@ If your "Solved" status isn't updating or the editor behaves strangely, you can 
 3. Right-click `http://localhost:8000` and select **Clear**.
 4. Refresh the page.
 
----
+
+### 3. Slow Java Compilation (Performance Tuning)
+
+If you are a Java developer and notice slow compilation times, the default CPU limits in Docker might be too restrictive.
+
+1. Open `docker-compose.yml`.
+2. Locate the `cpus: '0.85'` setting.
+3. Increase it to **1 core or more** (e.g., `'1.5'` or `'2.0'`) to speed up the process.
+
+```yaml
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'    # Increase to 1.5 cores or more
+
+```
+
 
 ## 📂 Project Structure
 
