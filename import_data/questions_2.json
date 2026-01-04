@@ -1,301 +1,336 @@
 [
-    {
-  "id": 215,
-  "title": "Kth Largest Element in an Array",
-  "description": "Given an integer array **nums** and an integer **k**, return the `k-th` largest element in the array.\n\nNote that it is the `k-th` largest element in the sorted order, not the `k-th` distinct element.\n\nCan you solve it without sorting the entire array?",
-  "input_format": "First line: An integer N representing the size of the array.\nSecond line: N space-separated integers representing the array nums.\nThird line: An integer K.",
-  "output_format": "A single integer representing the kth largest element.",
-  "difficulty": "Medium",
-  "tags": [
-    "heap",
-    "array",
-    "sorting"
-  ],
-  "solution": "### Observations\nA naive approach is to sort the array in descending order and pick the element at index `k-1`. This takes $O(N \\log N)$. However, we only need the $k^{th}$ largest, not the entire sorted array. We can improve this using a **Min-Heap**.\n\n### Approach: Min-Heap\n1.  Maintain a Min-Heap of size `k`.\n2.  Iterate through the array:\n    * Push the current number into the heap.\n    * If the heap size exceeds `k`, pop the smallest element (the root).\n3.  After processing all elements, the heap contains the `k` largest elements of the array.\n4.  The root of this Min-Heap is the smallest among the top `k`, which corresponds precisely to the $k^{th}$ largest element of the entire array.\n\n### Complexity Analysis\n* **Time Complexity:** $O(N \\log k)$. We iterate $N$ times, and heap operations take $O(\\log k)$.\n* **Space Complexity:** $O(k)$ to store the heap.\n\n### Code Logic\n\n**Python Logic**\n```python\nimport heapq\n\nheap = []\nfor num in nums:\n    heapq.heappush(heap, num)\n    if len(heap) > k:\n        heapq.heappop(heap)\nreturn heap[0]\n```",
-  "hints": [
-    "To find the Kth largest, you don't need to sort the whole array.",
-    "Think about maintaining a 'Top K' list as you iterate through the numbers.",
-    "A Min-Heap of size K is efficient because the smallest element in the Top K (the root) is exactly the Kth largest element overall.",
-    "If the heap grows larger than K, remove the smallest element."
-  ],
-  "boilerplate_python": "import sys\nimport heapq\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        nums = []\n        for _ in range(n):\n            nums.append(int(next(iterator)))\n        k = int(next(iterator))\n    except StopIteration:\n        return\n\n    # Write your code here\n    # result = ...\n\n    # print(result)\n\nif __name__ == '__main__':\n    solve()",
-  "boilerplate_java": "import java.io.*;\nimport java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String line = br.readLine();\n        if (line == null) return;\n        int n = Integer.parseInt(line.trim());\n        \n        int[] nums = new int[n];\n        String[] parts = br.readLine().trim().split(\"\\\\s+\");\n        for(int i=0; i<n; i++) {\n            nums[i] = Integer.parseInt(parts[i]);\n        }\n        \n        int k = Integer.parseInt(br.readLine().trim());\n        \n        // Write logic here\n        // int result = ...\n        \n        // System.out.println(result);\n    }\n}",
-  "test_cases": [
-    {
-      "input_data": "6\n3 2 1 5 6 4\n2",
-      "expected_output": "5",
-      "is_public": true
-    },
-    {
-      "input_data": "9\n3 2 3 1 2 4 5 5 6\n4",
-      "expected_output": "4",
-      "is_public": true
-    },
-    {
-      "input_data": "1\n1\n1",
-      "expected_output": "1",
-      "is_public": false
-    },
-    {
-      "input_data": "5\n-1 -2 -3 -4 -5\n2",
-      "expected_output": "-2",
-      "is_public": false
-    },
-    {
-      "input_data": "5\n100 100 100 100 100\n3",
-      "expected_output": "100",
-      "is_public": false
-    },
-    {
-      "input_data": "6\n1 2 3 4 5 1000\n1",
-      "expected_output": "1000",
-      "is_public": false
-    },
-    {
-      "input_data": "6\n1 2 3 4 5 1000\n6",
-      "expected_output": "1",
-      "is_public": false
-    }
-  ]
-},
-{
-  "id": 23,
-  "title": "Merge k Sorted Lists",
-  "description": "You are given an array of `k` linked-lists **lists**, each linked-list is sorted in ascending order.\n\nMerge all the linked-lists into one sorted linked-list and return it.",
-  "input_format": "First line: An integer K representing the number of lists.\nNext K lines: Each line starts with an integer M (size of list), followed by M space-separated integers representing the node values.",
-  "output_format": "A single line containing the space-separated integers of the merged list.",
-  "difficulty": "Hard",
-  "tags": [
-    "heap",
-    "linked_list"
-  ],
-  "solution": "### Observations\nWe need to merge $k$ sorted lists. A naive approach would be to collect all values into an array, sort them, and rebuild a list ($O(N \\log N)$ where $N$ is total elements). However, since the individual lists are already sorted, we can use a **Min-Heap** to efficiently select the smallest current element among the $k$ lists.\n\n### Approach: Min-Heap\n1.  Initialize a Min-Heap.\n2.  Push the **head node** of every non-empty list into the heap. The heap should store tuples/objects `(value, list_index, node)` so we know which list the value came from.\n3.  Create a dummy head for the result list.\n4.  While the heap is not empty:\n    * Pop the smallest node from the heap.\n    * Append this node to the result list.\n    * If the popped node has a `next` node, push that `next` node into the heap.\n\n### Complexity Analysis\n* **Time Complexity:** $O(N \\log k)$, where $N$ is the total number of nodes and $k$ is the number of lists. Heap operations take $O(\\log k)$.\n* **Space Complexity:** $O(k)$ for the heap.\n\n### Code Logic\n\n**Python Logic**\n```python\nimport heapq\n\n# Heap stores tuples: (node.val, i, node)\nmin_heap = []\nfor i, l in enumerate(lists):\n    if l:\n        heapq.heappush(min_heap, (l.val, i, l))\n\ndummy = ListNode(0)\ncurr = dummy\n\nwhile min_heap:\n    val, i, node = heapq.heappop(min_heap)\n    curr.next = node\n    curr = curr.next\n    if node.next:\n        heapq.heappush(min_heap, (node.next.val, i, node.next))\n\nreturn dummy.next\n```",
-  "hints": [
-    "Since all lists are sorted, the smallest element of the entire answer must be one of the heads of the K lists.",
-    "If you pick the smallest head, the next smallest element must be either one of the remaining K-1 heads or the next element from the list you just picked from.",
-    "Use a Min-Heap to keep track of the current head of every list.",
-    "Always pop the smallest value from the heap, add it to your result, and push the next node from that specific list back into the heap."
-  ],
-  "boilerplate_python": "import sys\nimport heapq\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n\n    iterator = iter(input_data)\n    try:\n        k = int(next(iterator))\n        lists = []\n        for _ in range(k):\n            m = int(next(iterator))\n            if m == 0:\n                lists.append(None)\n                continue\n            head = ListNode(int(next(iterator)))\n            curr = head\n            for _ in range(m-1):\n                curr.next = ListNode(int(next(iterator)))\n                curr = curr.next\n            lists.append(head)\n    except StopIteration:\n        return\n\n    # Write your code here to merge 'lists' (list of ListNode)\n    # result_head = ...\n\n    # Printing logic\n    # curr = result_head\n    # out = []\n    # while curr:\n    #     out.append(str(curr.val))\n    #     curr = curr.next\n    # print(\" \".join(out))\n\nif __name__ == '__main__':\n    solve()",
-  "boilerplate_java": "import java.io.*;\nimport java.util.*;\n\nclass ListNode {\n    int val;\n    ListNode next;\n    ListNode(int val) { this.val = val; }\n}\n\npublic class Solution {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String line = br.readLine();\n        if (line == null) return;\n        int k = Integer.parseInt(line.trim());\n        \n        ListNode[] lists = new ListNode[k];\n        \n        for(int i=0; i<k; i++) {\n            String[] parts = br.readLine().trim().split(\"\\\\s+\");\n            int m = Integer.parseInt(parts[0]);\n            if(m == 0) continue;\n            \n            lists[i] = new ListNode(Integer.parseInt(parts[1]));\n            ListNode curr = lists[i];\n            for(int j=1; j<m; j++) {\n                curr.next = new ListNode(Integer.parseInt(parts[j+1]));\n                curr = curr.next;\n            }\n        }\n        \n        // Write logic here\n        // ListNode result = ...\n        \n        /*\n        ListNode curr = result;\n        StringBuilder sb = new StringBuilder();\n        while(curr != null) {\n            sb.append(curr.val).append(\" \");\n            curr = curr.next;\n        }\n        System.out.println(sb.toString().trim());\n        */\n    }\n}",
-  "test_cases": [
-    {
-      "input_data": "3\n3 1 4 5\n3 1 3 4\n2 2 6",
-      "expected_output": "1 1 2 3 4 4 5 6",
-      "is_public": true
-    },
-    {
-      "input_data": "1\n0",
-      "expected_output": "",
-      "is_public": true
-    },
-    {
-      "input_data": "3\n0\n1 1\n0",
-      "expected_output": "1",
-      "is_public": true
-    },
-    {
-      "input_data": "2\n2 10 20\n2 15 25",
-      "expected_output": "10 15 20 25",
-      "is_public": false
-    },
-    {
-      "input_data": "4\n1 1\n1 2\n1 3\n1 4",
-      "expected_output": "1 2 3 4",
-      "is_public": false
-    },
-    {
-      "input_data": "2\n3 5 10 15\n3 0 1 2",
-      "expected_output": "0 1 2 5 10 15",
-      "is_public": false
-    },
-    {
-      "input_data": "2\n2 -10 -5\n1 -20",
-      "expected_output": "-20 -10 -5",
-      "is_public": false
-    }
-  ]
-},{
-  "id": 347,
-  "title": "Top K Frequent Elements",
-  "description": "Given an integer array **nums** and an integer **k**, return the `k` most frequent elements. You may return the answer in **any order**.",
-  "input_format": "First line: An integer N representing the size of the array.\nSecond line: N space-separated integers representing the array nums.\nThird line: An integer K.",
-  "output_format": "A single line containing K space-separated integers.",
-  "difficulty": "Medium",
-  "tags": [
-    "array",
-    "map",
-    "heap",
-    "bucket_sort"
-  ],
-  "solution": "### Observations\nWe need to count the frequency of each number first, which requires a Hash Map ($O(N)$). Once we have frequencies, we need to extract the top $k$. Sorting all frequencies would take $O(N \\log N)$. Can we do better?\n\n### Approach 1: Min-Heap\n1.  Count frequencies using a Hash Map.\n2.  Use a Min-Heap to store pairs of `(frequency, number)`.\n3.  Iterate through the unique numbers. Push into heap.\n4.  If heap size > `k`, pop the smallest frequency. This keeps the `k` largest frequencies in the heap.\n5.  **Time:** $O(N \\log k)$.\n\n### Approach 2: Bucket Sort (Linear Time)\n1.  Count frequencies.\n2.  Create an array of lists `buckets` where indices represent frequency (0 to N).\n3.  For each number, add it to the bucket corresponding to its frequency.\n4.  Iterate from the back of the `buckets` array (highest frequency) to the front, collecting numbers until we have `k` elements.\n5.  **Time:** $O(N)$.\n\n### Code Logic (Heap)\n\n**Python Logic**\n```python\nimport heapq\nfrom collections import Counter\n\ncount = Counter(nums)\nheap = []\n\nfor num, freq in count.items():\n    heapq.heappush(heap, (freq, num))\n    if len(heap) > k:\n        heapq.heappop(heap)\n\nreturn [num for freq, num in heap]\n```",
-  "hints": [
-    "First, you need to know how many times each element appears. Use a Hash Map (Dictionary) for this.",
-    "Once you have the counts, you essentially have a list of pairs (number, count). You need the top K pairs sorted by count.",
-    "A Min-Heap of size K can maintain the top K elements efficiently.",
-    "Alternatively, since the maximum frequency cannot exceed the array size N, can you use Bucket Sort?"
-  ],
-  "boilerplate_python": "import sys\nimport heapq\nfrom collections import Counter\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        nums = []\n        for _ in range(n):\n            nums.append(int(next(iterator)))\n        k = int(next(iterator))\n    except StopIteration:\n        return\n\n    # Write your code here\n    # result = ...\n\n    # print(*(result))\n\nif __name__ == '__main__':\n    solve()",
-  "boilerplate_java": "import java.io.*;\nimport java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String line = br.readLine();\n        if (line == null) return;\n        int n = Integer.parseInt(line.trim());\n        \n        int[] nums = new int[n];\n        String[] parts = br.readLine().trim().split(\"\\\\s+\");\n        for(int i=0; i<n; i++) {\n            nums[i] = Integer.parseInt(parts[i]);\n        }\n        \n        int k = Integer.parseInt(br.readLine().trim());\n        \n        // Write logic here\n        // int[] result = ...\n        \n        /*\n        StringBuilder sb = new StringBuilder();\n        for(int i : result) sb.append(i).append(\" \");\n        System.out.println(sb.toString().trim());\n        */\n    }\n}",
-  "test_cases": [
-    {
-      "input_data": "6\n1 1 1 2 2 3\n2",
-      "expected_output": "1 2",
-      "is_public": true
-    },
-    {
-      "input_data": "1\n1\n1",
-      "expected_output": "1",
-      "is_public": true
-    },
-    {
-      "input_data": "6\n1 2 3 4 5 6\n6",
-      "expected_output": "1 2 3 4 5 6",
-      "is_public": false
-    },
-    {
-      "input_data": "4\n10 10 20 20\n2",
-      "expected_output": "10 20",
-      "is_public": false
-    },
-    {
-      "input_data": "5\n4 4 4 1 1\n1",
-      "expected_output": "4",
-      "is_public": false
-    },
-    {
-      "input_data": "7\n5 5 5 2 2 8 8\n2",
-      "expected_output": "5 2",
-      "is_public": false
-    },
-    {
-      "input_data": "2\n-1 -1\n1",
-      "expected_output": "-1",
-      "is_public": false
-    }
-  ]
-},{
-  "id": 253,
-  "title": "Meeting Rooms II",
-  "description": "Given an array of meeting time intervals **intervals** where `intervals[i] = [start, end]`, return the minimum number of conference rooms required.\n\n### Example\n**Input:** `intervals = [[0,30],[5,10],[15,20]]`\n**Output:** `2`",
-  "input_format": "First line: An integer N representing the number of meetings.\nNext N lines: Two space-separated integers start and end.",
-  "output_format": "A single integer representing the number of rooms.",
-  "difficulty": "Medium",
-  "tags": [
-    "array",
-    "heap",
-    "sorting",
-    "two_pointers"
-  ],
-  "solution": "### Observations\nWe need to find the maximum number of overlapping meetings at any point in time. When a meeting starts, we need a room. When a meeting ends, a room becomes free.\n\n### Approach: Min-Heap\n1.  **Sort** the meetings by their **start time**. This helps us process meetings in chronological order.\n2.  Use a **Min-Heap** to track the **end times** of ongoing meetings.\n3.  Iterate through the sorted meetings:\n    * If the earliest ending meeting (heap top) ends *before or at* the current meeting's start time, it means that room is free. We remove that meeting from the heap (pop).\n    * Add the current meeting's end time to the heap (push).\n    * The size of the heap tells us how many rooms are currently occupied.\n4.  The result is the maximum size the heap reached (or simply the heap size at the end, as it never shrinks below the necessary count).\n\n### Complexity Analysis\n* **Time Complexity:** $O(N \\log N)$ for sorting. Heap operations take $O(N \\log N)$.\n* **Space Complexity:** $O(N)$ for the heap.\n\n### Code Logic\n\n**Python Logic**\n```python\nimport heapq\n\nintervals.sort(key=lambda x: x[0])\nheap = []  # Stores end times\n\nfor start, end in intervals:\n    # If the earliest ending meeting is done before this one starts\n    if heap and heap[0] <= start:\n        heapq.heappop(heap)\n    heapq.heappush(heap, end)\n\nreturn len(heap)\n```",
-  "hints": [
-    "Sort the intervals by start time so you can process them in order.",
-    "You need to keep track of end times of meetings currently in progress.",
-    "A Min-Heap can efficiently tell you which meeting ends the earliest.",
-    "If the earliest meeting ends before the current one starts, you can reuse that room (pop from heap)."
-  ],
-  "boilerplate_python": "import sys\nimport heapq\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        intervals = []\n        for _ in range(n):\n            s = int(next(iterator))\n            e = int(next(iterator))\n            intervals.append([s, e])\n    except StopIteration:\n        return\n\n    # Write your code here\n    # result = ...\n\n    # print(result)\n\nif __name__ == '__main__':\n    solve()",
-  "boilerplate_java": "import java.io.*;\nimport java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String line = br.readLine();\n        if (line == null) return;\n        int n = Integer.parseInt(line.trim());\n        \n        int[][] intervals = new int[n][2];\n        for(int i=0; i<n; i++) {\n            String[] parts = br.readLine().trim().split(\"\\\\s+\");\n            intervals[i][0] = Integer.parseInt(parts[0]);\n            intervals[i][1] = Integer.parseInt(parts[1]);\n        }\n        \n        // Write logic here\n        // int rooms = ...\n        \n        // System.out.println(rooms);\n    }\n}",
-  "test_cases": [
-    {
-      "input_data": "3\n0 30\n5 10\n15 20",
-      "expected_output": "2",
-      "is_public": true
-    },
-    {
-      "input_data": "2\n7 10\n2 4",
-      "expected_output": "1",
-      "is_public": true
-    },
-    {
-      "input_data": "1\n1 10",
-      "expected_output": "1",
-      "is_public": false
-    },
-    {
-      "input_data": "4\n1 5\n4 6\n5 8\n7 9",
-      "expected_output": "2",
-      "is_public": false
-    },
-    {
-      "input_data": "4\n1 10\n2 3\n4 5\n6 7",
-      "expected_output": "2",
-      "is_public": false
-    },
-    {
-      "input_data": "3\n1 5\n1 5\n1 5",
-      "expected_output": "3",
-      "is_public": false
-    },
-    {
-      "input_data": "5\n1 4\n2 5\n3 6\n4 7\n5 8",
-      "expected_output": "3",
-      "is_public": false
-    },
-    {
-      "input_data": "3\n1 2\n2 3\n3 4",
-      "expected_output": "1",
-      "is_public": false
-    }
-  ]
-},{
-  "id": 407,
-  "title": "Trapping Rain Water II",
-  "description": "Given an `m x n` integer matrix **heightMap** representing the height of each unit cell in a 2D elevation map, return the volume of water it can trap after raining.\n\n### Constraints\n* `m == heightMap.length`\n* `n == heightMap[i].length`\n* `1 <= m, n <= 200`\n* `0 <= heightMap[i][j] <= 2 * 10^4`",
-  "input_format": "First line: Two integers M and N.\nNext M lines: N space-separated integers representing the height map.",
-  "output_format": "A single integer representing the total water trapped.",
-  "difficulty": "Hard",
-  "tags": [
-    "heap",
-    "bfs",
-    "array",
-    "matrix"
-  ],
-  "solution": "### Observations\nWater flows from higher cells to lower cells and spills out from the boundaries. The amount of water a cell can hold is determined by the shortest boundary surrounding it. This is similar to the 1D Trapping Rain Water problem but in 2D.\n\n### Approach: Min-Heap + BFS\n1.  **Boundary:** Add all cells on the border of the matrix to a Min-Heap. These form the initial retaining wall. Mark them as visited.\n2.  **Process:** While the heap is not empty:\n    * Pop the cell with the smallest height `(h, r, c)` from the heap. This represents the lowest point in the current boundary wall.\n    * Check its 4 neighbors.\n    * If a neighbor hasn't been visited:\n        * If the neighbor's height is less than the current boundary height `h`, it will trap water: `water += h - neighbor_height`.\n        * The effective height of the neighbor becomes `max(h, neighbor_height)` (because water fills it up to `h`, or it acts as a new higher wall).\n        * Push the neighbor to the heap with this effective height.\n        * Mark as visited.\n\n### Complexity Analysis\n* **Time Complexity:** $O(M \\times N \\log(M \\times N))$. Each cell is pushed and popped from the heap at most once.\n* **Space Complexity:** $O(M \\times N)$ for the visited array and heap.\n\n### Code Logic\n\n**Python Logic**\n```python\nimport heapq\n\nif not heightMap or not heightMap[0]: return 0\nm, n = len(heightMap), len(heightMap[0])\nheap = []\nvisited = [[False]*n for _ in range(m)]\n\n# Add borders\nfor i in range(m):\n    for j in range(n):\n        if i == 0 or j == 0 or i == m-1 or j == n-1:\n            heapq.heappush(heap, (heightMap[i][j], i, j))\n            visited[i][j] = True\n\nres = 0\ndirs = [(0,1), (0,-1), (1,0), (-1,0)]\n\nwhile heap:\n    h, r, c = heapq.heappop(heap)\n    for dr, dc in dirs:\n        nr, nc = r + dr, c + dc\n        if 0 <= nr < m and 0 <= nc < n and not visited[nr][nc]:\n            res += max(0, h - heightMap[nr][nc])\n            heapq.heappush(heap, (max(h, heightMap[nr][nc]), nr, nc))\n            visited[nr][nc] = True\nreturn res\n```",
-  "hints": [
-    "Think about the boundary of the grid. Water cannot be trapped on the boundary.",
-    "The water level is dictated by the lowest wall surrounding a region. This suggests using a Min-Heap to process the lowest boundary first.",
-    "Start by adding all boundary cells to the Min-Heap.",
-    "When you pick the lowest boundary cell, check its unvisited neighbors. If a neighbor is lower, it traps water. If it's higher, it becomes a new boundary wall."
-  ],
-  "boilerplate_python": "import sys\nimport heapq\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n\n    iterator = iter(input_data)\n    try:\n        m = int(next(iterator))\n        n = int(next(iterator))\n        height_map = []\n        for _ in range(m):\n            row = []\n            for _ in range(n):\n                row.append(int(next(iterator)))\n            height_map.append(row)\n    except StopIteration:\n        return\n\n    # Write your code here\n    # result = ...\n\n    # print(result)\n\nif __name__ == '__main__':\n    solve()",
-  "boilerplate_java": "import java.io.*;\nimport java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String line = br.readLine();\n        if (line == null) return;\n        \n        String[] dims = line.trim().split(\"\\\\s+\");\n        int m = Integer.parseInt(dims[0]);\n        int n = Integer.parseInt(dims[1]);\n        \n        int[][] heightMap = new int[m][n];\n        for(int i=0; i<m; i++) {\n            String[] parts = br.readLine().trim().split(\"\\\\s+\");\n            for(int j=0; j<n; j++) {\n                heightMap[i][j] = Integer.parseInt(parts[j]);\n            }\n        }\n        \n        // Write logic here\n        // int water = ...\n        \n        // System.out.println(water);\n    }\n}",
-  "test_cases": [
-    {
-      "input_data": "3 6\n1 4 3 1 3 2\n3 2 1 3 2 4\n2 3 3 2 3 1",
-      "expected_output": "4",
-      "is_public": true
-    },
-    {
-      "input_data": "5 5\n3 3 3 3 3\n3 2 2 2 3\n3 2 1 2 3\n3 2 2 2 3\n3 3 3 3 3",
-      "expected_output": "10",
-      "is_public": true
-    },
-    {
-      "input_data": "3 3\n1 1 1\n1 1 1\n1 1 1",
-      "expected_output": "0",
-      "is_public": false
-    },
-    {
-      "input_data": "3 3\n5 5 5\n5 1 5\n5 5 5",
-      "expected_output": "4",
-      "is_public": false
-    },
-    {
-      "input_data": "1 5\n1 2 3 4 5",
-      "expected_output": "0",
-      "is_public": false
-    },
-    {
-      "input_data": "4 4\n10 10 10 10\n10 5 4 10\n10 4 5 10\n10 10 10 10",
-      "expected_output": "17",
-      "is_public": false
-    },
-    {
-      "input_data": "4 4\n5 5 5 5\n5 1 1 5\n5 1 1 5\n5 5 5 5",
-      "expected_output": "16",
-      "is_public": false
-    }
-  ]
-}
+  {
+    "id": 42,
+    "title": "Trapping Rain Water",
+    "description": "Given `n` non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it can trap after raining.\n\n**Example:**\nInput: **height** = [0,1,0,2,1,0,1,3,2,1,2,1]\nOutput: 6\n\nExplanation: The above elevation map (black section) is represented by array [0,1,0,2,1,0,1,3,2,1,2,1]. In this case, 6 units of rain water (blue section) are being trapped.",
+    "input_format": "First line: An integer N representing the size of the array.\nSecond line: N space-separated integers representing the elevation map.",
+    "output_format": "Print a single integer representing the total amount of trapped water.",
+    "difficulty": "Hard",
+    "tags": [
+      "array",
+      "two_pointers",
+      "dp",
+      "stacks"
+    ],
+    "solution": "### Observations\nWater trapped at any index `i` is determined by the `min(max_left, max_right) - height[i]`.\n\n### Approach\n1. **Brute Force**: For each element, find max left and max right. O(N^2).\n2. **Dynamic Programming**: Precompute `max_left` and `max_right` arrays. Iterate to calculate water. O(N) Time, O(N) Space.\n3. **Two Pointers (Optimal)**: Use `left` and `right` pointers. Maintain `left_max` and `right_max`. If `left_max < right_max`, fill water on the left side and move `left` pointer. Otherwise, fill right. This works because the water level is bounded by the smaller of the two heights.\n\n### Complexity Analysis\n- **Time**: O(N) - Single pass.\n- **Space**: O(1) - Only pointers and variables used.\n\n### Code Logic\n```python\nif not height: return 0\nl, r = 0, len(height) - 1\nleft_max, right_max = height[l], height[r]\nres = 0\nwhile l < r:\n    if left_max < right_max:\n        l += 1\n        left_max = max(left_max, height[l])\n        res += left_max - height[l]\n    else:\n        r -= 1\n        right_max = max(right_max, height[r])\n        res += right_max - height[r]\nreturn res\n```",
+    "hints": [
+      "Can you calculate the maximum height to the left and right of every index efficiently?",
+      "Try pre-computing the max height arrays from left-to-right and right-to-left.",
+      "Can we reduce the space complexity to O(1) using two pointers?",
+      "Focus on the smaller boundary: water level is determined by the shorter of the max-left and max-right bars.",
+      "Move the pointer that has the smaller current max height inward."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    # Read N\n    try:\n        line1 = sys.stdin.readline()\n        if not line1:\n            return\n        n = int(line1.strip())\n        \n        # Read Array\n        line2 = sys.stdin.readline()\n        if not line2:\n            heights = []\n        else:\n            heights = list(map(int, line2.strip().split()))\n            \n        # Your logic here\n        pass\n\n    except ValueError:\n        return\n\nif __name__ == \"__main__\":\n    solve()",
+    "boilerplate_java": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (scanner.hasNextInt()) {\n            int n = scanner.nextInt();\n            int[] height = new int[n];\n            for (int i = 0; i < n; i++) {\n                height[i] = scanner.nextInt();\n            }\n            // Call your logic function here\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "12\n0 1 0 2 1 0 1 3 2 1 2 1",
+        "expected_output": "6",
+        "is_public": true
+      },
+      {
+        "input_data": "6\n4 2 0 3 2 5",
+        "expected_output": "9",
+        "is_public": true
+      },
+      {
+        "input_data": "0\n",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n1 2 3 4 5",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n5 4 3 2 1",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "7\n5 2 1 2 1 5",
+        "expected_output": "14",
+        "is_public": false
+      },
+      {
+        "input_data": "100\n10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10 0 10",
+        "expected_output": "450",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "title": "3Sum",
+    "description": "Given an integer array **nums**, return all the triplets `[nums[i], nums[j], nums[k]]` such that `i != j`, `i != k`, and `j != k`, and `nums[i] + nums[j] + nums[k] == 0`.\n\nNotice that the solution set must not contain duplicate triplets.",
+    "input_format": "First line: An integer N representing the size of the array.\nSecond line: N space-separated integers.",
+    "output_format": "Print each triplet on a new line, with elements space-separated. The triplets should be sorted lexicographically, and elements within triplets sorted ascending. If none, print nothing.",
+    "difficulty": "Medium",
+    "tags": [
+      "array",
+      "two_pointers"
+    ],
+    "solution": "### Observations\nThe problem asks for `a + b + c = 0`. This is equivalent to `b + c = -a`. This reduces the problem to a Two Sum problem for each element `a`.\n\n### Approach\n1. **Sort the Array**: This allows using the two-pointer technique and handling duplicates easily.\n2. **Iterate**: Loop through the array with index `i`. If `nums[i] > 0`, break (sum can't be 0).\n3. **Skip Duplicates**: If `nums[i] == nums[i-1]`, continue.\n4. **Two Pointers**: Set `lo = i + 1` and `hi = n - 1`. While `lo < hi`, calculate sum.\n   - If sum < 0: `lo++`\n   - If sum > 0: `hi--`\n   - If sum == 0: Add to result, `lo++`, `hi--`, and skip duplicates for `lo` and `hi`.\n\n### Complexity Analysis\n- **Time**: O(N^2) - Sorting takes O(N log N), the loop takes O(N) and two pointers take O(N).\n- **Space**: O(1) or O(N) depending on sorting implementation.\n\n### Code Logic\n```python\nnums.sort()\nres = []\nfor i in range(len(nums)):\n    if nums[i] > 0: break\n    if i > 0 and nums[i] == nums[i-1]: continue\n    l, r = i + 1, len(nums) - 1\n    while l < r:\n        s = nums[i] + nums[l] + nums[r]\n        if s < 0: l += 1\n        elif s > 0: r -= 1\n        else:\n            res.append([nums[i], nums[l], nums[r]])\n            while l < r and nums[l] == nums[l+1]: l += 1\n            while l < r and nums[r] == nums[r-1]: r -= 1\n            l += 1; r -= 1\n```",
+    "hints": [
+      "Start by sorting the input array to handle duplicates efficiently.",
+      "Iterate through the array, fixing the first element of the triplet.",
+      "Use the two-pointer approach to find the other two elements that sum to the negative of the fixed element.",
+      "Be careful to skip duplicate values for both the fixed element and the two pointers to avoid duplicate triplets."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    try:\n        line1 = sys.stdin.readline()\n        if not line1: return\n        n = int(line1.strip())\n        line2 = sys.stdin.readline()\n        if not line2: \n            nums = []\n        else:\n            nums = list(map(int, line2.strip().split()))\n        \n        # Your logic here\n        # Print result like: print(f\"{a} {b} {c}\")\n        \n    except ValueError: return\n\nif __name__ == \"__main__\":\n    solve()",
+    "boilerplate_java": "import java.util.Scanner;\nimport java.util.Arrays;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (scanner.hasNextInt()) {\n            int n = scanner.nextInt();\n            int[] nums = new int[n];\n            for (int i = 0; i < n; i++) {\n                nums[i] = scanner.nextInt();\n            }\n            // Call logic\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "6\n-1 0 1 2 -1 -4",
+        "expected_output": "-1 -1 2\n-1 0 1",
+        "is_public": true
+      },
+      {
+        "input_data": "3\n0 1 1",
+        "expected_output": "",
+        "is_public": true
+      },
+      {
+        "input_data": "3\n0 0 0",
+        "expected_output": "0 0 0",
+        "is_public": true
+      },
+      {
+        "input_data": "0\n",
+        "expected_output": "",
+        "is_public": false
+      },
+      {
+        "input_data": "4\n-2 0 1 1",
+        "expected_output": "-2 1 1",
+        "is_public": false
+      },
+      {
+        "input_data": "6\n-2 0 0 2 2",
+        "expected_output": "-2 0 2",
+        "is_public": false
+      },
+      {
+        "input_data": "10\n-4 -2 -2 -2 0 1 2 2 2 3 3 4 4 6 6",
+        "expected_output": "-4 0 4\n-4 1 3\n-4 2 2\n-2 0 2",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "title": "Container With Most Water",
+    "description": "You are given an integer array **height** of length `n`. There are `n` vertical lines drawn such that the two endpoints of the `i-th` line are `(i, 0)` and `(i, height[i])`.\nFind two lines that together with the x-axis form a container, such that the container contains the most water. Return the maximum amount of water a container can store.",
+    "input_format": "First line: N\nSecond line: Array of N integers.",
+    "output_format": "A single integer representing the max area.",
+    "difficulty": "Medium",
+    "tags": [
+      "array",
+      "two_pointers",
+      "greedy"
+    ],
+    "solution": "### Observations\nThe area is calculated as `min(height[left], height[right]) * (right - left)`.\n\n### Approach\n1. **Two Pointers**: Start with pointers at the extreme ends (`0` and `n-1`).\n2. **Greedy Move**: Calculate the area. To maximize area, we need to overcome the reduction in width by finding a taller line. \n3. **Logic**: Move the pointer pointing to the shorter line inward. If heights are equal, move either (or both).\n\n### Complexity Analysis\n- **Time**: O(N) - Single pass.\n- **Space**: O(1).\n\n### Code Logic\n```python\nl, r = 0, len(height) - 1\nmax_area = 0\nwhile l < r:\n    h = min(height[l], height[r])\n    max_area = max(max_area, h * (r - l))\n    if height[l] < height[r]:\n        l += 1\n    else:\n        r -= 1\nreturn max_area\n```",
+    "hints": [
+      "The area is limited by the shorter line.",
+      "Start with the widest possible container (indices 0 and n-1).",
+      "Try to move the pointer that points to the shorter line inward, as keeping it will never result in a larger area with a smaller width."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    try:\n        line1 = sys.stdin.readline()\n        if not line1: return\n        n = int(line1.strip())\n        line2 = sys.stdin.readline()\n        if not line2: height = []\n        else: height = list(map(int, line2.strip().split()))\n        \n        # Your logic here\n        \n    except ValueError: return\n\nif __name__ == \"__main__\":\n    solve()",
+    "boilerplate_java": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (scanner.hasNextInt()) {\n            int n = scanner.nextInt();\n            int[] height = new int[n];\n            for(int i=0; i<n; i++) height[i] = scanner.nextInt();\n            // Logic\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "9\n1 8 6 2 5 4 8 3 7",
+        "expected_output": "49",
+        "is_public": true
+      },
+      {
+        "input_data": "2\n1 1",
+        "expected_output": "1",
+        "is_public": true
+      },
+      {
+        "input_data": "5\n4 3 2 1 4",
+        "expected_output": "16",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n1 2 1 2 1",
+        "expected_output": "4",
+        "is_public": false
+      },
+      {
+        "input_data": "2\n1000 1000",
+        "expected_output": "1000",
+        "is_public": false
+      },
+      {
+        "input_data": "8\n2 3 4 5 18 17 6",
+        "expected_output": "17",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 76,
+    "title": "Minimum Window Substring",
+    "description": "Given two strings `s` and `t` of lengths `m` and `n` respectively, return the minimum window substring of `s` such that every character in `t` (including duplicates) is included in the window. If there is no such substring, return the empty string \"\".\n\n",
+    "input_format": "First line: String s\nSecond line: String t",
+    "output_format": "Print the minimum window substring. If none exists, print nothing.",
+    "difficulty": "Hard",
+    "tags": [
+      "string",
+      "two_pointers",
+      "map"
+    ],
+    "solution": "### Observations\nWe need a substring that satisfies frequency counts of `t`.\n\n### Approach\n1. **Sliding Window**: Expand `right` pointer to include characters. Maintain a frequency map of `t` and current window.\n2. **Check Validity**: Maintain a `formed` variable tracking how many unique characters satisfy the required frequency.\n3. **Shrink**: Once the window is valid (`formed == required`), try to shrink from the `left` to minimize size while maintaining validity.\n4. **Track Min**: Update global minimum length and start index whenever a valid window is found.\n\n### Complexity Analysis\n- **Time**: O(N + M) - Each char is visited at most twice.\n- **Space**: O(1) if charset is small (ASCII 128), or O(K) distinct chars.\n\n### Code Logic\n```python\nfrom collections import Counter\nneed = Counter(t)\nmissing = len(t)\nl = start = end = 0\ni = 0\nfor j, char in enumerate(s, 1):\n    if need[char] > 0:\n        missing -= 1\n    need[char] -= 1\n    if missing == 0:\n        while i < j and need[s[i]] < 0:\n            need[s[i]] += 1\n            i += 1\n        if end == 0 or j - i < end - start:\n            start, end = i, j\n        need[s[i]] += 1\n        missing += 1\n        i += 1\nreturn s[start:end]\n```",
+    "hints": [
+      "Use two pointers to create a sliding window.",
+      "Expand the right pointer until you have all characters from string T.",
+      "Once you have all characters, contract the left pointer to remove unnecessary characters and find the minimum length.",
+      "Use a hash map to count the characters in T and track the characters in the current window."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    s = sys.stdin.readline().strip()\n    t = sys.stdin.readline().strip()\n    if not s or not t: return\n    \n    # Your logic\n    pass\n\nif __name__ == \"__main__\":\n    solve()",
+    "boilerplate_java": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (scanner.hasNext()) {\n            String s = scanner.next();\n            String t = scanner.next();\n            // Logic\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "ADOBECODEBANC\nABC",
+        "expected_output": "BANC",
+        "is_public": true
+      },
+      {
+        "input_data": "a\na",
+        "expected_output": "a",
+        "is_public": true
+      },
+      {
+        "input_data": "a\nb",
+        "expected_output": "",
+        "is_public": false
+      },
+      {
+        "input_data": "aa\naaa",
+        "expected_output": "",
+        "is_public": false
+      },
+      {
+        "input_data": "aaflslflsldkalskaaa\naaa",
+        "expected_output": "aaa",
+        "is_public": false
+      },
+      {
+        "input_data": "ab\na",
+        "expected_output": "a",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 424,
+    "title": "Longest Repeating Character Replacement",
+    "description": "You are given a string `s` and an integer `k`. You can choose any character of the string and change it to any other uppercase English character. You can perform this operation at most `k` times.\nReturn the length of the longest substring containing the same letter you can get after performing the above operations.",
+    "input_format": "First line: String s\nSecond line: Integer k",
+    "output_format": "Integer representing the max length.",
+    "difficulty": "Medium",
+    "tags": [
+      "string",
+      "two_pointers",
+      "map"
+    ],
+    "solution": "### Observations\nA window is valid if `(window_length - max_freq_char_count) <= k`. If the remaining characters (non-dominant ones) are $\\le k$, we can flip them all.\n\n### Approach\n1. **Sliding Window**: Maintain `left` and `right`. Expand `right`.\n2. **Track Max Frequency**: Keep a count of characters in the current window. Track `max_f` (count of the most frequent char in the current window).\n3. **Validity Check**: If `(right - left + 1) - max_f > k`, the window is invalid. Shrink from `left`. \n   *Note*: We don't need to decrement `max_f` when shrinking because we are looking for the *longest* valid window found so far. The window only grows when we find a higher `max_f`.\n\n### Complexity Analysis\n- **Time**: O(N).\n- **Space**: O(26) -> O(1).\n\n### Code Logic\n```python\ncount = {}\nmax_f = 0\nl = 0\nres = 0\nfor r in range(len(s)):\n    count[s[r]] = count.get(s[r], 0) + 1\n    max_f = max(max_f, count[s[r]])\n    \n    # If replacements needed exceed k, shrink window\n    if (r - l + 1) - max_f > k:\n        count[s[l]] -= 1\n        l += 1\n    \n    res = max(res, r - l + 1)\nreturn res\n```",
+    "hints": [
+      "Use a sliding window approach.",
+      "Keep track of the frequency of characters in the current window.",
+      "The condition for a valid window is: (window length) - (count of most frequent character) <= k.",
+      "You don't need to actually flip characters, just calculate if it's theoretically possible."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    s = sys.stdin.readline().strip()\n    try:\n        k = int(sys.stdin.readline().strip())\n    except ValueError: return\n    \n    # Logic\n    pass\n\nif __name__ == \"__main__\":\n    solve()",
+    "boilerplate_java": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (scanner.hasNext()) {\n            String s = scanner.next();\n            int k = scanner.nextInt();\n            // Logic\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "ABAB\n2",
+        "expected_output": "4",
+        "is_public": true
+      },
+      {
+        "input_data": "AABABBA\n1",
+        "expected_output": "4",
+        "is_public": true
+      },
+      {
+        "input_data": "AAAA\n0",
+        "expected_output": "4",
+        "is_public": false
+      },
+      {
+        "input_data": "ABCD\n0",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "ABBB\n2",
+        "expected_output": "4",
+        "is_public": false
+      },
+      {
+        "input_data": "A\n1",
+        "expected_output": "1",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 239,
+    "title": "Sliding Window Maximum",
+    "description": "You are given an array of integers **nums**, there is a sliding window of size `k` which is moving from the very left of the array to the very right. You can only see the `k` numbers in the window. Each time the sliding window moves right by one position.\nReturn the max sliding window.",
+    "input_format": "First line: N\nSecond line: Array of N integers\nThird line: k",
+    "output_format": "Space separated integers representing the max of each window.",
+    "difficulty": "Hard",
+    "tags": [
+      "array",
+      "queue",
+      "heap"
+    ],
+    "solution": "### Observations\nWe need the maximum in a range `[i, i+k-1]` efficiently. A standard heap is O(log k), making total O(N log k). We can do better.\n\n### Approach\n1. **Monotonic Deque**: Maintain a deque of indices such that the values corresponding to these indices are in decreasing order.\n2. **Process**: For each element `nums[i]`:\n   - Remove indices from the back that have values `<= nums[i]` (they are useless as `nums[i]` is newer and larger).\n   - Add `i` to the back.\n   - Remove indices from the front if they are out of the window (`index < i - k + 1`).\n   - If `i >= k - 1`, the front of the deque is the max for the current window.\n\n### Complexity Analysis\n- **Time**: O(N). Each element is added and removed from deque at most once.\n- **Space**: O(k).\n\n### Code Logic\n```python\nfrom collections import deque\nq = deque()\nres = []\nfor i in range(len(nums)):\n    while q and q[0] < i - k + 1:\n        q.popleft()\n    while q and nums[q[-1]] < nums[i]:\n        q.pop()\n    q.append(i)\n    if i >= k - 1:\n        res.append(nums[q[0]])\nprint(*res)\n```",
+    "hints": [
+      "How about using a data structure such as deque (double-ended queue)?",
+      "The queue should store indices, not values.",
+      "Maintain the queue such that the values corresponding to the indices are in strictly decreasing order.",
+      "Remove elements from the back of the queue that are smaller than the current element."
+    ],
+    "boilerplate_python": "import sys\nfrom collections import deque\n\ndef solve():\n    try:\n        line1 = sys.stdin.readline()\n        if not line1: return\n        n = int(line1.strip())\n        \n        line2 = sys.stdin.readline()\n        if not line2: nums = []\n        else: nums = list(map(int, line2.strip().split()))\n        \n        line3 = sys.stdin.readline()\n        if not line3: k = 1\n        else: k = int(line3.strip())\n        \n        # Logic\n        \n    except ValueError: return\n\nif __name__ == \"__main__\":\n    solve()",
+    "boilerplate_java": "import java.util.Scanner;\nimport java.util.Deque;\nimport java.util.ArrayDeque;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (scanner.hasNextInt()) {\n            int n = scanner.nextInt();\n            int[] nums = new int[n];\n            for(int i=0; i<n; i++) nums[i] = scanner.nextInt();\n            int k = scanner.nextInt();\n            // Logic\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "8\n1 3 -1 -3 5 3 6 7\n3",
+        "expected_output": "3 3 5 5 6 7",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n1\n1",
+        "expected_output": "1",
+        "is_public": true
+      },
+      {
+        "input_data": "5\n9 10 9 -7 -4\n5",
+        "expected_output": "10",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n1 -1 1 -1 1\n2",
+        "expected_output": "1 1 1 1",
+        "is_public": false
+      },
+      {
+        "input_data": "6\n4 3 2 1 0 -1\n3",
+        "expected_output": "4 3 2 1",
+        "is_public": false
+      },
+      {
+        "input_data": "6\n1 2 3 4 5 6\n3",
+        "expected_output": "3 4 5 6",
+        "is_public": false
+      }
+    ]
+  }
 ]

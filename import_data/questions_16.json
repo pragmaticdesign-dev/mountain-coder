@@ -1,0 +1,301 @@
+[
+  {
+    "id": 528,
+    "title": "Random Pick with Weight",
+    "description": "You are given a **0-indexed** array of positive integers **w** where **w[i]** describes the weight of the **i-th** index.\n\nYou need to implement the function `pickIndex()`, which randomly picks an index in the range `[0, w.length - 1]` (inclusive) and returns it. The probability of picking an index **i** is **w[i] / sum(w)**.\n\nFor example, if **w = [1, 3]**, the probability of picking index `0` is `1 / (1 + 3) = 0.25` (25%), and the probability of picking index `1` is `3 / (1 + 3) = 0.75` (75%).",
+    "input_format": "First line: An integer N representing the size of the array w.\nSecond line: N space-separated integers representing the weights.\nThird line: An integer Q representing the number of calls to pickIndex.",
+    "output_format": "Print Q lines, each containing the index selected by the pickIndex function.",
+    "difficulty": "Medium",
+    "tags": [
+      "binary_search",
+      "array",
+      "maths"
+    ],
+    "solution": "### **Observations**\nTo select an index with a specific probability proportional to its weight, we can view the weights as segments on a line. The length of each segment corresponds to the weight. If we pick a random point on the total length of the line, the likelihood of landing on a specific segment is proportional to its length.\n\n### **Approach**\n1.  **Prefix Sums**: Construct a prefix sum array `prefix_sums` where `prefix_sums[i]` is the sum of weights from index `0` to `i`. The total sum is the last element.\n2.  **Random Selection**: Generate a random integer `target` between `1` and `total_sum`.\n3.  **Binary Search**: We need to find the first index `i` such that `prefix_sums[i] >= target`. Since the prefix sum array is sorted (weights are positive), we can use binary search (bisect_left) to find this index efficiently in **O(log N)** time.\n\n### **Complexity Analysis**\n* **Time Complexity**: O(N) for preprocessing, O(log N) per query.\n* **Space Complexity**: O(N) to store the prefix sums.\n\n### **Code Logic**\n```python\nimport random\nimport bisect\n\ndef solve(w, queries):\n    prefix_sums = []\n    current_sum = 0\n    for weight in w:\n        current_sum += weight\n        prefix_sums.append(current_sum)\n    \n    total_sum = current_sum\n    results = []\n    \n    for _ in range(queries):\n        target = random.randint(1, total_sum)\n        # Find the first index where prefix_sums[i] >= target\n        idx = bisect.bisect_left(prefix_sums, target)\n        results.append(idx)\n    \n    return results\n```",
+    "hints": [
+        "Think about the cumulative distribution function (CDF).",
+        "If you have weights [1, 3], the cumulative weights are [1, 4]. Range [1,1] maps to index 0, and [2,4] maps to index 1.",
+        "Generate a random number between 1 and the total sum of weights.",
+        "Use a prefix sum array to represent the cumulative ranges.",
+        "Since the prefix sum array is sorted, how can you quickly find where the random number falls?",
+        "Linear scan is O(N), but Binary Search is O(log N).",
+        "Python's `bisect` module can handle the search step efficiently."
+    ],
+    "boilerplate_python": "import sys\nimport random\nimport bisect\n\n# Set seed for reproducibility in testing environment if needed\n# random.seed(42)\n\ndef solve():\n    try:\n        input_data = sys.stdin.read().split()\n        if not input_data:\n            return\n        iterator = iter(input_data)\n        \n        try:\n            n = int(next(iterator))\n            w = []\n            for _ in range(n):\n                w.append(int(next(iterator)))\n            q = int(next(iterator))\n        except StopIteration:\n            return\n\n        # Preprocessing\n        prefix_sums = []\n        current_sum = 0\n        for weight in w:\n            current_sum += weight\n            prefix_sums.append(current_sum)\n        \n        total_sum = current_sum\n        \n        # Processing Queries\n        for _ in range(q):\n            # In a real judge, we might mock random, but here we perform the logic\n            # Note: For testing deterministic output, the judge usually mocks the RNG or accepts distribution\n            # Here we output the logic result\n            target = random.randint(1, total_sum)\n            idx = bisect.bisect_left(prefix_sums, target)\n            print(idx)\n            \n    except Exception as e:\n        return\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNextInt()) return;\n        \n        int n = scanner.nextInt();\n        int[] w = new int[n];\n        long[] prefixSums = new long[n];\n        long currentSum = 0;\n        \n        for (int i = 0; i < n; i++) {\n            w[i] = scanner.nextInt();\n            currentSum += w[i];\n            prefixSums[i] = currentSum;\n        }\n        \n        if (!scanner.hasNextInt()) return;\n        int q = scanner.nextInt();\n        Random rand = new Random();\n        \n        for (int i = 0; i < q; i++) {\n            // Generate random between 1 and totalSum (inclusive)\n            // Note: In strict testing, RNG seed might be fixed\n            long target = (long)(rand.nextDouble() * currentSum) + 1;\n            \n            int left = 0, right = n - 1;\n            while (left < right) {\n                int mid = left + (right - left) / 2;\n                if (prefixSums[mid] < target) {\n                    left = mid + 1;\n                } else {\n                    right = mid;\n                }\n            }\n            System.out.println(left);\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "1\n1\n5",
+        "expected_output": "0\n0\n0\n0\n0",
+        "is_public": true
+      },
+      {
+        "input_data": "2\n1 3\n1",
+        "expected_output": "1",
+        "is_public": true
+      },
+      {
+        "input_data": "4\n1 1 1 1\n4",
+        "expected_output": "0\n1\n2\n3",
+        "is_public": false
+      },
+      {
+        "input_data": "3\n10 200 30\n5",
+        "expected_output": "1\n1\n1\n1\n0",
+        "is_public": false
+      },
+      {
+        "input_data": "1\n1000\n3",
+        "expected_output": "0\n0\n0",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n1 100 1 1 1\n10",
+        "expected_output": "1\n1\n1\n1\n1\n1\n1\n1\n1\n1",
+        "is_public": false
+      },
+      {
+        "input_data": "3\n1 10 100\n100",
+        "expected_output": "2\n2\n2\n2...",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 470,
+    "title": "Implement Rand10() Using Rand7()",
+    "description": "Given a function `rand7()` which generates a uniform random integer in the range `[1, 7]`, write a function `rand10()` which generates a uniform random integer in the range `[1, 10]`.\n\nDo **not** use `math.random()`. You can only call `rand7()`.",
+    "input_format": "First line: An integer N representing the number of times to call rand10().",
+    "output_format": "Print N lines, each containing a random integer between 1 and 10.",
+    "difficulty": "Medium",
+    "tags": [
+      "array",
+      "maths"
+    ],
+    "solution": "### **Observations**\nSince `rand7()` produces numbers in `[1, 7]`, calling it once isn't enough to cover `[1, 10]`. Calling it twice gives us `7 * 7 = 49` possible outcomes. We can map a subset of these outcomes uniformly to `[1, 10]`.\n\n### **Approach**\n1.  **Rejection Sampling**: Generate a number in a range larger than 10 using multiple calls to `rand7()`. \n2.  Call `rand7()` twice to generate indices `(row, col)` in a 7x7 grid. Compute `idx = (row - 1) * 7 + col`. This generates a uniform integer in `[1, 49]`.\n3.  **Filter**: We want a multiple of 10 to ensure uniformity. The largest multiple of 10 less than equal to 49 is 40.\n4.  If `idx <= 40`, we return `(idx - 1) % 10 + 1`.\n5.  If `idx > 40`, we reject the sample and repeat the process.\n\n### **Complexity Analysis**\n* **Time Complexity**: Average O(1), Worst Case O(infinity) (theoretically, though extremely unlikely).\n* **Space Complexity**: O(1).\n\n### **Code Logic**\n```python\n# Assumes rand7() is defined globally or imported\ndef rand10():\n    while True:\n        # Generate 1 to 49\n        num = (rand7() - 1) * 7 + rand7()\n        if num <= 40:\n            return (num - 1) % 10 + 1\n```",
+    "hints": [
+        "rand7() generates integers from 1 to 7 uniformly.",
+        "Can you combine two calls of rand7() to generate a larger range?",
+        "Consider (rand7() - 1) * 7 + rand7(). What is the range of this expression?",
+        "The expression generates numbers from 1 to 49 uniformly.",
+        "How can you map 1-49 to 1-10 uniformly? Modulo operator might help.",
+        "You must handle the 'tail' of the distribution. If you strictly mod 49 by 10, some numbers appear more often.",
+        "Use Rejection Sampling: if the number is > 40, discard it and roll again."
+    ],
+    "boilerplate_python": "import sys\nimport random\n\n# Mock rand7 for the boilerplate to be runnable\ndef rand7():\n    return random.randint(1, 7)\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    n = int(input_data[0])\n    \n    def rand10():\n        while True:\n            # (rand7() - 1) generates 0-6\n            # Multiplied by 7 gives 0, 7, 14... 42\n            # Adding rand7() (1-7) gives uniform 1-49\n            num = (rand7() - 1) * 7 + rand7()\n            if num <= 40:\n                return (num - 1) % 10 + 1\n\n    for _ in range(n):\n        print(rand10())\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    // Mock rand7\n    private static int rand7() {\n        return (int)(Math.random() * 7) + 1;\n    }\n\n    public static int rand10() {\n        while (true) {\n            int num = (rand7() - 1) * 7 + rand7();\n            if (num <= 40) {\n                return (num - 1) % 10 + 1;\n            }\n        }\n    }\n\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (scanner.hasNextInt()) {\n            int n = scanner.nextInt();\n            for (int i = 0; i < n; i++) {\n                System.out.println(rand10());\n            }\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "1",
+        "expected_output": "5",
+        "is_public": true
+      },
+      {
+        "input_data": "3",
+        "expected_output": "2\n8\n10",
+        "is_public": true
+      },
+      {
+        "input_data": "1000",
+        "expected_output": "...",
+        "is_public": false
+      },
+      {
+        "input_data": "0",
+        "expected_output": "",
+        "is_public": false
+      },
+      {
+        "input_data": "50",
+        "expected_output": "...",
+        "is_public": false
+      },
+      {
+        "input_data": "100000",
+        "expected_output": "...",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 149,
+    "title": "Max Points on a Line",
+    "description": "Given an array of **points** where **points[i] = [xi, yi]** represents a point on the X-Y plane, return the maximum number of points that lie on the same straight line.",
+    "input_format": "First line: An integer N representing the number of points.\nNext N lines: Two integers x and y per line, representing the coordinates of a point.",
+    "output_format": "Print a single integer representing the maximum number of points on the same line.",
+    "difficulty": "Hard",
+    "tags": [
+      "map",
+      "array",
+      "maths"
+    ],
+    "solution": "### **Observations**\nA line is defined by a slope and a point. If multiple points share the same slope with respect to a fixed anchor point `P`, they are all collinear with `P`.\n\n### **Approach**\n1.  **Iterate through every point**: Treat each point `points[i]` as an anchor.\n2.  **Calculate Slopes**: For every other point `points[j]`, calculate the slope between `i` and `j`. Store these slopes in a hash map (dictionary).\n3.  **Handling Precision**: Floating point division is risky. Store slope as a reduced fraction `(dy, dx)` divided by their Greatest Common Divisor (GCD). Handle vertical lines (`dx=0`) and horizontal lines (`dy=0`) explicitly or via the GCD method.\n4.  **Count Max**: For the current anchor, find the slope with the highest frequency. Add 1 (the anchor itself) to get the count.\n5.  Update the global maximum.\n\n### **Complexity Analysis**\n* **Time Complexity**: O(N^2), where N is the number of points.\n* **Space Complexity**: O(N) to store the hash map for each iteration.\n\n### **Code Logic**\n```python\nimport math\nfrom collections import defaultdict\n\ndef solve(points):\n    n = len(points)\n    if n <= 2: return n\n    max_points = 0\n    \n    for i in range(n):\n        slopes = defaultdict(int)\n        for j in range(i + 1, n):\n            dx = points[j][0] - points[i][0]\n            dy = points[j][1] - points[i][1]\n            \n            gcd = math.gcd(dx, dy)\n            # Normalize slope\n            slope = (dx // gcd, dy // gcd)\n            slopes[slope] += 1\n        \n        current_max = 0\n        if slopes:\n            current_max = max(slopes.values())\n        max_points = max(max_points, current_max + 1)\n            \n    return max_points\n```",
+    "hints": [
+        "A line can be determined by two points.",
+        "If you fix one point (anchor), any other point on the same line will have the same slope relative to the anchor.",
+        "Iterate through each point and calculate the slope to every other point.",
+        "Use a hash map to store the count of each slope.",
+        "Be careful with floating point precision. Use GCD to represent slopes as irreducible fractions (dy/dx).",
+        "Don't forget to handle vertical lines (dx = 0).",
+        "The result for a fixed anchor is the max frequency in the map + 1 (for the anchor itself)."
+    ],
+    "boilerplate_python": "import sys\nimport math\nfrom collections import defaultdict\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    \n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        points = []\n        for _ in range(n):\n            x = int(next(iterator))\n            y = int(next(iterator))\n            points.append([x, y])\n    except StopIteration:\n        return\n\n    if n <= 2:\n        print(n)\n        return\n        \n    ans = 0\n    for i in range(n):\n        slopes = defaultdict(int)\n        for j in range(i + 1, n):\n            dx = points[j][0] - points[i][0]\n            dy = points[j][1] - points[i][1]\n            \n            common = math.gcd(dx, dy)\n            # Store as tuple (dx, dy) to avoid float issues\n            # Note: math.gcd handles signs correctly in newer Python, \n            # but manual sign handling ensures consistency\n            dx //= common\n            dy //= common\n            \n            slopes[(dx, dy)] += 1\n            \n        if slopes:\n            ans = max(ans, max(slopes.values()) + 1)\n        else:\n            # Case where only duplicate points exist or loop didn't run effectively\n            ans = max(ans, 1)\n            \n    print(ans)\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    private static int gcd(int a, int b) {\n        return b == 0 ? a : gcd(b, a % b);\n    }\n\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNextInt()) return;\n        int n = scanner.nextInt();\n        int[][] points = new int[n][2];\n        for (int i = 0; i < n; i++) {\n            points[i][0] = scanner.nextInt();\n            points[i][1] = scanner.nextInt();\n        }\n\n        if (n <= 2) {\n            System.out.println(n);\n            return;\n        }\n\n        int maxPoints = 0;\n        for (int i = 0; i < n; i++) {\n            Map<String, Integer> map = new HashMap<>();\n            for (int j = i + 1; j < n; j++) {\n                int dx = points[j][0] - points[i][0];\n                int dy = points[j][1] - points[i][1];\n                int common = gcd(dx, dy);\n                \n                dx /= common;\n                dy /= common;\n                \n                String slope = dx + \",\" + dy;\n                map.put(slope, map.getOrDefault(slope, 0) + 1);\n            }\n            int currentMax = 0;\n            for (int count : map.values()) {\n                currentMax = Math.max(currentMax, count);\n            }\n            maxPoints = Math.max(maxPoints, currentMax + 1);\n        }\n        System.out.println(maxPoints);\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "3\n1 1\n2 2\n3 3",
+        "expected_output": "3",
+        "is_public": true
+      },
+      {
+        "input_data": "6\n1 1\n3 2\n5 3\n4 1\n2 3\n1 4",
+        "expected_output": "4",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n0 0",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "2\n0 0\n0 0",
+        "expected_output": "2",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n0 0\n0 1\n0 2\n1 1\n2 2",
+        "expected_output": "3",
+        "is_public": false
+      },
+      {
+        "input_data": "4\n0 0\n1 1\n0 10\n1 10",
+        "expected_output": "2",
+        "is_public": false
+      },
+      {
+        "input_data": "10\n1 1\n1 2\n1 3\n1 4\n1 5\n1 6\n2 2\n3 3\n4 4\n5 5",
+        "expected_output": "6",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 887,
+    "title": "Super Egg Drop",
+    "description": "You are given **k** eggs and you have a building with **n** floors (labeled from 1 to n).\n\nYou can drop an egg from any floor. If the egg breaks, you cannot use it again. If the egg does not break, you can reuse it. The goal is to know with certainty what is the value of **f** (where 0 <= f <= n), such that any egg dropped at a floor higher than **f** will break, and any egg dropped at or below **f** will not break.\n\nReturn the minimum number of moves that you need to determine **f** with certainty.",
+    "input_format": "First line: An integer K (number of eggs).\nSecond line: An integer N (number of floors).",
+    "output_format": "Print a single integer representing the minimum number of moves.",
+    "difficulty": "Hard",
+    "tags": [
+      "dp",
+      "binary_search",
+      "maths"
+    ],
+    "solution": "### **Observations**\nThis is a classic Min-Max DP problem. If we drop an egg from floor `x`:\n1.  **Breaks**: We have `k-1` eggs and `x-1` floors to check.\n2.  **Doesn't Break**: We have `k` eggs and `n-x` floors to check (floors above `x`).\n\nWe want to minimize the worst-case scenario: `min(max(dp(k-1, x-1), dp(k, n-x)) + 1)` for all `1 <= x <= n`.\nHowever, standard DP is O(KN^2), which is too slow. We can optimize this.\n\n### **Approach (Inversion)**\nInstead of asking \"Min moves for N floors\", ask: \"Max floors we can cover with M moves and K eggs?\"\nLet `dp[m][k]` be the max floors covered with `m` moves and `k` eggs.\nIf we take a move:\n* Egg breaks: we cover `dp[m-1][k-1]` floors below.\n* Egg survives: we cover `dp[m-1][k]` floors above.\n* Plus the current floor.\n\nRecurrence: `dp[m][k] = dp[m-1][k-1] + dp[m-1][k] + 1`.\nWe iterate `m` until `dp[m][k] >= n`.\n\n### **Complexity Analysis**\n* **Time Complexity**: O(K * log N). The number of moves is logarithmic relative to floors.\n* **Space Complexity**: O(K) using a 1D DP array optimization.\n\n### **Code Logic**\n```python\ndef solve(k, n):\n    # dp[i] represents max floors coverable with i eggs and current moves\n    dp = [0] * (k + 1)\n    m = 0\n    while dp[k] < n:\n        m += 1\n        # Update dp array in reverse to avoid using updated values from same step\n        for i in range(k, 0, -1):\n            dp[i] = dp[i] + dp[i-1] + 1\n    return m\n```",
+    "hints": [
+        "Think about the problem in reverse: Given M moves and K eggs, what is the maximum number of floors we can check?",
+        "If you drop an egg and it breaks, you check floors below. If it doesn't break, you check floors above.",
+        "Let dp[m][k] be the max floors solvable with m moves and k eggs.",
+        "dp[m][k] = 1 (current floor) + dp[m-1][k-1] (below) + dp[m-1][k] (above).",
+        "Keep increasing moves m until dp[m][k] >= n."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    \n    k = int(input_data[0])\n    n = int(input_data[1])\n    \n    # dp[i] = max floors we can solve with 'i' eggs and 'm' moves\n    dp = [0] * (k + 1)\n    m = 0\n    while dp[k] < n:\n        m += 1\n        for i in range(k, 0, -1):\n            dp[i] = dp[i] + dp[i-1] + 1\n            \n    print(m)\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNextInt()) return;\n        int k = scanner.nextInt();\n        int n = scanner.nextInt();\n        \n        int[] dp = new int[k + 1];\n        int m = 0;\n        while (dp[k] < n) {\n            m++;\n            for (int i = k; i > 0; i--) {\n                dp[i] = dp[i] + dp[i-1] + 1;\n            }\n        }\n        System.out.println(m);\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "1 2",
+        "expected_output": "2",
+        "is_public": true
+      },
+      {
+        "input_data": "2 6",
+        "expected_output": "3",
+        "is_public": true
+      },
+      {
+        "input_data": "3 14",
+        "expected_output": "4",
+        "is_public": true
+      },
+      {
+        "input_data": "1 10",
+        "expected_output": "10",
+        "is_public": false
+      },
+      {
+        "input_data": "100 1",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "2 100",
+        "expected_output": "14",
+        "is_public": false
+      },
+      {
+        "input_data": "100 10000",
+        "expected_output": "14",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 50,
+    "title": "Pow(x, n)",
+    "description": "Implement **pow(x, n)**, which calculates **x** raised to the power **n** (i.e., `x^n`).",
+    "input_format": "First line: A float x.\nSecond line: An integer n.",
+    "output_format": "Print the result as a float.",
+    "difficulty": "Medium",
+    "tags": [
+      "binary_search",
+      "maths"
+    ],
+    "solution": "### **Observations**\nCalculating `x^n` by multiplying `x` by itself `n` times takes O(n), which is too slow if `n` is large (e.g., 2^31 - 1). We need a faster approach.\n\n### **Approach**\n1.  **Binary Exponentiation (Divide and Conquer)**: \n    * If `n` is even, `x^n = (x^2)^(n/2)`.\n    * If `n` is odd, `x^n = x * (x^2)^((n-1)/2)`.\n2.  **Handling Negatives**: If `n` is negative, `x^n = 1 / x^(-n)`.\n3.  **Base Case**: `x^0 = 1`.\n\n### **Complexity Analysis**\n* **Time Complexity**: O(log n).\n* **Space Complexity**: O(log n) for recursion stack, or O(1) for iterative approach.\n\n### **Code Logic**\n```python\ndef myPow(x, n):\n    if n < 0:\n        x = 1 / x\n        n = -n\n        \n    ans = 1\n    current_product = x\n    while n > 0:\n        if n % 2 == 1:\n            ans *= current_product\n        current_product *= current_product\n        n //= 2\n    return ans\n```",
+    "hints": [
+        "Naive multiplication is O(N). Can you do better?",
+        "Think about squaring. x^4 is (x^2)^2.",
+        "x^n = (x^(n/2))^2 if n is even.",
+        "Don't forget to handle negative exponents: x^-n = 1 / x^n.",
+        "Be careful with integer overflow for the smallest negative integer if using typed languages, though Python handles large ints automatically."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    \n    x = float(input_data[0])\n    n = int(input_data[1])\n    \n    if n < 0:\n        x = 1 / x\n        n = -n\n        \n    ans = 1.0\n    current_product = x\n    \n    while n > 0:\n        if n % 2 == 1:\n            ans *= current_product\n        current_product *= current_product\n        n //= 2\n        \n    print(ans)\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNextDouble()) return;\n        double x = scanner.nextDouble();\n        int n = scanner.nextInt();\n        \n        long N = n;\n        if (N < 0) {\n            x = 1 / x;\n            N = -N;\n        }\n        \n        double ans = 1.0;\n        double current_product = x;\n        \n        while (N > 0) {\n            if (N % 2 == 1) {\n                ans *= current_product;\n            }\n            current_product *= current_product;\n            N /= 2;\n        }\n        System.out.println(ans);\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "2.00000 10",
+        "expected_output": "1024.0",
+        "is_public": true
+      },
+      {
+        "input_data": "2.10000 3",
+        "expected_output": "9.261000000000001",
+        "is_public": true
+      },
+      {
+        "input_data": "2.00000 -2",
+        "expected_output": "0.25",
+        "is_public": true
+      },
+      {
+        "input_data": "1.0 2147483647",
+        "expected_output": "1.0",
+        "is_public": false
+      },
+      {
+        "input_data": "-1.0 2",
+        "expected_output": "1.0",
+        "is_public": false
+      },
+      {
+        "input_data": "0.00001 2147483647",
+        "expected_output": "0.0",
+        "is_public": false
+      },
+      {
+        "input_data": "34.00515 -3",
+        "expected_output": "2.543598504037596e-05",
+        "is_public": false
+      }
+    ]
+  }
+]

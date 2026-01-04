@@ -1,8 +1,8 @@
 Act as a Content Generator for a custom coding judge platform. 
-I will paste a coding problem (Title and Description). 
-You must output a single, valid JSON object that matches the following schema exactly.
+I will paste  coding problems (Title). 
+You must output a json list, and inside valid JSON object that matches the following schema exactly.
 
-**JSON Schema Rules:**
+**JSON Schema Rules for each problem:**
 1. "id": Use a standard LeetCode ID number if applicable, otherwise generate a random unique integer 4 character.
 2. "title": The exact title of the problem.
 3. "description": Use Markdown. Make sure to bold key variables (e.g., **nums**) and format code blocks.
@@ -12,10 +12,10 @@ You must output a single, valid JSON object that matches the following schema ex
 7. "tags": A list of strings representing topics , lower cases and kebab case (e.g., ["array", "two_pointers", "dp"]).
     predefined tags are  ["array", "map", "two_pointers", "string", "dp","linked_list","graph","searching","binary_search","stacks","queue","heap","tree","bst","set","traversal","trie"];
 8. "solution": A detailed explanation in Markdown with:
-   - **Observations:** Key insights.
+   - **Observations:** Key insights and intiutions why that Observations.
    - **Approach:** Step-by-step logic moving from brute force to optimized.
    - **Complexity Analysis:** Time and Space complexity.
-   - **Code Logic:** Python and Java snippets of the *core logic only* (no boilerplate).
+   - **Code Logic:** Python snippets of the *core logic only* basically in def solve(<input>).
 9. "hints": A list of 3-7 hints that guide the user from a naive solution to the optimal one.
 10. "boilerplate_python": A template starting with "import sys\ndef solve():". It MUST include the code to read `sys.stdin` based on the input_format.
 11. "boilerplate_java": A template class named "Solution" with a `main` method using `Scanner` or `BufferedReader`.
@@ -32,6 +32,8 @@ You must output a single, valid JSON object that matches the following schema ex
 
 **Important:** - Ensure all strings are properly escaped for JSON (especially newlines `\n`).
 - The Python boilerplate MUST include the reading logic for the specific input format.
+- Markdown syntax should be correct with proper escaped character for JSON 
+- input format , output format , examples and test cases should be as refined as possible without any error with proper formating
 
 Here is the Problem:
 [PASTE YOUR PROBLEM TEXT HERE]

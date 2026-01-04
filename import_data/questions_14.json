@@ -1,0 +1,272 @@
+[
+  {
+    "id": 62,
+    "title": "Unique Paths",
+    "description": "There is a robot on an `m x n` grid. The robot is initially located at the **top-left corner** (i.e., `grid[0][0]`). The robot tries to move to the **bottom-right corner** (i.e., `grid[m - 1][n - 1]`). The robot can only move either **down** or **right** at any point in time.\n\nGiven the two integers **m** and **n**, return *the number of possible unique paths that the robot can take to reach the bottom-right corner*.\n\nThe test cases are generated so that the answer will be less than or equal to `2 * 10^9`.",
+    "input_format": "A single line containing two space-separated integers: m and n.",
+    "output_format": "Print a single integer representing the number of unique paths.",
+    "difficulty": "Medium",
+    "tags": [
+      "dp",
+      "array"
+    ],
+    "solution": "### Observations\nSince the robot can only move right or down, the number of ways to reach any cell `(i, j)` depends solely on the number of ways to reach the cell directly above it `(i-1, j)` and the cell directly to the left of it `(i, j-1)`.\n\n### Approach\n1.  **Base Case:** The first row and the first column can only be reached in 1 way (moving straight right or straight down).\n2.  **DP Transition:** For any other cell `dp[i][j] = dp[i-1][j] + dp[i][j-1]`.\n3.  **Optimization:** We can optimize space from `O(m*n)` to `O(n)` because we only need the previous row to calculate the current row.\n\n### Complexity Analysis\n- **Time Complexity:** $O(m \\times n)$ - We visit every cell once.\n- **Space Complexity:** $O(n)$ - Using a 1D array to store the current row.\n\n### Code Logic\n```python\ndef solve(m, n):\n    row = [1] * n\n    for i in range(1, m):\n        for j in range(1, n):\n            row[j] += row[j-1]\n    return row[-1]\n```",
+    "hints": [
+      "Consider this as a grid problem. How many ways to reach cell (0,0)? Just 1.",
+      "If you are at cell (i, j), you could have arrived from (i-1, j) or (i, j-1).",
+      "Try to build a 2D table where table[i][j] stores the paths to reach that cell.",
+      "Can you reduce the space complexity? Do you need the whole matrix or just the previous row?"
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    # Reading input from stdin\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    m = int(input_data[0])\n    n = int(input_data[1])\n    \n    # Your code here\n    # result = ...\n    # print(result)\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (scanner.hasNextInt()) {\n            int m = scanner.nextInt();\n            int n = scanner.nextInt();\n            \n            // Write your solution here\n            // System.out.println(result);\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "3 7",
+        "expected_output": "28",
+        "is_public": true
+      },
+      {
+        "input_data": "3 2",
+        "expected_output": "3",
+        "is_public": true
+      },
+      {
+        "input_data": "1 1",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "1 10",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "10 1",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "23 12",
+        "expected_output": "193536720",
+        "is_public": false
+      },
+      {
+        "input_data": "51 9",
+        "expected_output": "1916797311",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 458,
+    "title": "Poor Pigs",
+    "description": "There are **buckets** buckets of liquid, where exactly one of the buckets is poisonous. To figure out which one is poisonous, you feed some number of (poor) pigs the liquid to see whether they will die or not. Unfortunately, you only have **minutesToTest** minutes to determine which bucket is poisonous.\n\nYou can feed the pigs according to these steps:\n1. Choose some live pigs to feed.\n2. For each pig, choose which buckets to feed it. The pig will consume all the chosen buckets simultaneously and will take no time. Each pig can consume any number of buckets, and each bucket can be fed to any number of pigs.\n3. Wait for **minutesToDie** minutes. You may not feed any other pigs during this time.\n4. After **minutesToDie** minutes have passed, any pigs that have been fed the poisonous bucket will die, and all others will survive.\n5. Repeat this process until you run out of time.\n\nGiven **buckets**, **minutesToDie**, and **minutesToTest**, return *the minimum number of pigs needed to figure out which bucket is poisonous within the allotted time*.",
+    "input_format": "Three space-separated integers: buckets, minutesToDie, minutesToTest.",
+    "output_format": "Print a single integer representing the minimum number of pigs.",
+    "difficulty": "Hard",
+    "tags": [
+      "dp",
+      "searching"
+    ],
+    "solution": "### Observations\nThis is an information theory problem. We are encoding the bucket location into the states of the pigs.\n\n### Approach\n1.  **Calculate States per Pig:** In the total testing time, how many rounds can we run? `rounds = minutesToTest / minutesToDie`. A single pig can survive round 1, round 2... up to round `k`, or die in any of them. Thus, one pig has `rounds + 1` states.\n2.  **Total Information:** If we have `p` pigs, the total number of distinct scenarios (buckets) they can distinguish is `(rounds + 1)^p`.\n3.  **Equation:** We need to find the minimum `p` such that `(rounds + 1)^p >= buckets`.\n4.  **Logarithm:** Taking the log, `p >= log(buckets) / log(rounds + 1)`.\n\n### Complexity Analysis\n- **Time Complexity:** $O(1)$ - Simple mathematical calculation or very small loop.\n- **Space Complexity:** $O(1)$.\n\n### Code Logic\n```python\nimport math\n\ndef solve(buckets, minutesToDie, minutesToTest):\n    states = (minutesToTest // minutesToDie) + 1\n    # We need states^pigs >= buckets\n    # pigs = ceil(log(buckets) / log(states))\n    pigs = math.ceil(math.log(buckets) / math.log(states))\n    return pigs\n```",
+    "hints": [
+      "Think about how many states a single pig can represent. If there is 1 test allowed, a pig is either dead or alive (2 states).",
+      "If you have 2 tests allowed, a pig can die in the 1st test, the 2nd test, or survive both (3 states).",
+      "If you have 'p' pigs and each pig has 's' states, how many combinations can they form together?",
+      "The problem reduces to finding the smallest 'p' such that s^p >= buckets."
+    ],
+    "boilerplate_python": "import sys\nimport math\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    buckets = int(input_data[0])\n    minutesToDie = int(input_data[1])\n    minutesToTest = int(input_data[2])\n    \n    # Your logic here\n    # print(result)\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (scanner.hasNextInt()) {\n            int buckets = scanner.nextInt();\n            int die = scanner.nextInt();\n            int test = scanner.nextInt();\n            \n            // Write your solution here\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "4 15 15",
+        "expected_output": "2",
+        "is_public": true
+      },
+      {
+        "input_data": "4 15 30",
+        "expected_output": "2",
+        "is_public": true
+      },
+      {
+        "input_data": "1000 15 60",
+        "expected_output": "5",
+        "is_public": true
+      },
+      {
+        "input_data": "1 1 1",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "1000 15 15",
+        "expected_output": "10",
+        "is_public": false
+      },
+      {
+        "input_data": "125 10 40",
+        "expected_output": "3",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 260,
+    "title": "Single Number III",
+    "description": "Given an integer array **nums**, in which exactly two elements appear only once and all the other elements appear exactly twice. Find the two elements that appear only once. You can return the answer in any order.\n\nYou must write an algorithm that runs in linear runtime complexity and uses only constant extra space.",
+    "input_format": "First line: An integer N (size of the array).\nSecond line: N space-separated integers representing the array nums.",
+    "output_format": "Print the two single numbers separated by a space, in ascending order.",
+    "difficulty": "Medium",
+    "tags": [
+      "array",
+      "maths"
+    ],
+    "solution": "### Observations\nIf we XOR all numbers in the array, the duplicates cancel out (since `x ^ x = 0`). The result will be `a ^ b` where `a` and `b` are the two unique numbers. Since `a` and `b` are distinct, `a ^ b` will have at least one bit set to 1.\n\n### Approach\n1.  **Global XOR:** Compute the XOR of all elements. Let this be `xor_sum`. \n2.  **Find Separator:** Find the rightmost set bit in `xor_sum`. This bit must be set in either `a` or `b`, but not both. We can calculate this mask using `xor_sum & -xor_sum`.\n3.  **Partition:** Iterate through the array again. If a number has that bit set, XOR it into `group1`. If not, XOR it into `group2`.\n4.  **Result:** `group1` and `group2` will eventually hold `a` and `b` respectively, as the duplicates in each group will still cancel out.\n\n### Complexity Analysis\n- **Time Complexity:** $O(N)$ - We traverse the array twice.\n- **Space Complexity:** $O(1)$ - Only variable storage used.\n\n### Code Logic\n```python\ndef solve(nums):\n    xor_sum = 0\n    for x in nums:\n        xor_sum ^= x\n    \n    # Get rightmost set bit\n    mask = xor_sum & -xor_sum\n    \n    a, b = 0, 0\n    for x in nums:\n        if x & mask:\n            a ^= x\n        else:\n            b ^= x\n    return sorted([a, b])\n```",
+    "hints": [
+      "The XOR of all elements gives the XOR of the two unique numbers.",
+      "How can you distinguish between the two unique numbers based on their XOR sum?",
+      "Find any bit that is set in the XOR sum. That bit must be 1 in one number and 0 in the other.",
+      "Use that bit to divide all numbers into two groups and run XOR logic on each group separately."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    n = int(input_data[0])\n    nums = [int(x) for x in input_data[1:]]\n    \n    # Your logic here\n    # result_list = ...\n    # print(f\"{result_list[0]} {result_list[1]}\")\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (scanner.hasNextInt()) {\n            int n = scanner.nextInt();\n            int[] nums = new int[n];\n            for(int i=0; i<n; i++) nums[i] = scanner.nextInt();\n            \n            // Write logic here\n            // System.out.println(min + \" \" + max);\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "6\n1 2 1 3 2 5",
+        "expected_output": "3 5",
+        "is_public": true
+      },
+      {
+        "input_data": "2\n-1 0",
+        "expected_output": "-1 0",
+        "is_public": true
+      },
+      {
+        "input_data": "2\n0 1",
+        "expected_output": "0 1",
+        "is_public": true
+      },
+      {
+        "input_data": "4\n100 50 100 25",
+        "expected_output": "25 50",
+        "is_public": false
+      },
+      {
+        "input_data": "6\n10000 20000 10000 30000 20000 50000",
+        "expected_output": "30000 50000",
+        "is_public": false
+      },
+      {
+        "input_data": "8\n5 5 2 2 8 8 9 1",
+        "expected_output": "1 9",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 421,
+    "title": "Maximum XOR of Two Numbers in an Array",
+    "description": "Given an integer array **nums**, return *the maximum result of `nums[i] XOR nums[j]`*, where `0 <= i <= j < n`.",
+    "input_format": "First line: An integer N (size of array).\nSecond line: N space-separated integers.",
+    "output_format": "Print a single integer representing the maximum XOR value.",
+    "difficulty": "Medium",
+    "tags": [
+      "trie",
+      "array"
+    ],
+    "solution": "### Observations\nTo maximize XOR, for every bit of a number starting from the most significant bit (MSB), we want to XOR it with a number that has the opposite bit (0 vs 1, 1 vs 0). A **Trie** (Prefix Tree) is efficient for storing binary representations and querying the best match.\n\n### Approach\n1.  **Insert:** Insert the binary representation of every number into a Trie (typically 31 or 32 bits deep).\n2.  **Query:** For each number in the array, traverse the Trie. For every bit `b` in the number, try to go to the child node representing `1-b` (opposite bit). If that path exists, we gain a `1` at that position in the result. If not, we are forced to go to `b`, resulting in a `0`.\n3.  **Track Max:** Maintain the maximum XOR found across all queries.\n\n### Complexity Analysis\n- **Time Complexity:** $O(N \\times L)$ where $L$ is the number of bits (32).\n- **Space Complexity:** $O(N \\times L)$ to store the Trie.\n\n### Code Logic\n```python\nclass TrieNode:\n    def __init__(self):\n        self.children = {}\n\ndef solve(nums):\n    root = TrieNode()\n    # Build Trie\n    for num in nums:\n        node = root\n        for i in range(31, -1, -1):\n            bit = (num >> i) & 1\n            if bit not in node.children:\n                node.children[bit] = TrieNode()\n            node = node.children[bit]\n            \n    max_xor = 0\n    # Query Trie\n    for num in nums:\n        node = root\n        curr_xor = 0\n        for i in range(31, -1, -1):\n            bit = (num >> i) & 1\n            toggled = 1 - bit\n            if toggled in node.children:\n                curr_xor |= (1 << i)\n                node = node.children[toggled]\n            else:\n                node = node.children[bit]\n        max_xor = max(max_xor, curr_xor)\n    return max_xor\n```",
+    "hints": [
+      "Think about the binary representation of numbers.",
+      "To maximize XOR, you want the bits to differ as much as possible, starting from the Most Significant Bit (MSB).",
+      "Can you use a data structure to store the binary strings efficiently?",
+      "Try using a Trie (Prefix Tree) to store the numbers. For each number, try to find a path in the Trie that has opposite bits."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    n = int(input_data[0])\n    nums = [int(x) for x in input_data[1:]]\n    \n    # Your logic here\n    # print(max_xor_result)\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (scanner.hasNextInt()) {\n            int n = scanner.nextInt();\n            int[] nums = new int[n];\n            for(int i=0; i<n; i++) nums[i] = scanner.nextInt();\n            \n            // Write logic here\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "6\n3 10 5 25 2 8",
+        "expected_output": "28",
+        "is_public": true
+      },
+      {
+        "input_data": "6\n14 70 53 83 49 91",
+        "expected_output": "127",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n5",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "2\n8 8",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "2\n2 4",
+        "expected_output": "6",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n0 1 2 3 4",
+        "expected_output": "7",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 371,
+    "title": "Sum of Two Integers",
+    "description": "Given two integers **a** and **b**, return *the sum of the two integers without using the operators `+` and `-`*.",
+    "input_format": "A single line containing two space-separated integers: a and b.",
+    "output_format": "Print the sum of the integers.",
+    "difficulty": "Medium",
+    "tags": [
+      "array",
+      "maths"
+    ],
+    "solution": "### Observations\nWe need to simulate hardware addition using bitwise operators.\n* **Sum without carry:** This is achieved using XOR (`^`). `0+0=0`, `1+0=1`, `0+1=1`, `1+1=0`. \n* **Carry:** A carry is generated only when both bits are 1 (`1+1`). This is achieved using AND (`&`) shifted left by 1 (`<< 1`).\n\n### Approach\n1.  Loop while `carry` is not 0.\n2.  Calculate `sum_without_carry = a ^ b`.\n3.  Calculate `carry = (a & b) << 1`.\n4.  Update `a = sum_without_carry` and `b = carry`.\n5.  **Language Specific:** Python integers are arbitrary precision. To simulate 32-bit overflow (especially for negatives), we must mask with `0xFFFFFFFF`.\n\n### Complexity Analysis\n- **Time Complexity:** $O(1)$ - specifically proportional to the number of bits (32).\n- **Space Complexity:** $O(1)$.\n\n### Code Logic\n```python\ndef solve(a, b):\n    mask = 0xFFFFFFFF\n    while (b & mask) > 0:\n        carry = (a & b) << 1\n        a = a ^ b\n        b = carry\n    return (a & mask) if b > 0 else a\n```",
+    "hints": [
+      "Recall how binary addition works bit by bit.",
+      "XOR (^) acts like a sum without carry.",
+      "AND (&) followed by a left shift (<<) finds the carry.",
+      "Be careful with negative numbers if your language handles infinite precision integers (like Python)."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    a = int(input_data[0])\n    b = int(input_data[1])\n    \n    # Your logic here\n    # print(result)\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (scanner.hasNextInt()) {\n            int a = scanner.nextInt();\n            int b = scanner.nextInt();\n            \n            // Write logic here\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "1 2",
+        "expected_output": "3",
+        "is_public": true
+      },
+      {
+        "input_data": "2 3",
+        "expected_output": "5",
+        "is_public": true
+      },
+      {
+        "input_data": "-1 1",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "-10 -20",
+        "expected_output": "-30",
+        "is_public": false
+      },
+      {
+        "input_data": "0 -5",
+        "expected_output": "-5",
+        "is_public": false
+      },
+      {
+        "input_data": "2147483647 -2147483648",
+        "expected_output": "-1",
+        "is_public": false
+      }
+    ]
+  }
+]

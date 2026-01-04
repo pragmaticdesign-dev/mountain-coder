@@ -1,422 +1,302 @@
-[{
-  "id": 15,
-  "title": "3Sum",
-  "description": "Given an integer array **nums**, return all the triplets `[nums[i], nums[j], nums[k]]` such that `i != j`, `i != k`, and `j != k`, and `nums[i] + nums[j] + nums[k] == 0`.\n\nNotice that the solution set must not contain duplicate triplets.",
-  "input_format": "First line: An integer N representing the size of the array.\nSecond line: N space-separated integers representing the array nums.",
-  "output_format": "Print each triplet on a new line, with elements separated by spaces. The triplets should be sorted lexicographically, and elements inside each triplet should be sorted.",
-  "difficulty": "Medium",
-  "tags": [
-    "array",
-    "two_pointers",
-    "sorting"
-  ],
-  "solution": "### Observations\nWe need to find three numbers that sum to zero. A brute force approach of checking all triplets is $O(N^3)$. We can reduce this by sorting the array first. If we fix one number, the problem reduces to finding two other numbers that sum to `-fixed_number` (Two Sum problem).\n\n### Approach: Sorting + Two Pointers\n1.  **Sort** the array in non-decreasing order. This helps in avoiding duplicates and allows using two pointers.\n2.  Iterate through the array with index `i` from `0` to `N-2`:\n    * If `nums[i] > 0`, break (since the array is sorted, we can't find two positive numbers that sum to a negative to balance it).\n    * If `i > 0` and `nums[i] == nums[i-1]`, continue (skip duplicates for the first element).\n    * Set two pointers: `left = i + 1` and `right = N - 1`.\n    * While `left < right`:\n        * Calculate `sum = nums[i] + nums[left] + nums[right]`.\n        * If `sum < 0`: Increment `left`.\n        * If `sum > 0`: Decrement `right`.\n        * If `sum == 0`: Found a triplet. Add to results. Increment `left`, decrement `right`. **Crucial:** Skip duplicate values for `left` and `right` to avoid duplicate triplets.\n\n### Complexity Analysis\n* **Time Complexity:** $O(N^2)$. Sorting takes $O(N \\log N)$, and the nested loop runs in $O(N^2)$.\n* **Space Complexity:** $O(1)$ or $O(N)$ depending on the sorting implementation (ignoring output space).\n\n### Code Logic\n\n**Python Logic**\n```python\nnums.sort()\nres = []\nfor i in range(len(nums)):\n    if i > 0 and nums[i] == nums[i-1]:\n        continue\n    l, r = i + 1, len(nums) - 1\n    while l < r:\n        s = nums[i] + nums[l] + nums[r]\n        if s < 0:\n            l += 1\n        elif s > 0:\n            r -= 1\n        else:\n            res.append([nums[i], nums[l], nums[r]])\n            l += 1\n            while nums[l] == nums[l-1] and l < r:\n                l += 1\n# Print res logic\n```",
-  "hints": [
-    "Sort the array first. This is crucial for avoiding duplicates efficiently.",
-    "Fix the first element of the triplet, then finding the other two becomes a standard 'Two Sum' problem.",
-    "Use the Two Pointer technique for the remaining part of the array.",
-    "Be careful about handling duplicates. If `nums[i] == nums[i-1]`, skip `i`."
-  ],
-  "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        nums = []\n        for _ in range(n):\n            nums.append(int(next(iterator)))\n    except StopIteration:\n        return\n\n    # Write your code here\n    # result = []\n\n    # Print logic (ensure sorted output for deterministic check)\n    # for triplet in result:\n    #     print(\" \".join(map(str, triplet)))\n\nif __name__ == '__main__':\n    solve()",
-  "boilerplate_java": "import java.io.*;\nimport java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String line = br.readLine();\n        if (line == null) return;\n        int n = Integer.parseInt(line.trim());\n        \n        int[] nums = new int[n];\n        String[] parts = br.readLine().trim().split(\"\\\\s+\");\n        for(int i=0; i<n; i++) nums[i] = Integer.parseInt(parts[i]);\n        \n        // Write logic here\n        // List<List<Integer>> res = ...\n        \n        /*\n        // Printing logic for judge\n        for(List<Integer> triplet : res) {\n             System.out.println(triplet.get(0) + \" \" + triplet.get(1) + \" \" + triplet.get(2));\n        }\n        */\n    }\n}",
-  "test_cases": [
-    {
-      "input_data": "6\n-1 0 1 2 -1 -4",
-      "expected_output": "-1 -1 2\n-1 0 1",
-      "is_public": true
-    },
-    {
-      "input_data": "3\n0 1 1",
-      "expected_output": "",
-      "is_public": true
-    },
-    {
-      "input_data": "3\n0 0 0",
-      "expected_output": "0 0 0",
-      "is_public": true
-    },
-    {
-      "input_data": "4\n-2 0 1 1",
-      "expected_output": "-2 1 1",
-      "is_public": false
-    },
-    {
-      "input_data": "6\n-1 0 1 2 -1 -4",
-      "expected_output": "-1 -1 2\n-1 0 1",
-      "is_public": false
-    },
-    {
-      "input_data": "5\n-5 1 2 3 4",
-      "expected_output": "-5 1 4\n-5 2 3",
-      "is_public": false
-    },
-    {
-      "input_data": "1\n0",
-      "expected_output": "",
-      "is_public": false
-    }
-  ]
-},
-{
-  "id": 11,
-  "title": "Container With Most Water",
-  "description": "You are given an integer array **height** of length `n`. There are `n` vertical lines drawn such that the two endpoints of the `i-th` line are `(i, 0)` and `(i, height[i])`.\n\nFind two lines that together with the x-axis form a container, such that the container contains the most water.\n\nReturn the maximum amount of water a container can store.",
-  "input_format": "First line: An integer N.\nSecond line: N space-separated integers representing heights.",
-  "output_format": "A single integer representing the maximum area.",
-  "difficulty": "Medium",
-  "tags": [
-    "array",
-    "two_pointers",
-    "greedy"
-  ],
-  "solution": "### Observations\nThe area of water is determined by the shorter of the two lines multiplied by the distance between them. `Area = min(height[left], height[right]) * (right - left)`.\nWe want to maximize this area. A brute force check of all pairs is $O(N^2)$.\n\n### Approach: Two Pointers\n1.  Start with pointers at both ends of the array: `left = 0`, `right = n - 1`.\n2.  Calculate the area for the current pair.\n3.  To potentially find a larger area, we need to move one of the pointers. Since the width `(right - left)` will always decrease as we move inwards, we must try to increase the height.\n4.  **Greedy Logic:** Move the pointer that points to the shorter line. If we move the taller line, the new area is limited by the shorter line (which we kept) and the width decreases, so the area can only shrink or stay the same. Moving the shorter line gives a chance to find a taller line.\n\n### Complexity Analysis\n* **Time Complexity:** $O(N)$. We process each element at most once.\n* **Space Complexity:** $O(1)$.\n\n### Code Logic\n\n**Python Logic**\n```python\nl, r = 0, len(height) - 1\nmax_area = 0\nwhile l < r:\n    area = (r - l) * min(height[l], height[r])\n    max_area = max(max_area, area)\n    if height[l] < height[r]:\n        l += 1\n    else:\n        r -= 1\nreturn max_area\n```",
-  "hints": [
-    "The width of the container is determined by the distance between indices.",
-    "The height is determined by the shorter of the two lines.",
-    "Start with the maximum width (indices 0 and N-1).",
-    "Always move the pointer pointing to the shorter line inward to potentially find a taller line."
-  ],
-  "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        height = []\n        for _ in range(n):\n            height.append(int(next(iterator)))\n    except StopIteration:\n        return\n\n    # Write your code here\n    # result = ...\n\n    # print(result)\n\nif __name__ == '__main__':\n    solve()",
-  "boilerplate_java": "import java.io.*;\nimport java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String line = br.readLine();\n        if (line == null) return;\n        int n = Integer.parseInt(line.trim());\n        \n        int[] height = new int[n];\n        String[] parts = br.readLine().trim().split(\"\\\\s+\");\n        for(int i=0; i<n; i++) height[i] = Integer.parseInt(parts[i]);\n        \n        // Write logic here\n        // int result = ...\n        \n        // System.out.println(result);\n    }\n}",
-  "test_cases": [
-    {
-      "input_data": "9\n1 8 6 2 5 4 8 3 7",
-      "expected_output": "49",
-      "is_public": true
-    },
-    {
-      "input_data": "2\n1 1",
-      "expected_output": "1",
-      "is_public": true
-    },
-    {
-      "input_data": "5\n4 3 2 1 4",
-      "expected_output": "16",
-      "is_public": false
-    },
-    {
-      "input_data": "5\n1 2 1 2 1",
-      "expected_output": "4",
-      "is_public": false
-    },
-    {
-      "input_data": "2\n1000 1000",
-      "expected_output": "1000",
-      "is_public": false
-    },
-    {
-      "input_data": "4\n1 2 4 3",
-      "expected_output": "4",
-      "is_public": false
-    },
-    {
-      "input_data": "3\n10 1 10",
-      "expected_output": "20",
-      "is_public": false
-    }
-  ]
-},
-{
-  "id": 42,
-  "title": "Trapping Rain Water",
-  "description": "Given `n` non-negative integers representing an elevation map where the width of each bar is `1`, compute how much water it can trap after raining.",
-  "input_format": "First line: An integer N.\nSecond line: N space-separated integers representing the elevation map.",
-  "output_format": "A single integer representing the total trapped water.",
-  "difficulty": "Hard",
-  "tags": [
-    "array",
-    "two_pointers",
-    "dp",
-    "stacks"
-  ],
-  "solution": "### Observations\nThe amount of water at any index `i` is determined by the maximum height to its left and the maximum height to its right. `Water[i] = min(max_left, max_right) - height[i]` (if positive).\n\n### Approach: Two Pointers\nInstead of pre-calculating left and right max arrays (which takes $O(N)$ space), we can use two pointers.\n1.  Initialize `left = 0`, `right = n - 1`.\n2.  Maintain `max_left` and `max_right` variables.\n3.  While `left < right`:\n    * If `height[left] < height[right]`:\n        * If `height[left] >= max_left`, update `max_left`.\n        * Else, `ans += max_left - height[left]`.\n        * Move `left` forward.\n    * Else:\n        * If `height[right] >= max_right`, update `max_right`.\n        * Else, `ans += max_right - height[right]`.\n        * Move `right` backward.\n\n### Complexity Analysis\n* **Time Complexity:** $O(N)$.\n* **Space Complexity:** $O(1)$.\n\n### Code Logic\n\n**Python Logic**\n```python\nl, r = 0, len(height) - 1\nmax_l, max_r = 0, 0\nans = 0\n\nwhile l < r:\n    if height[l] < height[r]:\n        if height[l] >= max_l: max_l = height[l]\n        else: ans += max_l - height[l]\n        l += 1\n    else:\n        if height[r] >= max_r: max_r = height[r]\n        else: ans += max_r - height[r]\n        r -= 1\nreturn ans\n```",
-  "hints": [
-    "For any bar i, the water it can hold depends on the tallest bar to its left and the tallest bar to its right.",
-    "Water at i = min(max_left, max_right) - height[i].",
-    "You can pre-compute the max_left and max_right for every index using Dynamic Programming.",
-    "Can you optimize the space to O(1) using two pointers? The pointer with the smaller height limits the water level."
-  ],
-  "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        height = []\n        for _ in range(n):\n            height.append(int(next(iterator)))\n    except StopIteration:\n        return\n\n    # Write your code here\n    # result = ...\n\n    # print(result)\n\nif __name__ == '__main__':\n    solve()",
-  "boilerplate_java": "import java.io.*;\nimport java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String line = br.readLine();\n        if (line == null) return;\n        int n = Integer.parseInt(line.trim());\n        \n        int[] height = new int[n];\n        String[] parts = br.readLine().trim().split(\"\\\\s+\");\n        for(int i=0; i<n; i++) height[i] = Integer.parseInt(parts[i]);\n        \n        // Write logic here\n        // int result = ...\n        \n        // System.out.println(result);\n    }\n}",
-  "test_cases": [
-    {
-      "input_data": "12\n0 1 0 2 1 0 1 3 2 1 2 1",
-      "expected_output": "6",
-      "is_public": true
-    },
-    {
-      "input_data": "6\n4 2 0 3 2 5",
-      "expected_output": "9",
-      "is_public": true
-    },
-    {
-      "input_data": "5\n1 2 3 4 5",
-      "expected_output": "0",
-      "is_public": false
-    },
-    {
-      "input_data": "5\n5 4 3 2 1",
-      "expected_output": "0",
-      "is_public": false
-    },
-    {
-      "input_data": "3\n2 0 2",
-      "expected_output": "2",
-      "is_public": false
-    },
-    {
-      "input_data": "6\n5 5 1 7 1 1",
-      "expected_output": "4",
-      "is_public": false
-    },
-    {
-      "input_data": "1\n10",
-      "expected_output": "0",
-      "is_public": false
-    }
-  ]
-},
-{
-  "id": 39,
-  "title": "Longest Substring Without Repeating Characters",
-  "description": "Given a string `s`, find the length of the **longest substring** without repeating characters.",
-  "input_format": "A single line containing the string S.",
-  "output_format": "A single integer representing the maximum length.",
-  "difficulty": "Medium",
-  "tags": [
-    "string",
-    "two_pointers",
-    "set",
-    "map"
-  ],
-  "solution": "### Observations\nWe need to find a window `[l, r]` such that all characters inside are unique. As we expand `r`, if we find a duplicate, we must contract `l` until the duplicate is removed.\n\n### Approach: Sliding Window + Set/Map\n1.  Use a set `charSet` to track characters in the current window.\n2.  Initialize `l = 0` and `max_len = 0`.\n3.  Iterate `r` from `0` to `len(s)`:\n    * While `s[r]` is in `charSet`, remove `s[l]` from the set and increment `l`.\n    * Add `s[r]` to `charSet`.\n    * Update `max_len = max(max_len, r - l + 1)`.\n\n### Complexity Analysis\n* **Time Complexity:** $O(N)$. Each character is added and removed at most once.\n* **Space Complexity:** $O(min(N, A))$, where $A$ is the alphabet size (e.g., 26 or 128).\n\n### Code Logic\n\n**Python Logic**\n```python\nchar_set = set()\nl = 0\nres = 0\nfor r in range(len(s)):\n    while s[r] in char_set:\n        char_set.remove(s[l])\n        l += 1\n    char_set.add(s[r])\n    res = max(res, r - l + 1)\nreturn res\n```",
-  "hints": [
-    "Use a sliding window. Keep a window of unique characters.",
-    "Expand the right side of the window.",
-    "If you encounter a character already in the window, shrink the left side until that character is removed.",
-    "Use a Set or Hash Map to keep track of characters in the current window."
-  ],
-  "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().splitlines()\n    if not input_data:\n        s = \"\"\n    else:\n        s = input_data[0]\n\n    # Write your code here\n    # result = ...\n\n    # print(result)\n\nif __name__ == '__main__':\n    solve()",
-  "boilerplate_java": "import java.io.*;\nimport java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String s = br.readLine();\n        if (s == null) s = \"\";\n        \n        // Write logic here\n        // int result = ...\n        \n        // System.out.println(result);\n    }\n}",
-  "test_cases": [
-    {
-      "input_data": "abcabcbb",
-      "expected_output": "3",
-      "is_public": true
-    },
-    {
-      "input_data": "bbbbb",
-      "expected_output": "1",
-      "is_public": true
-    },
-    {
-      "input_data": "pwwkew",
-      "expected_output": "3",
-      "is_public": true
-    },
-    {
-      "input_data": "",
-      "expected_output": "0",
-      "is_public": false
-    },
-    {
-      "input_data": " ",
-      "expected_output": "1",
-      "is_public": false
-    },
-    {
-      "input_data": "au",
-      "expected_output": "2",
-      "is_public": false
-    },
-    {
-      "input_data": "dvdf",
-      "expected_output": "3",
-      "is_public": false
-    },
-    {
-      "input_data": "abba",
-      "expected_output": "2",
-      "is_public": false
-    }
-  ]
-},
-{
-  "id": 76,
-  "title": "Minimum Window Substring",
-  "description": "Given two strings `s` and `t` of lengths `m` and `n` respectively, return the **minimum window substring** of `s` such that every character in `t` (including duplicates) is included in the window. If there is no such substring, return the empty string `\"\"`.\n\nThe testcases will be generated such that the answer is unique.",
-  "input_format": "First line: String S.\nSecond line: String T.",
-  "output_format": "A single string representing the minimum window.",
-  "difficulty": "Hard",
-  "tags": [
-    "string",
-    "two_pointers",
-    "map",
-    "sliding_window"
-  ],
-  "solution": "### Observations\nWe need the smallest substring in `s` that contains all characters (and frequencies) of `t`. This is a classic **Sliding Window** problem.\n\n### Approach\n1.  Count character frequencies of `t` in a map `countT`.\n2.  Maintain a `window` map for the current window in `s`.\n3.  Have a variable `have` (count of satisfied characters) and `need` (total distinct characters in `t`).\n4.  Expand `r`:\n    * Add `s[r]` to `window`.\n    * If `s[r]` satisfies the requirement in `countT` (i.e., `window[s[r]] == countT[s[r]]`), increment `have`.\n5.  Contract `l` (while `have == need`):\n    * Update result if current window is smaller than minimum found so far.\n    * Remove `s[l]` from `window`.\n    * If removing `s[l]` breaks the requirement (`window[s[l]] < countT[s[l]]`), decrement `have`.\n    * Increment `l`.\n\n### Complexity Analysis\n* **Time Complexity:** $O(N + M)$.\n* **Space Complexity:** $O(1)$ (since map size is limited to character set size).\n\n### Code Logic\n\n**Python Logic**\n```python\nif t == \"\": return \"\"\ncountT, window = {}, {}\nfor c in t: countT[c] = 1 + countT.get(c, 0)\n\nhave, need = 0, len(countT)\nres, resLen = [-1, -1], float(\"inf\")\nl = 0\n\nfor r in range(len(s)):\n    c = s[r]\n    window[c] = 1 + window.get(c, 0)\n    if c in countT and window[c] == countT[c]:\n        have += 1\n    \n    while have == need:\n        if (r - l + 1) < resLen:\n            res = [l, r]\n            resLen = (r - l + 1)\n        window[s[l]] -= 1\n        if s[l] in countT and window[s[l]] < countT[s[l]]:\n            have -= 1\n        l += 1\n        \nl, r = res\nreturn s[l:r+1] if resLen != float(\"inf\") else \"\"\n```",
-  "hints": [
-    "Use two pointers to create a window. Increase 'right' to satisfy the condition.",
-    "Once the window contains all characters of T, increase 'left' to minimize the window size.",
-    "Use a hash map to count the frequency of characters in T and compare it with the current window.",
-    "Keep track of the minimum length window found so far."
-  ],
-  "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().splitlines()\n    if len(input_data) < 2:\n        return\n    \n    s = input_data[0]\n    t = input_data[1]\n\n    # Write your code here\n    # result = ...\n\n    # print(result)\n\nif __name__ == '__main__':\n    solve()",
-  "boilerplate_java": "import java.io.*;\nimport java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String s = br.readLine();\n        String t = br.readLine();\n        if (s == null || t == null) return;\n        \n        // Write logic here\n        // String result = ...\n        \n        // System.out.println(result);\n    }\n}",
-  "test_cases": [
-    {
-      "input_data": "ADOBECODEBANC\nABC",
-      "expected_output": "BANC",
-      "is_public": true
-    },
-    {
-      "input_data": "a\na",
-      "expected_output": "a",
-      "is_public": true
-    },
-    {
-      "input_data": "a\naa",
-      "expected_output": "",
-      "is_public": true
-    },
-    {
-      "input_data": "ab\na",
-      "expected_output": "a",
-      "is_public": false
-    },
-    {
-      "input_data": "aa\na",
-      "expected_output": "a",
-      "is_public": false
-    },
-    {
-      "input_data": "ADOBECODEBANC\nXYZ",
-      "expected_output": "",
-      "is_public": false
-    },
-    {
-      "input_data": "abc\nb",
-      "expected_output": "b",
-      "is_public": false
-    }
-  ]
-},
-{
-  "id": 567,
-  "title": "Permutation in String",
-  "description": "Given two strings `s1` and `s2`, return `true` if `s2` contains a permutation of `s1`, or `false` otherwise.\n\nIn other words, return `true` if one of `s1`'s permutations is the substring of `s2`.",
-  "input_format": "First line: String s1.\nSecond line: String s2.",
-  "output_format": "A single string \"true\" or \"false\".",
-  "difficulty": "Medium",
-  "tags": [
-    "string",
-    "two_pointers",
-    "sliding_window"
-  ],
-  "solution": "### Observations\nWe need to find if any substring of `s2` has the exact same character counts as `s1`. The substring must be of the same length as `s1`.\n\n### Approach: Fixed Size Sliding Window\n1.  If `len(s1) > len(s2)`, return False.\n2.  Count frequencies of `s1`.\n3.  Initialize a window in `s2` of size `len(s1)`. Count frequencies in this initial window.\n4.  Check if counts match. If yes, return True.\n5.  Slide the window one character at a time:\n    * Remove the character leaving the window (decrement count).\n    * Add the new character entering the window (increment count).\n    * Check if matches.\n\n### Complexity Analysis\n* **Time Complexity:** $O(N)$, where $N$ is length of `s2`. Comparison of maps takes $O(26) = O(1)$.\n* **Space Complexity:** $O(1)$.\n\n### Code Logic\n\n**Python Logic**\n```python\nif len(s1) > len(s2): return False\n\nc1 = [0] * 26\nc2 = [0] * 26\n\nfor i in range(len(s1)):\n    c1[ord(s1[i]) - ord('a')] += 1\n    c2[ord(s2[i]) - ord('a')] += 1\n\nmatches = 0\nfor i in range(26):\n    if c1[i] == c2[i]: matches += 1\n\nl = 0\nfor r in range(len(s1), len(s2)):\n    if matches == 26: return True\n    \n    index = ord(s2[r]) - ord('a')\n    c2[index] += 1\n    if c1[index] == c2[index]: matches += 1\n    elif c1[index] + 1 == c2[index]: matches -= 1\n    \n    index = ord(s2[l]) - ord('a')\n    c2[index] -= 1\n    if c1[index] == c2[index]: matches += 1\n    elif c1[index] - 1 == c2[index]: matches -= 1\n    l += 1\n    \nreturn matches == 26\n```",
-  "hints": [
-    "A permutation implies the same characters with the same frequencies.",
-    "Use a sliding window of fixed size equal to the length of s1.",
-    "Maintain frequency counts for the window and compare them with s1's counts.",
-    "You can optimize the comparison by keeping a 'matches' counter instead of comparing whole arrays every time."
-  ],
-  "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().splitlines()\n    if len(input_data) < 2:\n        return\n    \n    s1 = input_data[0]\n    s2 = input_data[1]\n\n    # Write your code here\n    # result = ...\n\n    # print(\"true\" if result else \"false\")\n\nif __name__ == '__main__':\n    solve()",
-  "boilerplate_java": "import java.io.*;\nimport java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String s1 = br.readLine();\n        String s2 = br.readLine();\n        if (s1 == null || s2 == null) return;\n        \n        // Write logic here\n        // boolean result = ...\n        \n        // System.out.println(result ? \"true\" : \"false\");\n    }\n}",
-  "test_cases": [
-    {
-      "input_data": "ab\neidbaooo",
-      "expected_output": "true",
-      "is_public": true
-    },
-    {
-      "input_data": "ab\neidboaoo",
-      "expected_output": "false",
-      "is_public": true
-    },
-    {
-      "input_data": "abc\nbbbca",
-      "expected_output": "true",
-      "is_public": false
-    },
-    {
-      "input_data": "hello\nooolleoooleh",
-      "expected_output": "false",
-      "is_public": false
-    },
-    {
-      "input_data": "adc\ndcda",
-      "expected_output": "true",
-      "is_public": false
-    },
-    {
-      "input_data": "a\nab",
-      "expected_output": "true",
-      "is_public": false
-    },
-    {
-      "input_data": "ab\na",
-      "expected_output": "false",
-      "is_public": false
-    }
-  ]
-},
-{
-  "id": 424,
-  "title": "Longest Repeating Character Replacement",
-  "description": "You are given a string `s` and an integer `k`. You can choose any character of the string and change it to any other uppercase English character. You can perform this operation at most `k` times.\n\nReturn the length of the longest substring containing the same letter you can get after performing the above operations.",
-  "input_format": "First line: String S.\nSecond line: Integer K.",
-  "output_format": "A single integer representing the max length.",
-  "difficulty": "Medium",
-  "tags": [
-    "string",
-    "sliding_window",
-    "two_pointers"
-  ],
-  "solution": "### Observations\nIn any substring, if we want to make all characters the same, we should convert the minority characters to the majority character (the most frequent char in that substring). \nCondition for valid window: `(length of window) - (count of most frequent char) <= k`.\n\n### Approach: Sliding Window\n1.  Use a map `count` to store frequencies in the current window.\n2.  Maintain `max_f` which is the count of the most frequent character in the current window.\n3.  Expand `r`:\n    * Update count of `s[r]`.\n    * Update `max_f = max(max_f, count[s[r]])`.\n4.  Check condition: `(r - l + 1) - max_f > k`.\n    * If true, the window is invalid. Shrink `l`.\n    * Note: We don't strictly need to decrement `max_f` when shrinking because a smaller `max_f` won't yield a larger result than we've already found. We only care about finding a new maximum.\n5.  Update result `res = max(res, r - l + 1)`.\n\n### Complexity Analysis\n* **Time Complexity:** $O(N)$.\n* **Space Complexity:** $O(1)$ (26 uppercase letters).\n\n### Code Logic\n\n**Python Logic**\n```python\ncount = {}\nres = 0\nl = 0\nmax_f = 0\n\nfor r in range(len(s)):\n    count[s[r]] = 1 + count.get(s[r], 0)\n    max_f = max(max_f, count[s[r]])\n    \n    if (r - l + 1) - max_f > k:\n        count[s[l]] -= 1\n        l += 1\n        \n    res = max(res, r - l + 1)\nreturn res\n```",
-  "hints": [
-    "A valid window means: length_of_window - count_of_most_frequent_char <= k.",
-    "Use a sliding window. Expand the right side.",
-    "If the window becomes invalid (requires more than k replacements), shrink it from the left.",
-    "You only need to track the max frequency seen in the current window."
-  ],
-  "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    \n    s = input_data[0]\n    try:\n        k = int(input_data[1])\n    except IndexError:\n        return\n\n    # Write your code here\n    # result = ...\n\n    # print(result)\n\nif __name__ == '__main__':\n    solve()",
-  "boilerplate_java": "import java.io.*;\nimport java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String s = br.readLine();\n        String kStr = br.readLine();\n        if (s == null || kStr == null) return;\n        int k = Integer.parseInt(kStr.trim());\n        \n        // Write logic here\n        // int result = ...\n        \n        // System.out.println(result);\n    }\n}",
-  "test_cases": [
-    {
-      "input_data": "ABAB\n2",
-      "expected_output": "4",
-      "is_public": true
-    },
-    {
-      "input_data": "AABABBA\n1",
-      "expected_output": "4",
-      "is_public": true
-    },
-    {
-      "input_data": "AAAA\n2",
-      "expected_output": "4",
-      "is_public": false
-    },
-    {
-      "input_data": "ABCDE\n1",
-      "expected_output": "2",
-      "is_public": false
-    },
-    {
-      "input_data": "AABBBBA\n0",
-      "expected_output": "4",
-      "is_public": false
-    },
-    {
-      "input_data": "ABAA\n0",
-      "expected_output": "2",
-      "is_public": false
-    },
-    {
-      "input_data": "ABBB\n2",
-      "expected_output": "4",
-      "is_public": false
-    }
-  ]
-}
+[
+  {
+    "id": 84,
+    "title": "Largest Rectangle in Histogram",
+    "description": "Given an array of integers **heights** representing the histogram's bar height where the width of each bar is 1, return the area of the *largest rectangle* in the histogram.\n\n### Example\nInput: heights = [2,1,5,6,2,3]\nOutput: 10\nExplanation: The largest rectangle has an area = 10 units.",
+    "input_format": "The first line contains an integer **N**.\nThe second line contains **N** space-separated integers representing the **heights**.",
+    "output_format": "Print a single integer representing the maximum area.",
+    "difficulty": "Hard",
+    "tags": [
+      "array",
+      "stacks"
+    ],
+    "solution": "### Observations\nThe core problem is finding the limits (left and right boundaries) for each bar where it can be the smallest bar in a rectangle. If we know the first index to the left that is smaller (`left_smaller`) and the first index to the right that is smaller (`right_smaller`), the width of the rectangle formed using the current bar as the full height is `right_smaller - left_smaller - 1`.\n\n### Approach\n1. **Brute Force:** For each bar, expand to the left and right until a smaller bar is found. Calculate area. Time: $O(N^2)$.\n2. **Monotonic Stack (Optimized):** \n   - We need to find the *Next Smaller Element* (NSE) and *Previous Smaller Element* (PSE) for every bar efficiently.\n   - Maintain a stack that keeps indices of bars with increasing heights.\n   - Iterate through the histogram. If the current bar is smaller than the bar at the stack top, it means the current bar is the 'Right Boundary' for the stack top.\n   - Pop the stack top. The new stack top (after popping) is the 'Left Boundary'.\n   - Calculate area for the popped bar: `height * (current_index - new_stack_top - 1)`.\n   - Push the current index.\n\n### Complexity Analysis\n- **Time Complexity:** $O(N)$, as each element is pushed and popped at most once.\n- **Space Complexity:** $O(N)$ for the stack.\n\n### Code Logic\n```python\ndef largestRectangleArea(heights):\n    stack = [] # pairs of (index, height)\n    max_area = 0\n    # Append a 0 height at the end to flush the stack\n    heights.append(0)\n    \n    for i, h in enumerate(heights):\n        start = i\n        while stack and stack[-1][1] > h:\n            index, height = stack.pop()\n            max_area = max(max_area, height * (i - index))\n            start = index\n        stack.append((start, h))\n        \n    return max_area\n```",
+    "hints": [
+      "Think about what limits the width of a rectangle with a specific height.",
+      "For any bar `i`, the rectangle with height `heights[i]` extends to the left until it hits a bar smaller than `heights[i]`, and similarly to the right.",
+      "Can you find the nearest smaller element to the left and right for every element efficiently?",
+      "Try using a stack to keep track of increasing heights.",
+      "When you encounter a bar smaller than the one at the top of the stack, you have found the right boundary for the stack top.",
+      "The left boundary for the stack top is the element currently below it in the stack."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    # Reading input\n    input = sys.stdin.read().split()\n    if not input: return\n    n = int(input[0])\n    heights = list(map(int, input[1:n+1]))\n    \n    # Write your solution here\n    \nsolve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String line1 = br.readLine();\n        if (line1 == null) return;\n        int n = Integer.parseInt(line1.trim());\n        \n        int[] heights = new int[n];\n        String[] parts = br.readLine().trim().split(\"\\\\s+\");\n        for(int i=0; i<n; i++) {\n            heights[i] = Integer.parseInt(parts[i]);\n        }\n        \n        // Write your solution logic here\n        // System.out.println(result);\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "6\n2 1 5 6 2 3",
+        "expected_output": "10",
+        "is_public": true
+      },
+      {
+        "input_data": "2\n2 4",
+        "expected_output": "4",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n100",
+        "expected_output": "100",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n0 0 0 0 0",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n1 2 3 4 5",
+        "expected_output": "9",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n5 4 3 2 1",
+        "expected_output": "9",
+        "is_public": false
+      },
+      {
+        "input_data": "7\n2 1 2 0 2 2 2",
+        "expected_output": "6",
+        "is_public": false
+      },
+      {
+        "input_data": "6\n1 1 1 1 1 1",
+        "expected_output": "6",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 739,
+    "title": "Daily Temperatures",
+    "description": "Given an array of integers **temperatures** represents the daily temperatures, return an array **answer** such that **answer[i]** is the number of days you have to wait after the `i-th` day to get a warmer temperature. If there is no future day for which this is possible, keep **answer[i]** == 0.",
+    "input_format": "The first line contains an integer **N**.\nThe second line contains **N** space-separated integers representing the **temperatures**.",
+    "output_format": "Print **N** space-separated integers representing the waiting days.",
+    "difficulty": "Medium",
+    "tags": [
+      "array",
+      "stacks"
+    ],
+    "solution": "### Observations\nWe need to find the distance to the *next greater element* for each element in the array. A brute force approach would look ahead for every element, resulting in $O(N^2)$. We need a way to remember previous unsolved indices.\n\n### Approach\n1. **Monotonic Stack:** Use a stack to store indices of temperatures.\n2. Iterate through the list of temperatures.\n3. While the stack is not empty and the current temperature is greater than the temperature at the index stored at the top of the stack:\n   - This means we found a warmer day for the index at the stack top.\n   - Pop the index (`prev_index`).\n   - Calculate the wait time: `current_index - prev_index`.\n   - Store this in the result array at `prev_index`.\n4. Push the current index onto the stack.\n\n### Complexity Analysis\n- **Time Complexity:** $O(N)$. Each index is pushed and popped at most once.\n- **Space Complexity:** $O(N)$ for the stack.\n\n### Code Logic\n```python\ndef dailyTemperatures(T):\n    ans = [0] * len(T)\n    stack = [] # stores indices\n    \n    for i, t in enumerate(T):\n        while stack and T[stack[-1]] < t:\n            prev_index = stack.pop()\n            ans[prev_index] = i - prev_index\n        stack.append(i)\n    return ans\n```",
+    "hints": [
+      "If the temperature on day `i` is lower than day `j` (where `i < j`), day `i` is still waiting for a warmer day.",
+      "Try to maintain a list of indices that haven't found a warmer day yet.",
+      "Should this list of indices be ordered by temperature in increasing or decreasing order?",
+      "A stack can help you track the indices of days with decreasing temperatures.",
+      "When you see a temperature warmer than the stack's top, you can resolve the answer for that top index."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    # Reading input\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    n = int(input_data[0])\n    temps = list(map(int, input_data[1:n+1]))\n    \n    # Write logic here\n    \nsolve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String line1 = br.readLine();\n        if (line1 == null) return;\n        int n = Integer.parseInt(line1.trim());\n        \n        int[] temps = new int[n];\n        String[] parts = br.readLine().trim().split(\"\\\\s+\");\n        for(int i=0; i<n; i++) {\n            temps[i] = Integer.parseInt(parts[i]);\n        }\n        \n        // Write solution here\n        // System.out.print(...)\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "4\n30 40 50 60",
+        "expected_output": "1 1 1 0",
+        "is_public": true
+      },
+      {
+        "input_data": "8\n73 74 75 71 69 72 76 73",
+        "expected_output": "1 1 4 2 1 1 0 0",
+        "is_public": true
+      },
+      {
+        "input_data": "3\n30 60 90",
+        "expected_output": "1 1 0",
+        "is_public": false
+      },
+      {
+        "input_data": "4\n90 80 70 60",
+        "expected_output": "0 0 0 0",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n89 62 70 58 47",
+        "expected_output": "0 1 0 0 0",
+        "is_public": false
+      },
+      {
+        "input_data": "6\n30 30 30 30 30 30",
+        "expected_output": "0 0 0 0 0 0",
+        "is_public": false
+      },
+      {
+        "input_data": "6\n30 30 31 30 30 32",
+        "expected_output": "2 1 3 2 1 0",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 155,
+    "title": "Min Stack",
+    "description": "Design a stack that supports push, pop, top, and retrieving the minimum element in constant time.\n\nImplement the `MinStack` class:\n* `push(val)` pushes the element val onto the stack.\n* `pop()` removes the element on the top of the stack.\n* `top()` gets the top element of the stack.\n* `getMin()` retrieves the minimum element in the stack.\n\n**Note:** This is a design problem. The input simulates operations.",
+    "input_format": "The first line contains an integer **N** (number of operations).\nThe next **N** lines contain operations: `push X`, `pop`, `top`, or `getMin`.",
+    "output_format": "For `top` and `getMin` operations, print the result on a new line.",
+    "difficulty": "Medium",
+    "tags": [
+      "stacks",
+      "array"
+    ],
+    "solution": "### Observations\nThe standard stack operations are $O(1)$, but finding the minimum is usually $O(N)$. To achieve $O(1)$ for `getMin`, we need to store extra information.\n\n### Approach\n1. **Two Stacks:** \n   - Maintain a main stack for data.\n   - Maintain a `min_stack` that tracks the minimums encountered so far.\n2. **Push:**\n   - Always push to the main stack.\n   - If the `min_stack` is empty or the new value is $\\le$ the top of `min_stack`, push it to `min_stack` as well.\n3. **Pop:**\n   - Pop from the main stack.\n   - If the popped value is equal to the top of `min_stack`, pop from `min_stack` too.\n4. **GetMin:**\n   - Simply return the top of `min_stack`.\n\n### Complexity Analysis\n- **Time Complexity:** $O(1)$ for all operations.\n- **Space Complexity:** $O(N)$ for the auxiliary stack.\n\n### Code Logic\n```python\nclass MinStack:\n    def __init__(self):\n        self.stack = []\n        self.min_stack = []\n\n    def push(self, val):\n        self.stack.append(val)\n        # Push to min_stack if it's the new minimum\n        if not self.min_stack or val <= self.min_stack[-1]:\n            self.min_stack.append(val)\n\n    def pop(self):\n        if self.stack:\n            val = self.stack.pop()\n            if val == self.min_stack[-1]:\n                self.min_stack.pop()\n\n    def top(self):\n        return self.stack[-1] if self.stack else None\n\n    def getMin(self):\n        return self.min_stack[-1] if self.min_stack else None\n```",
+    "hints": [
+      "Can you use an auxiliary data structure to keep track of the minimums?",
+      "Consider a second stack that only pushes a value if it is smaller than or equal to the current minimum.",
+      "When popping from the main stack, check if the value matches the top of the minimum stack.",
+      "Space complexity will be O(N), but time complexity for getMin needs to be O(1)."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    lines = sys.stdin.read().splitlines()\n    if not lines: return\n    n = int(lines[0])\n    \n    stack = [] # Implement your stack logic here\n    # Aux variable or stack for min\n    \n    for i in range(1, n + 1):\n        parts = lines[i].split()\n        op = parts[0]\n        \n        if op == \"push\":\n            val = int(parts[1])\n            # Logic for push\n        elif op == \"pop\":\n            # Logic for pop\n            pass\n        elif op == \"top\":\n            # Print top\n            pass\n        elif op == \"getMin\":\n            # Print min\n            pass\n\nsolve()",
+    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextInt()) return;\n        int n = sc.nextInt();\n        \n        Stack<Integer> stack = new Stack<>();\n        Stack<Integer> minStack = new Stack<>();\n        \n        for (int i = 0; i < n; i++) {\n            String op = sc.next();\n            if (op.equals(\"push\")) {\n                int val = sc.nextInt();\n                stack.push(val);\n                if (minStack.isEmpty() || val <= minStack.peek()) {\n                    minStack.push(val);\n                }\n            } else if (op.equals(\"pop\")) {\n                int val = stack.pop();\n                if (val == minStack.peek()) {\n                    minStack.pop();\n                }\n            } else if (op.equals(\"top\")) {\n                System.out.println(stack.peek());\n            } else if (op.equals(\"getMin\")) {\n                System.out.println(minStack.peek());\n            }\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "7\npush -2\npush 0\npush -3\ngetMin\npop\ntop\ngetMin",
+        "expected_output": "-3\n0\n-2",
+        "is_public": true
+      },
+      {
+        "input_data": "5\npush 1\npush 2\ntop\ngetMin\npop",
+        "expected_output": "2\n1",
+        "is_public": true
+      },
+      {
+        "input_data": "5\npush 2147483646\npush 2147483646\npush 2147483647\ntop\npop\ngetMin\npop\ngetMin\npop\npush 2147483647\ntop\ngetMin\npush -2147483648\ntop\ngetMin\npop\ngetMin",
+        "expected_output": "2147483647\n2147483646\n2147483646\n2147483647\n2147483647\n-2147483648\n-2147483648\n2147483647",
+        "is_public": false
+      },
+      {
+        "input_data": "6\npush 10\npush 5\npush 5\npop\ngetMin\npop",
+        "expected_output": "5",
+        "is_public": false
+      },
+      {
+        "input_data": "4\npush 1\npush 1\npush 1\ngetMin",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "6\npush 10\npush 20\npush 5\ngetMin\npush 2\ngetMin",
+        "expected_output": "5\n2",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 227,
+    "title": "Basic Calculator II",
+    "description": "Given a string **s** which represents an expression, evaluate this expression and return its value. The integer division should truncate toward zero. The expression strings only contain non-negative integers, `+`, `-`, `*`, `/` operators, and empty spaces.",
+    "input_format": "A single line containing the string **s**.",
+    "output_format": "A single integer representing the result.",
+    "difficulty": "Medium",
+    "tags": [
+      "stacks",
+      "string"
+    ],
+    "solution": "### Observations\nStandard math rules apply: Multiplication and Division have higher precedence than Addition and Subtraction. We cannot simply evaluate left-to-right. We need to store numbers and process high-precedence operators immediately.\n\n### Approach\n1. **Using a Stack:**\n   - Initialize a `stack` to keep track of numbers to be summed up at the end.\n   - Keep track of the `last_operator` (initially `+`) and `current_number` (0).\n2. **Iteration:**\n   - Traverse the string char by char.\n   - If digit: update `current_number` (`num = num * 10 + digit`).\n   - If operator or end of string: \n     - Apply `last_operator` to `current_number` relative to the stack.\n     - If `+`: push `current_number`.\n     - If `-`: push `-current_number`.\n     - If `*`: pop top, multiply by `current_number`, push result.\n     - If `/`: pop top, divide by `current_number` (integer division truncating to zero), push result.\n     - Update `last_operator` to the current char and reset `current_number`.\n3. **Result:** Sum all elements in the stack.\n\n### Complexity Analysis\n- **Time Complexity:** $O(N)$ where N is string length.\n- **Space Complexity:** $O(N)$ for the stack.\n\n### Code Logic\n```python\ndef calculate(s):\n    stack = []\n    current_num = 0\n    op = '+'\n    s += '+' # sentinel to process last number\n    \n    for char in s:\n        if char.isdigit():\n            current_num = current_num * 10 + int(char)\n        elif char in '+-*/':\n            if op == '+':\n                stack.append(current_num)\n            elif op == '-':\n                stack.append(-current_num)\n            elif op == '*':\n                stack.append(stack.pop() * current_num)\n            elif op == '/':\n                top = stack.pop()\n                # Python integer division flooring issue handling\n                res = int(top / current_num)\n                stack.append(res)\n            op = char\n            current_num = 0\n            \n    return sum(stack)\n```",
+    "hints": [
+      "Scan the string from left to right.",
+      "Keep a variable for the current number being built.",
+      "Keep a variable for the LAST operator seen, not the current one.",
+      "If the last operator was '*' or '/', you must evaluate it immediately against the last number on the stack.",
+      "If the last operator was '+' or '-', just push the number (or negative number) to the stack.",
+      "Finally, sum up the stack."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    s = sys.stdin.read().strip()\n    if not s: return\n    \n    # Write logic here\n    \nsolve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String s = br.readLine();\n        if (s == null) return;\n        \n        // Write logic here\n        // System.out.println(result);\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "3+2*2",
+        "expected_output": "7",
+        "is_public": true
+      },
+      {
+        "input_data": " 3/2 ",
+        "expected_output": "1",
+        "is_public": true
+      },
+      {
+        "input_data": " 3+5 / 2 ",
+        "expected_output": "5",
+        "is_public": true
+      },
+      {
+        "input_data": "100-5",
+        "expected_output": "95",
+        "is_public": false
+      },
+      {
+        "input_data": "1*2*3*4",
+        "expected_output": "24",
+        "is_public": false
+      },
+      {
+        "input_data": "10-2*3",
+        "expected_output": "4",
+        "is_public": false
+      },
+      {
+        "input_data": "14-3/2",
+        "expected_output": "13",
+        "is_public": false
+      },
+      {
+        "input_data": "0-2147483647",
+        "expected_output": "-2147483647",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 394,
+    "title": "Decode String",
+    "description": "Given an encoded string, return its decoded string.\nThe encoding rule is: `k[encoded_string]`, where the encoded_string inside the square brackets is being repeated exactly `k` times. `k` is guaranteed to be a positive integer.\nYou may assume that the input string is always valid; there are no extra white spaces, square brackets are well-formed, etc.\n\n### Example\n`3[a]2[bc]` -> `aaabcbc`",
+    "input_format": "A single line containing the string **s**.",
+    "output_format": "Print the decoded string.",
+    "difficulty": "Medium",
+    "tags": [
+      "stacks",
+      "string"
+    ],
+    "solution": "### Observations\nThis problem involves nested structures (brackets inside brackets), which suggests a Stack-based approach or Recursion. We need to process the inner-most brackets first.\n\n### Approach\n1. **Two Stacks (or One Compound Stack):** \n   - `count_stack`: to store the repeat numbers `k`.\n   - `str_stack`: to store the string built so far before encountering a `[`.\n2. **Iteration:**\n   - If digit: Build the number `k`.\n   - If `[`: Push the current `k` to `count_stack` and current `string` to `str_stack`. Reset `string` and `k`.\n   - If `]`: \n     - Pop `current_k` from `count_stack`.\n     - Pop `prev_string` from `str_stack`.\n     - Update `string = prev_string + (current_string * current_k)`.\n   - If char: Append to current `string`.\n\n### Complexity Analysis\n- **Time Complexity:** $O(\\text{size of output})$, as we construct the final string.\n- **Space Complexity:** $O(N)$ for stack depth.\n\n### Code Logic\n```python\ndef decodeString(s):\n    stack = []\n    curNum = 0\n    curString = ''\n    \n    for c in s:\n        if c == '[':\n            stack.append(curString)\n            stack.append(curNum)\n            curString = ''\n            curNum = 0\n        elif c == ']':\n            num = stack.pop()\n            prevString = stack.pop()\n            curString = prevString + num * curString\n        elif c.isdigit():\n            curNum = curNum * 10 + int(c)\n        else:\n            curString += c\n    return curString\n```",
+    "hints": [
+      "Use a stack to keep track of the current number and the string built before a bracket.",
+      "When you encounter a `[`, you need to save the state (current number and current string) so you can start building the inner string.",
+      "When you encounter a `]`, you finish the inner string. Retrieve the last saved number to repeat the inner string, and append it to the last saved string prefix.",
+      "Remember that numbers can be more than one digit."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    s = sys.stdin.read().strip()\n    if not s: return\n    \n    # Write logic here\n    \nsolve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String s = br.readLine();\n        if (s == null) return;\n        \n        // Write logic here\n        // System.out.println(result);\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "3[a]2[bc]",
+        "expected_output": "aaabcbc",
+        "is_public": true
+      },
+      {
+        "input_data": "3[a2[c]]",
+        "expected_output": "accaccacc",
+        "is_public": true
+      },
+      {
+        "input_data": "2[abc]3[cd]ef",
+        "expected_output": "abcabccdcdcdef",
+        "is_public": true
+      },
+      {
+        "input_data": "10[a]",
+        "expected_output": "aaaaaaaaaa",
+        "is_public": false
+      },
+      {
+        "input_data": "2[3[a]b]",
+        "expected_output": "aaabaaab",
+        "is_public": false
+      },
+      {
+        "input_data": "1[a]",
+        "expected_output": "a",
+        "is_public": false
+      },
+      {
+        "input_data": "a",
+        "expected_output": "a",
+        "is_public": false
+      }
+    ]
+  }
 ]

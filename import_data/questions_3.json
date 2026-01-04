@@ -1,240 +1,267 @@
 [
-    {
-  "id": 55,
-  "title": "Jump Game",
-  "description": "You are given an integer array **nums**. You are initially positioned at the array's **first index**.\n\nEach element in the array represents your maximum jump length at that position.\n\nReturn `true` if you can reach the last index, or `false` otherwise.",
-  "input_format": "First line: An integer N representing the size of the array.\nSecond line: N space-separated integers representing the array nums.",
-  "output_format": "A single string \"true\" or \"false\".",
-  "difficulty": "Medium",
-  "tags": [
-    "array",
-    "dp",
-    "greedy"
-  ],
-  "solution": "### Observations\nThis looks like a dynamic programming problem where `dp[i]` indicates if index `i` is reachable. However, that requires $O(N^2)$. We can optimize this by noticing that we only care about the **maximum reachable index** at any point.\n\n### Approach: Greedy\n1.  Initialize a variable `max_reachable` to 0.\n2.  Iterate through the array with index `i`.\n3.  If `i` is greater than `max_reachable`, it means we cannot reach this index from any previous jump. Return `false`.\n4.  Update `max_reachable = max(max_reachable, i + nums[i])`.\n5.  If `max_reachable` is greater than or equal to the last index (`n - 1`), return `true`.\n\n### Complexity Analysis\n* **Time Complexity:** $O(N)$. We iterate through the array once.\n* **Space Complexity:** $O(1)$. We only use a few variables.\n\n### Code Logic\n\n**Python Logic**\n```python\nmax_reachable = 0\nfor i, jump in enumerate(nums):\n    if i > max_reachable:\n        return False\n    max_reachable = max(max_reachable, i + jump)\n    if max_reachable >= len(nums) - 1:\n        return True\nreturn True\n```",
-  "hints": [
-    "You don't need to calculate every possible path.",
-    "Try to keep track of the furthest index you can reach from your current position.",
-    "If you are at index `i` and the furthest you can reach is less than `i`, then you can never reach `i`.",
-    "Greedily update the maximum reach at every step."
-  ],
-  "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        nums = []\n        for _ in range(n):\n            nums.append(int(next(iterator)))\n    except StopIteration:\n        return\n\n    # Write your code here\n    # result = ...\n\n    # print(\"true\" if result else \"false\")\n\nif __name__ == '__main__':\n    solve()",
-  "boilerplate_java": "import java.io.*;\nimport java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String line = br.readLine();\n        if (line == null) return;\n        int n = Integer.parseInt(line.trim());\n        \n        int[] nums = new int[n];\n        String[] parts = br.readLine().trim().split(\"\\\\s+\");\n        for(int i=0; i<n; i++) {\n            nums[i] = Integer.parseInt(parts[i]);\n        }\n        \n        // Write logic here\n        // boolean result = ...\n        \n        // System.out.println(result ? \"true\" : \"false\");\n    }\n}",
-  "test_cases": [
-    {
-      "input_data": "5\n2 3 1 1 4",
-      "expected_output": "true",
-      "is_public": true
-    },
-    {
-      "input_data": "5\n3 2 1 0 4",
-      "expected_output": "false",
-      "is_public": true
-    },
-    {
-      "input_data": "1\n0",
-      "expected_output": "true",
-      "is_public": false
-    },
-    {
-      "input_data": "2\n0 2",
-      "expected_output": "false",
-      "is_public": false
-    },
-    {
-      "input_data": "4\n1 2 3 0",
-      "expected_output": "true",
-      "is_public": false
-    },
-    {
-      "input_data": "6\n5 4 0 2 0 1",
-      "expected_output": "true",
-      "is_public": false
-    },
-    {
-      "input_data": "7\n1 1 1 1 1 1 1",
-      "expected_output": "true",
-      "is_public": false
-    },
-    {
-      "input_data": "4\n1 0 1 0",
-      "expected_output": "false",
-      "is_public": false
-    }
-  ]
-},
-{
-  "id": 322,
-  "title": "Coin Change",
-  "description": "You are given an integer array **coins** representing coins of different denominations and an integer **amount** representing a total amount of money.\n\nReturn the fewest number of coins that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return `-1`.\n\nYou may assume that you have an infinite number of each kind of coin.",
-  "input_format": "First line: An integer N (number of coin types).\nSecond line: N space-separated integers representing the coins.\nThird line: An integer 'amount'.",
-  "output_format": "A single integer representing the minimum number of coins or -1.",
-  "difficulty": "Medium",
-  "tags": [
-    "array",
-    "dp",
-    "bfs"
-  ],
-  "solution": "### Observations\nWe want to minimize the number of coins. A greedy approach (always taking the largest coin) fails here (e.g., coins=[1,3,4], amount=6; Greedy gives 4+1+1=3 coins, but Optimal is 3+3=2 coins). This suggests Dynamic Programming or BFS.\n\n### Approach: Dynamic Programming (Bottom-Up)\n1.  Create an array `dp` of size `amount + 1`, initialized to `amount + 1` (a value larger than any possible solution). Set `dp[0] = 0`.\n2.  Iterate through every amount `a` from 1 to `amount`.\n3.  For each coin `c` in `coins`:\n    * If `a - c >= 0`, we can potentially form amount `a` by adding one coin `c` to the optimal solution for `a - c`.\n    * `dp[a] = min(dp[a], 1 + dp[a - c])`.\n4.  If `dp[amount]` is still `amount + 1`, it means the amount cannot be formed. Return -1. Otherwise, return `dp[amount]`.\n\n### Complexity Analysis\n* **Time Complexity:** $O(S \\times N)$, where $S$ is the amount and $N$ is the number of coin denominations.\n* **Space Complexity:** $O(S)$ for the DP table.\n\n### Code Logic\n\n**Python Logic**\n```python\ndp = [float('inf')] * (amount + 1)\ndp[0] = 0\n\nfor a in range(1, amount + 1):\n    for c in coins:\n        if a - c >= 0:\n            dp[a] = min(dp[a], 1 + dp[a - c])\n\nreturn dp[amount] if dp[amount] != float('inf') else -1\n```",
-  "hints": [
-    "This is a classic Dynamic Programming problem.",
-    "Define dp[i] as the minimum number of coins needed to make amount i.",
-    "To calculate dp[i], look at dp[i - coin_value] for all coin values.",
-    "Initialize your DP array with a value slightly larger than the maximum possible amount so you can use the min() function effectively."
-  ],
-  "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        coins = []\n        for _ in range(n):\n            coins.append(int(next(iterator)))\n        amount = int(next(iterator))\n    except StopIteration:\n        return\n\n    # Write your code here\n    # result = ...\n\n    # print(result)\n\nif __name__ == '__main__':\n    solve()",
-  "boilerplate_java": "import java.io.*;\nimport java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String line = br.readLine();\n        if (line == null) return;\n        int n = Integer.parseInt(line.trim());\n        \n        int[] coins = new int[n];\n        String[] parts = br.readLine().trim().split(\"\\\\s+\");\n        for(int i=0; i<n; i++) {\n            coins[i] = Integer.parseInt(parts[i]);\n        }\n        \n        String amtLine = br.readLine();\n        if (amtLine == null) return;\n        int amount = Integer.parseInt(amtLine.trim());\n        \n        // Write logic here\n        // int result = ...\n        \n        // System.out.println(result);\n    }\n}",
-  "test_cases": [
-    {
-      "input_data": "3\n1 2 5\n11",
-      "expected_output": "3",
-      "is_public": true
-    },
-    {
-      "input_data": "1\n2\n3",
-      "expected_output": "-1",
-      "is_public": true
-    },
-    {
-      "input_data": "1\n1\n0",
-      "expected_output": "0",
-      "is_public": true
-    },
-    {
-      "input_data": "3\n1 3 4\n6",
-      "expected_output": "2",
-      "is_public": false
-    },
-    {
-      "input_data": "2\n2 5\n10",
-      "expected_output": "2",
-      "is_public": false
-    },
-    {
-      "input_data": "3\n186 419 83\n6249",
-      "expected_output": "20",
-      "is_public": false
-    },
-    {
-      "input_data": "4\n1 2 5 10\n18",
-      "expected_output": "4",
-      "is_public": false
-    }
-  ]
-},
-{
-  "id": 134,
-  "title": "Gas Station",
-  "description": "There are `n` gas stations along a circular route, where the amount of gas at the `i-th` station is **gas[i]**.\n\nYou have a car with an unlimited gas tank and it costs **cost[i]** of gas to travel from the `i-th` station to its next `(i + 1)-th` station. You begin the journey with an empty tank at one of the gas stations.\n\nGiven two integer arrays `gas` and `cost`, return the starting gas station's index if you can travel around the circuit once in the clockwise direction, otherwise return `-1`. If there exists a solution, it is guaranteed to be **unique**.",
-  "input_format": "First line: An integer N.\nSecond line: N space-separated integers for gas.\nThird line: N space-separated integers for cost.",
-  "output_format": "A single integer representing the starting index or -1.",
-  "difficulty": "Medium",
-  "tags": [
-    "array",
-    "greedy"
-  ],
-  "solution": "### Observations\n1.  If sum(gas) < sum(cost), it's impossible to complete the circuit. Return -1 immediately.\n2.  If the total gas is sufficient, there must be a solution.\n\n### Approach: Greedy\n1.  Initialize `total_tank` (to check validity) and `curr_tank` (to find start index) to 0.\n2.  Initialize `start_index` to 0.\n3.  Iterate through the stations:\n    * Update `total_tank` and `curr_tank` by adding `gas[i] - cost[i]`.\n    * If `curr_tank` drops below 0, it means we cannot reach station `i` from the current `start_index`. Therefore, the starting station must be after `i`. Reset `start_index` to `i + 1` and reset `curr_tank` to 0.\n4.  Return `start_index` if `total_tank >= 0`, else -1.\n\n### Complexity Analysis\n* **Time Complexity:** $O(N)$. Single pass.\n* **Space Complexity:** $O(1)$.\n\n### Code Logic\n\n**Python Logic**\n```python\nif sum(gas) < sum(cost):\n    return -1\n\nstart, curr_tank = 0, 0\nfor i in range(len(gas)):\n    curr_tank += gas[i] - cost[i]\n    if curr_tank < 0:\n        start = i + 1\n        curr_tank = 0\nreturn start\n```",
-  "hints": [
-    "Check if the total gas is at least the total cost. If not, return -1 immediately.",
-    "If you start at station A and get stuck at station B, then no station between A and B can be a valid starting point.",
-    "Keep a running total of gas balance. If it drops below zero, reset your starting point to the next station."
-  ],
-  "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        gas = []\n        for _ in range(n):\n            gas.append(int(next(iterator)))\n        cost = []\n        for _ in range(n):\n            cost.append(int(next(iterator)))\n    except StopIteration:\n        return\n\n    # Write your code here\n    # result = ...\n\n    # print(result)\n\nif __name__ == '__main__':\n    solve()",
-  "boilerplate_java": "import java.io.*;\nimport java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String line = br.readLine();\n        if (line == null) return;\n        int n = Integer.parseInt(line.trim());\n        \n        int[] gas = new int[n];\n        String[] partsGas = br.readLine().trim().split(\"\\\\s+\");\n        for(int i=0; i<n; i++) gas[i] = Integer.parseInt(partsGas[i]);\n        \n        int[] cost = new int[n];\n        String[] partsCost = br.readLine().trim().split(\"\\\\s+\");\n        for(int i=0; i<n; i++) cost[i] = Integer.parseInt(partsCost[i]);\n        \n        // Write logic here\n        // int result = ...\n        \n        // System.out.println(result);\n    }\n}",
-  "test_cases": [
-    {
-      "input_data": "5\n1 2 3 4 5\n3 4 5 1 2",
-      "expected_output": "3",
-      "is_public": true
-    },
-    {
-      "input_data": "3\n2 3 4\n3 4 3",
-      "expected_output": "-1",
-      "is_public": true
-    },
-    {
-      "input_data": "1\n5\n4",
-      "expected_output": "0",
-      "is_public": false
-    },
-    {
-      "input_data": "1\n4\n5",
-      "expected_output": "-1",
-      "is_public": false
-    },
-    {
-      "input_data": "4\n5 1 2 3\n4 4 1 5",
-      "expected_output": "-1",
-      "is_public": false
-    },
-    {
-      "input_data": "6\n1 2 3 4 5 100\n1 2 3 4 5 1",
-      "expected_output": "5",
-      "is_public": false
-    },
-    {
-      "input_data": "4\n5 8 2 8\n6 5 6 6",
-      "expected_output": "3",
-      "is_public": false
-    }
-  ]
-},
-{
-  "id": 1899,
-  "title": "Merge Triplets to Form Target Triplet",
-  "description": "A **triplet** is an array of three integers. You are given a 2D integer array **triplets**, where `triplets[i] = [ai, bi, ci]`, and an integer array **target** = `[x, y, z]`.\n\nTo help you achieve the target, you can apply the following operation on `triplets` any number of times (possibly zero):\n\n* Choose two indices (0-indexed) `i` and `j` (`i != j`) and update `triplets[j]` to become `[max(ai, aj), max(bi, bj), max(ci, cj)]`.\n* Ignore the index `i` for the rest of the operations.\n\nReturn `true` if it is possible to obtain the **target** triplet `[x, y, z]` as an element of `triplets`, or `false` otherwise.",
-  "input_format": "First line: An integer N representing the number of triplets.\nNext N lines: Three space-separated integers representing each triplet.\nLast line: Three space-separated integers representing the target.",
-  "output_format": "A single string \"true\" or \"false\".",
-  "difficulty": "Medium",
-  "tags": [
-    "array",
-    "greedy"
-  ],
-  "solution": "### Observations\n1.  If a triplet has any value greater than the corresponding value in `target`, it can NEVER be used. Using it would make the resulting triplet exceed the target (since we only take the `max`). We should ignore such triplets.\n2.  For the remaining valid triplets, we can merge them all together. Merging `[a,b,c]` and `[d,e,f]` results in `[max(a,d), max(b,e), max(c,f)]`.\n3.  If the combined result of all valid triplets equals the target, then it's possible.\n\n### Approach: Greedy\n1.  Initialize a set `res` to store indices we have successfully matched (0, 1, and 2).\n2.  Iterate through each triplet `t`:\n    * If `t[0] > target[0]` or `t[1] > target[1]` or `t[2] > target[2]`: Skip this triplet.\n    * Otherwise, check which components match the target. If `t[i] == target[i]`, add `i` to `res`.\n3.  If `len(res) == 3` (meaning we found valid components for x, y, and z), return `true`.\n\n### Complexity Analysis\n* **Time Complexity:** $O(N)$.\n* **Space Complexity:** $O(1)$.\n\n### Code Logic\n\n**Python Logic**\n```python\ngood = set()\nfor t in triplets:\n    if t[0] > target[0] or t[1] > target[1] or t[2] > target[2]:\n        continue\n    \n    for i, v in enumerate(t):\n        if v == target[i]:\n            good.add(i)\n            \nreturn len(good) == 3\n```",
-  "hints": [
-    "A triplet with any value larger than the target cannot be part of the solution.",
-    "Filter out the 'bad' triplets.",
-    "Among the remaining 'good' triplets, check if you can find the target values for each of the 3 positions (x, y, z) at least once.",
-    "You don't need to actually simulate the merging. Just checking existence is enough."
-  ],
-  "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        triplets = []\n        for _ in range(n):\n            triplets.append([int(next(iterator)), int(next(iterator)), int(next(iterator))])\n        \n        target = [int(next(iterator)), int(next(iterator)), int(next(iterator))]\n    except StopIteration:\n        return\n\n    # Write your code here\n    # result = ...\n\n    # print(\"true\" if result else \"false\")\n\nif __name__ == '__main__':\n    solve()",
-  "boilerplate_java": "import java.io.*;\nimport java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String line = br.readLine();\n        if (line == null) return;\n        int n = Integer.parseInt(line.trim());\n        \n        int[][] triplets = new int[n][3];\n        for(int i=0; i<n; i++) {\n            String[] parts = br.readLine().trim().split(\"\\\\s+\");\n            triplets[i][0] = Integer.parseInt(parts[0]);\n            triplets[i][1] = Integer.parseInt(parts[1]);\n            triplets[i][2] = Integer.parseInt(parts[2]);\n        }\n        \n        String[] tParts = br.readLine().trim().split(\"\\\\s+\");\n        int[] target = new int[]{Integer.parseInt(tParts[0]), Integer.parseInt(tParts[1]), Integer.parseInt(tParts[2])};\n        \n        // Write logic here\n        // boolean result = ...\n        \n        // System.out.println(result ? \"true\" : \"false\");\n    }\n}",
-  "test_cases": [
-    {
-      "input_data": "3\n2 5 3\n1 8 4\n1 7 5\n2 7 5",
-      "expected_output": "true",
-      "is_public": true
-    },
-    {
-      "input_data": "2\n1 3 4\n1 5 9\n5 5 5",
-      "expected_output": "false",
-      "is_public": true
-    },
-    {
-      "input_data": "3\n2 5 3\n2 3 4\n1 2 5\n2 5 5",
-      "expected_output": "true",
-      "is_public": true
-    },
-    {
-      "input_data": "1\n1 2 3\n1 2 3",
-      "expected_output": "true",
-      "is_public": false
-    },
-    {
-      "input_data": "1\n1 2 10\n1 2 3",
-      "expected_output": "false",
-      "is_public": false
-    },
-    {
-      "input_data": "4\n1 1 1\n2 2 2\n3 3 3\n10 10 10\n3 3 3",
-      "expected_output": "true",
-      "is_public": false
-    },
-    {
-      "input_data": "3\n5 1 1\n1 5 1\n1 1 5\n5 5 5",
-      "expected_output": "true",
-      "is_public": false
-    }
-  ]
-}
+  {
+    "id": 33,
+    "title": "Search in Rotated Sorted Array",
+    "description": "There is an integer array **nums** sorted in ascending order (with distinct values). Prior to being passed to your function, **nums** is possibly rotated at an unknown pivot index `k` (1 <= k < nums.length) such that the resulting array is `[nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]]` (0-indexed).\n\nGiven the array **nums** after the possible rotation and an integer **target**, return the index of **target** if it is in **nums**, or `-1` if it is not in **nums**.\n\nYou must write an algorithm with `O(log n)` runtime complexity.",
+    "input_format": "First line: An integer N representing the size of the array.\nSecond line: N space-separated integers representing the array nums.\nThird line: An integer target.",
+    "output_format": "Print the index of the target, or -1 if not found.",
+    "difficulty": "Medium",
+    "tags": [
+      "array",
+      "binary_search"
+    ],
+    "solution": "### Observations\nThe array is sorted but rotated. This means if we split the array into two halves at the middle, at least one half will always be sorted.\n\n### Approach\n1. Use standard Binary Search with `low` and `high`.\n2. Calculate `mid`.\n3. Check if `nums[mid]` is the target.\n4. If not, identify which half is sorted:\n   - If `nums[low] <= nums[mid]`, the left half is sorted.\n   - Otherwise, the right half is sorted.\n5. Check if the target lies within the range of the sorted half.\n   - If yes, eliminate the other half.\n   - If no, search in the unsorted half.\n\n### Complexity Analysis\n- **Time:** O(log N)\n- **Space:** O(1)\n\n### Code Logic\n```python\nwhile low <= high:\n    mid = (low + high) // 2\n    if nums[mid] == target:\n        return mid\n    if nums[low] <= nums[mid]: # Left half sorted\n        if nums[low] <= target < nums[mid]:\n            high = mid - 1\n        else:\n            low = mid + 1\n    else: # Right half sorted\n        if nums[mid] < target <= nums[high]:\n            low = mid + 1\n        else:\n            high = mid - 1\nreturn -1\n```",
+    "hints": [
+      "The array is rotated, but one half (left or right) is always sorted.",
+      "Use Binary Search. Determine which side is sorted by comparing nums[low] and nums[mid].",
+      "If the left side is sorted, check if the target lies within the range [nums[low], nums[mid]].",
+      "If the right side is sorted, check if the target lies within the range [nums[mid], nums[high]]."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    # Read N\n    try:\n        line1 = sys.stdin.readline()\n        if not line1:\n            return\n        n = int(line1.strip())\n        \n        # Read Array\n        line2 = sys.stdin.readline()\n        if not line2:\n            return\n        nums = list(map(int, line2.strip().split()))\n        \n        # Read Target\n        line3 = sys.stdin.readline()\n        if not line3:\n            return\n        target = int(line3.strip())\n        \n        # Write your solution here\n        \n    except ValueError:\n        return\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (sc.hasNextInt()) {\n            int n = sc.nextInt();\n            int[] nums = new int[n];\n            for(int i=0; i<n; i++) {\n                nums[i] = sc.nextInt();\n            }\n            int target = sc.nextInt();\n            \n            // Call your solution function here\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "7\n4 5 6 7 0 1 2\n0",
+        "expected_output": "4",
+        "is_public": true
+      },
+      {
+        "input_data": "7\n4 5 6 7 0 1 2\n3",
+        "expected_output": "-1",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n1\n0",
+        "expected_output": "-1",
+        "is_public": false
+      },
+      {
+        "input_data": "1\n1\n1",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "3\n3 1 2\n2",
+        "expected_output": "2",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n3 1\n3",
+        "expected_output": "0",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "title": "Median of Two Sorted Arrays",
+    "description": "Given two sorted arrays **nums1** and **nums2** of size `m` and `n` respectively, return the median of the two sorted arrays.\n\nThe overall run time complexity should be `O(log (m+n))`.",
+    "input_format": "First line: Two integers M and N.\nSecond line: M integers for nums1.\nThird line: N integers for nums2.",
+    "output_format": "Print the median value as a float (formatted to usually 5 decimal places if needed, but standard print is fine).",
+    "difficulty": "Hard",
+    "tags": [
+      "array",
+      "binary_search"
+    ],
+    "solution": "### Observations\nMerging arrays takes O(m+n), which is too slow. We need O(log(min(m,n))). The median divides the combined set into two equal halves.\n\n### Approach\n1. Ensure `nums1` is the smaller array to minimize binary search range.\n2. Binary search on the partition index of `nums1`.\n3. Calculate the partition index for `nums2` based on the total elements needed in the left half.\n4. Check if the partition is valid:\n   - `maxLeft1 <= minRight2`\n   - `maxLeft2 <= minRight1`\n5. If valid, calculate median based on total length (odd or even).\n6. If invalid, adjust binary search pointers.\n\n### Complexity Analysis\n- **Time:** O(log(min(m, n)))\n- **Space:** O(1)\n\n### Code Logic\n```python\nA, B = nums1, nums2\ntotal = len(A) + len(B)\nhalf = total // 2\n\nif len(B) < len(A):\n    A, B = B, A\n\nl, r = 0, len(A) - 1\nwhile True:\n    i = (l + r) // 2\n    j = half - i - 2\n    \n    Aleft = A[i] if i >= 0 else float('-inf')\n    Aright = A[i+1] if (i+1) < len(A) else float('inf')\n    Bleft = B[j] if j >= 0 else float('-inf')\n    Bright = B[j+1] if (j+1) < len(B) else float('inf')\n    \n    if Aleft <= Bright and Bleft <= Aright:\n        if total % 2:\n            return min(Aright, Bright)\n        return (max(Aleft, Bleft) + min(Aright, Bright)) / 2\n    elif Aleft > Bright:\n        r = i - 1\n    else:\n        l = i + 1\n```",
+    "hints": [
+      "Don't merge the arrays; that is O(M+N). Use Binary Search.",
+      "Perform Binary Search on the smaller array to cut time complexity.",
+      "Try to find a partition such that all elements on the left are smaller than all elements on the right.",
+      "The partition split is valid when max(left_part) <= min(right_part)."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    try:\n        line1 = sys.stdin.readline()\n        if not line1: return\n        m, n = map(int, line1.split())\n        \n        line2 = sys.stdin.readline()\n        nums1 = list(map(int, line2.split())) if line2.strip() else []\n        \n        line3 = sys.stdin.readline()\n        nums2 = list(map(int, line3.split())) if line3.strip() else []\n        \n        # Logic here\n        \n    except ValueError: return\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(sc.hasNextInt()) {\n            int m = sc.nextInt();\n            int n = sc.nextInt();\n            int[] nums1 = new int[m];\n            int[] nums2 = new int[n];\n            for(int i=0; i<m; i++) nums1[i] = sc.nextInt();\n            for(int i=0; i<n; i++) nums2[i] = sc.nextInt();\n            \n            // Logic here\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "2 1\n1 3\n2",
+        "expected_output": "2.0",
+        "is_public": true
+      },
+      {
+        "input_data": "2 2\n1 2\n3 4",
+        "expected_output": "2.5",
+        "is_public": true
+      },
+      {
+        "input_data": "0 1\n\n1",
+        "expected_output": "1.0",
+        "is_public": false
+      },
+      {
+        "input_data": "2 2\n100 101\n1 2",
+        "expected_output": "51.0",
+        "is_public": false
+      },
+      {
+        "input_data": "1 1\n1\n2",
+        "expected_output": "1.5",
+        "is_public": false
+      },
+      {
+        "input_data": "3 3\n1 2 3\n1 2 3",
+        "expected_output": "2.0",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 410,
+    "title": "Split Array Largest Sum",
+    "description": "Given an integer array **nums** and an integer **k**, split **nums** into **k** non-empty subarrays such that the largest sum of any subarray is minimized.\n\nReturn the minimized largest sum of the split.",
+    "input_format": "First line: Two integers N and K.\nSecond line: N integers representing the array nums.",
+    "output_format": "Print the integer result representing the minimized largest sum.",
+    "difficulty": "Hard",
+    "tags": [
+      "binary_search",
+      "array"
+    ],
+    "solution": "### Observations\nThis is a classic 'Min-Max' problem. We are looking for a value `X` such that we can split the array into `k` parts where no part sums to more than `X`.\n\n### Approach\n1. Use Binary Search on the Answer space.\n2. **Range:** The smallest possible max sum is `max(nums)` (each element is a split). The largest is `sum(nums)` (one split).\n3. **Check Function:** Can we split the array into `<= k` subarrays such that no subarray sum exceeds `mid`?\n   - Iterate greedily; add numbers to current sum.\n   - If adding a number exceeds `mid`, start a new subarray and increment count.\n4. If valid, try a smaller sum (`high = mid - 1`). If not, need a larger sum (`low = mid + 1`).\n\n### Complexity Analysis\n- **Time:** O(N * log(Sum - Max))\n- **Space:** O(1)\n\n### Code Logic\n```python\ndef can_split(largest_sum):\n    splits = 1\n    curr_sum = 0\n    for n in nums:\n        curr_sum += n\n        if curr_sum > largest_sum:\n            splits += 1\n            curr_sum = n\n    return splits <= k\n\nlow, high = max(nums), sum(nums)\nres = high\nwhile low <= high:\n    mid = (low + high) // 2\n    if can_split(mid):\n        res = mid\n        high = mid - 1\n    else:\n        low = mid + 1\nreturn res\n```",
+    "hints": [
+      "Think about the range of possible answers. What is the lower bound and upper bound?",
+      "Lower bound is the maximum single element (cannot split smaller than that). Upper bound is the sum of all elements.",
+      "Use Binary Search on this range of sums.",
+      "Write a greedy function to check if a specific sum cap is feasible with K splits."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    lines = sys.stdin.read().split()\n    if not lines: return\n    \n    iterator = iter(lines)\n    try:\n        n = int(next(iterator))\n        k = int(next(iterator))\n        nums = []\n        for _ in range(n):\n            nums.append(int(next(iterator)))\n        \n        # Logic here\n            \n    except StopIteration:\n        return\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(sc.hasNextInt()) {\n            int n = sc.nextInt();\n            int k = sc.nextInt();\n            int[] nums = new int[n];\n            for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n            \n            // Logic here\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "5 2\n7 2 5 10 8",
+        "expected_output": "18",
+        "is_public": true
+      },
+      {
+        "input_data": "5 2\n1 2 3 4 5",
+        "expected_output": "9",
+        "is_public": true
+      },
+      {
+        "input_data": "5 5\n1 2 3 4 5",
+        "expected_output": "5",
+        "is_public": false
+      },
+      {
+        "input_data": "5 1\n1 2 3 4 5",
+        "expected_output": "15",
+        "is_public": false
+      },
+      {
+        "input_data": "3 3\n100 100 100",
+        "expected_output": "100",
+        "is_public": false
+      },
+      {
+        "input_data": "4 2\n1 1 1 100",
+        "expected_output": "100",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 875,
+    "title": "Koko Eating Bananas",
+    "description": "Koko loves to eat bananas. There are `n` piles of bananas, the `i-th` pile has `piles[i]` bananas. The guards have gone and will come back in `h` hours.\n\nKoko can decide her bananas-per-hour eating speed of `k`. Each hour, she chooses some pile of bananas and eats `k` bananas from that pile. If the pile has less than `k` bananas, she eats all of them instead and will not eat any more bananas during this hour.\n\nReturn the minimum integer `k` such that she can eat all the bananas within `h` hours.",
+    "input_format": "First line: Two integers N and H.\nSecond line: N integers representing the piles.",
+    "output_format": "Print the minimum eating speed k.",
+    "difficulty": "Medium",
+    "tags": [
+      "binary_search",
+      "array"
+    ],
+    "solution": "### Observations\nIf Koko can eat all bananas at speed `k`, she can also eat them at speed `k+1`. This monotonicity suggests Binary Search on the answer.\n\n### Approach\n1. **Range:** Speed can be from `1` to `max(piles)`.\n2. **Check Function:** For a given speed `k`, calculate total hours needed.\n   - Hours for a pile `p` = `ceil(p / k)`.\n   - In integer arithmetic: `(p + k - 1) // k`.\n3. If `hours_needed <= h`, `k` is valid. Try to find a smaller `k` (move left).\n4. Otherwise, speed is too slow. Increase `k` (move right).\n\n### Complexity Analysis\n- **Time:** O(N * log(Max_Pile))\n- **Space:** O(1)\n\n### Code Logic\n```python\nimport math\n\nl, r = 1, max(piles)\nres = r\n\nwhile l <= r:\n    k = (l + r) // 2\n    hours = 0\n    for p in piles:\n        hours += (p + k - 1) // k\n    \n    if hours <= h:\n        res = k\n        r = k - 1\n    else:\n        l = k + 1\nreturn res\n```",
+    "hints": [
+      "If Koko eats at speed K, how many hours does it take to finish a pile of size P? It takes ceil(P/K).",
+      "The possible speeds range from 1 to max(piles).",
+      "Use Binary Search to find the minimum speed.",
+      "Be careful with integer division. ceil(x/y) is (x + y - 1) // y."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    lines = sys.stdin.read().split()\n    if not lines: return\n    iterator = iter(lines)\n    try:\n        n = int(next(iterator))\n        h = int(next(iterator))\n        piles = []\n        for _ in range(n):\n            piles.append(int(next(iterator)))\n        \n        # Logic here\n            \n    except StopIteration: return\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(sc.hasNextInt()) {\n            int n = sc.nextInt();\n            int h = sc.nextInt();\n            int[] piles = new int[n];\n            for(int i=0; i<n; i++) piles[i] = sc.nextInt();\n            \n            // Logic here\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "4 8\n3 6 7 11",
+        "expected_output": "4",
+        "is_public": true
+      },
+      {
+        "input_data": "5 5\n30 11 23 4 20",
+        "expected_output": "30",
+        "is_public": true
+      },
+      {
+        "input_data": "5 6\n30 11 23 4 20",
+        "expected_output": "23",
+        "is_public": true
+      },
+      {
+        "input_data": "3 1000\n1 1 1",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "1 2\n10",
+        "expected_output": "5",
+        "is_public": false
+      },
+      {
+        "input_data": "1 1\n1000000000",
+        "expected_output": "1000000000",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 162,
+    "title": "Find Peak Element",
+    "description": "A peak element is an element that is strictly greater than its neighbors.\n\nGiven a **0-indexed** integer array **nums**, find a peak element, and return its index. If the array contains multiple peaks, return the index to **any of the peaks**.\n\nYou may imagine that `nums[-1] = nums[n] = -∞`. In other words, an element is always considered to be strictly greater than a neighbor that is outside the array.\n\nYou must write an algorithm that runs in `O(log n)` time.",
+    "input_format": "First line: Integer N.\nSecond line: N integers for the array.",
+    "output_format": "Print the index of any peak element.",
+    "difficulty": "Medium",
+    "tags": [
+      "array",
+      "binary_search"
+    ],
+    "solution": "### Observations\nSince we want `O(log n)` and the array is unsorted, but we need to find a local maximum, we can use the slope property.\n\n### Approach\n1. Use Binary Search.\n2. Calculate `mid`.\n3. Compare `nums[mid]` with `nums[mid + 1]`.\n4. If `nums[mid] < nums[mid + 1]`, we are on an upward slope. A peak must exist to the right (since the right end is -infinity). Move `low = mid + 1`.\n5. If `nums[mid] > nums[mid + 1]`, we are on a downward slope. A peak must exist to the left (or be `mid` itself). Move `high = mid`.\n\n### Complexity Analysis\n- **Time:** O(log N)\n- **Space:** O(1)\n\n### Code Logic\n```python\nl, r = 0, len(nums) - 1\nwhile l < r:\n    mid = (l + r) // 2\n    if nums[mid] > nums[mid + 1]:\n        r = mid\n    else:\n        l = mid + 1\nreturn l\n```",
+    "hints": [
+      "Think of the array as a mountain landscape.",
+      "If nums[mid] < nums[mid+1], then you are climbing up. The peak must be to the right.",
+      "If nums[mid] > nums[mid+1], you are going down. The peak is to the left or at mid.",
+      "Binary search can discard half the array based on slope."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    try:\n        line1 = sys.stdin.readline()\n        if not line1: return\n        n = int(line1.strip())\n        \n        line2 = sys.stdin.readline()\n        if not line2: return\n        nums = list(map(int, line2.strip().split()))\n        \n        # Logic here\n        \n    except ValueError: return\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(sc.hasNextInt()) {\n            int n = sc.nextInt();\n            int[] nums = new int[n];\n            for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n            \n            // Logic here\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "4\n1 2 3 1",
+        "expected_output": "2",
+        "is_public": true
+      },
+      {
+        "input_data": "7\n1 2 1 3 5 6 4",
+        "expected_output": "5",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n1",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "2\n1 2",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "2\n2 1",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "3\n1 5 1",
+        "expected_output": "1",
+        "is_public": false
+      }
+    ]
+  }
 ]

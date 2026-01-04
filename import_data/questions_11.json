@@ -1,0 +1,357 @@
+[
+  {
+    "id": "307",
+    "title": "Range Sum Query - Mutable",
+    "description": "Given an integer array **nums**, handle multiple queries of the following types:\n\n1. **Update**: Update the value of an element in **nums**.\n2. **Sum Range**: Calculate the sum of the elements of **nums** between indices **left** and **right** inclusive where **left** <= **right**.\n\nImplement the following operations:\n* `update(index, val)`: Updates the value of **nums[index]** to be **val**.\n* `sumRange(left, right)`: Returns the sum of the elements of **nums** between indices **left** and **right** inclusive (i.e. **nums[left]** + **nums[left + 1]** + ... + **nums[right]**).",
+    "input_format": "First line: Two integers N (size of array) and Q (number of queries).\nSecond line: N integers representing the initial array.\nNext Q lines: A character 'U' or 'S' followed by two integers. 'U index val' updates the array. 'S left right' queries the sum.",
+    "output_format": "For each 'S' (sum) query, print the calculated sum on a new line.",
+    "difficulty": "Medium",
+    "tags": [
+      "tree",
+      "array"
+    ],
+    "solution": "### Observations\nA naive approach using simple array updates takes $O(1)$ for updates but $O(N)$ for range sums. Conversely, a prefix sum array takes $O(1)$ for sums but $O(N)$ for updates. To balance both, we need a data structure that supports logarithmic time operations.\n\n### Approach\nWe can use a **Segment Tree** or a **Binary Indexed Tree (Fenwick Tree)**.\n1. **Segment Tree Construction**: Build a tree where leaves represent array elements and internal nodes represent the sum of their children.\n2. **Update**: Update the leaf node and traverse up to update the sums of ancestors. Complexity: $O(\\log N)$.\n3. **Query**: Traverse the tree to find nodes that fall completely within the query range $[L, R]$. Complexity: $O(\\log N)$.\n\n### Complexity Analysis\n* **Time**: $O(N)$ to build, $O(\\log N)$ per query/update.\n* **Space**: $O(N)$ for the tree storage.\n\n### Code Logic\n```python\ndef solve(nums, queries):\n    n = len(nums)\n    tree = [0] * (2 * n)\n    \n    # Build tree\n    for i in range(n):\n        tree[n + i] = nums[i]\n    for i in range(n - 1, 0, -1):\n        tree[i] = tree[2 * i] + tree[2 * i + 1]\n        \n    output = []\n    for type, a, b in queries:\n        if type == 'U':\n            idx, val = a, b\n            idx += n\n            tree[idx] = val\n            while idx > 1:\n                tree[idx >> 1] = tree[idx] + tree[idx ^ 1]\n                idx >>= 1\n        else:\n            l, r = a, b\n            l += n\n            r += n\n            res = 0\n            while l <= r:\n                if l % 2 == 1:\n                    res += tree[l]\n                    l += 1\n                if r % 2 == 0:\n                    res += tree[r]\n                    r -= 1\n                l >>= 1\n                r >>= 1\n            output.append(str(res))\n    return output\n```",
+    "hints": [
+      "A linear scan for sumRange is too slow (O(N) per query).",
+      "Prefix sums make queries fast but updates slow.",
+      "Consider a structure that splits the array into chunks or a hierarchy.",
+      "A Segment Tree allows both update and query in O(log N).",
+      "Alternatively, a Binary Indexed Tree (Fenwick Tree) is easier to implement."
+    ],
+    "boilerplate_python": "import sys\n\n# Increase recursion depth for deep trees if necessary\nsys.setrecursionlimit(2000)\n\ndef solve():\n    # Reading input\n    try:\n        input = sys.stdin.read().split()\n    except Exception:\n        return\n\n    if not input: return\n    \n    iterator = iter(input)\n    try:\n        N = int(next(iterator))\n        Q = int(next(iterator))\n        \n        nums = []\n        for _ in range(N):\n            nums.append(int(next(iterator)))\n            \n        # Process logic here\n        # Example of parsing queries:\n        # for _ in range(Q):\n        #     type_char = next(iterator)\n        #     val1 = int(next(iterator))\n        #     val2 = int(next(iterator))\n        \n        # Write your Segment Tree or BIT logic here\n        \n    except StopIteration:\n        pass\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st = new StringTokenizer(br.readLine());\n        \n        int N = Integer.parseInt(st.nextToken());\n        int Q = Integer.parseInt(st.nextToken());\n        \n        int[] nums = new int[N];\n        st = new StringTokenizer(br.readLine());\n        for (int i = 0; i < N; i++) {\n            nums[i] = Integer.parseInt(st.nextToken());\n        }\n        \n        // Initialize your data structure here\n        \n        for (int i = 0; i < Q; i++) {\n            st = new StringTokenizer(br.readLine());\n            String type = st.nextToken();\n            int a = Integer.parseInt(st.nextToken());\n            int b = Integer.parseInt(st.nextToken());\n            \n            if (type.equals(\"U\")) {\n                // Handle Update\n            } else {\n                // Handle Sum Range query and print result\n            }\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "3 3\n1 3 5\nS 0 2\nU 1 2\nS 0 2",
+        "expected_output": "9\n8",
+        "is_public": true
+      },
+      {
+        "input_data": "5 4\n1 2 3 4 5\nS 0 4\nU 2 10\nS 2 3\nS 0 4",
+        "expected_output": "15\n14\n22",
+        "is_public": true
+      },
+      {
+        "input_data": "1 2\n10\nS 0 0\nU 0 5\nS 0 0",
+        "expected_output": "10\n5",
+        "is_public": false
+      },
+      {
+        "input_data": "5 2\n0 0 0 0 0\nU 2 5\nS 0 4",
+        "expected_output": "5",
+        "is_public": false
+      },
+      {
+        "input_data": "5 3\n-1 -2 -3 -4 -5\nS 0 2\nU 0 1\nS 0 2",
+        "expected_output": "-6\n-4",
+        "is_public": false
+      },
+      {
+        "input_data": "5 1\n1 2 3 4 5\nS 4 4",
+        "expected_output": "5",
+        "is_public": false
+      },
+      {
+      "input_data": "5 1\n1 2 3 4 5\nS 4 4",
+      "expected_output": "5",
+      "is_public": false
+    },
+    {
+      "input_data": "100 3\n1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1\nS 0 99\nU 50 100\nS 0 99",
+      "expected_output": "100\n199",
+      "is_public": false
+    }
+    ]
+  },
+  {
+    "id": "315",
+    "title": "Count of Smaller Numbers After Self",
+    "description": "Given an integer array **nums**, return an integer array **counts** where **counts[i]** is the number of smaller elements to the right of **nums[i]**.",
+    "input_format": "First line: An integer N.\nSecond line: N space-separated integers representing nums.",
+    "output_format": "Print N space-separated integers representing the counts array.",
+    "difficulty": "Hard",
+    "tags": [
+      "tree",
+      "binary_search",
+      "array"
+    ],
+    "solution": "### Observations\nA brute force approach compares every element with every subsequent element, resulting in $O(N^2)$. Given constraints often reach $N=10^5$, we need $O(N \\log N)$.\n\n### Approach\nThis problem is equivalent to counting inversions. We can solve it using:\n1.  **Merge Sort**: During the merge step, if we pick an element from the right subarray, it implies it is smaller than the remaining elements in the left subarray. We can track indices to update counts.\n2.  **Binary Indexed Tree (BIT) / Segment Tree**: Discretize the values (map values to ranks 1..N) to handle large numbers/negatives. Iterate from right to left. For each element, query the sum of frequencies of smaller ranks, then add 1 to the current rank's frequency.\n\n### Complexity Analysis\n* **Time**: $O(N \\log N)$ using BIT or Merge Sort.\n* **Space**: $O(N)$ for auxiliary arrays/tree.\n\n### Code Logic (BIT Approach)\n```python\ndef solve(nums):\n    # Coordinate compression (discretization)\n    sorted_unique = sorted(list(set(nums)))\n    ranks = {val: i + 1 for i, val in enumerate(sorted_unique)}\n    \n    bit = [0] * (len(ranks) + 1)\n    def update(i, delta):\n        while i < len(bit):\n            bit[i] += delta\n            i += i & (-i)\n            \n    def query(i):\n        s = 0\n        while i > 0:\n            s += bit[i]\n            i -= i & (-i)\n        return s\n        \n    res = []\n    # Iterate right to left\n    for x in reversed(nums):\n        r = ranks[x]\n        res.append(query(r - 1))\n        update(r, 1)\n        \n    return res[::-1]\n```",
+    "hints": [
+      "Traversing from right to left might simplify the problem.",
+      "Think about how Merge Sort counts inversions.",
+      "Can we use a data structure to keep track of seen elements and query how many are smaller?",
+      "Since values can be large or negative, consider coordinate compression (mapping values to ranks).",
+      "A Fenwick Tree (BIT) or Segment Tree is ideal here."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    # Reading input\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    \n    try:\n        N = int(next(iterator))\n        nums = []\n        for _ in range(N):\n            nums.append(int(next(iterator)))\n        \n        # Implement logic here\n        \n        # Print result as space separated string\n        # print(*(result))\n    except StopIteration:\n        pass\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String line = br.readLine();\n        if(line == null) return;\n        int N = Integer.parseInt(line.trim());\n        \n        int[] nums = new int[N];\n        StringTokenizer st = new StringTokenizer(br.readLine());\n        for(int i=0; i<N; i++) {\n            nums[i] = Integer.parseInt(st.nextToken());\n        }\n        \n        // Solve\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "4\n5 2 6 1",
+        "expected_output": "2 1 1 0",
+        "is_public": true
+      },
+      {
+        "input_data": "2\n-1 -1",
+        "expected_output": "0 0",
+        "is_public": true
+      },
+      {
+        "input_data": "5\n1 2 3 4 5",
+        "expected_output": "0 0 0 0 0",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n5 4 3 2 1",
+        "expected_output": "4 3 2 1 0",
+        "is_public": false
+      },
+      {
+        "input_data": "1\n10",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "6\n-5 -2 -5 -2 -1 -10",
+        "expected_output": "1 1 1 1 1 0",
+        "is_public": false
+      },
+      {
+        "input_data": "0\n",
+        "expected_output": "",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": "218",
+    "title": "The Skyline Problem",
+    "description": "A city's skyline is the outer contour of the silhouette formed by all the buildings in that city when viewed from a distance. Given the locations and heights of all the buildings, return the **skyline** formed by these buildings collectively.\n\nEach building is represented by triplets `[left, right, height]`. The output is a list of \"key points\" `[x, y]` in the format of a sorted list.",
+    "input_format": "First line: N (number of buildings).\nNext N lines: Three integers L R H for each building.",
+    "output_format": "Print the key points. Each point on a new line as 'x y'.",
+    "difficulty": "Hard",
+    "tags": [
+      "heap",
+      "array",
+      "tree"
+    ],
+    "solution": "### Observations\nThe critical points in a skyline only change at the start (left edge) or end (right edge) of a building. We can view this as a sweep-line problem processing events at x-coordinates.\n\n### Approach\n1.  **Events**: Break each building `[L, R, H]` into two events: `(L, -H)` (start) and `(R, H)` (end). We use negative height for start to simplify sorting (process starts before ends if x is same, and higher starts before lower starts).\n2.  **Sorting**: Sort events by x-coordinate. Tie-breakers: start events before end events; for two starts, higher height first.\n3.  **Max Heap**: Iterate through sorted events. Maintain a Max Heap of active building heights. \n    * At a start event, push height to heap.\n    * At an end event, remove height (lazy removal via a hash map or simply checking heap top).\n4.  **Key Points**: If the max height in the heap changes after processing an event, record the new `[x, max_height]` as a key point.\n\n### Complexity Analysis\n* **Time**: $O(N \\log N)$ due to sorting and heap operations.\n* **Space**: $O(N)$ for the heap.\n\n### Code Logic\n```python\nimport heapq\n\ndef solve(buildings):\n    events = []\n    for l, r, h in buildings:\n        events.append((l, -h, r))\n        events.append((r, 0, 0)) # 0 height marks end, but we need to remove h\n    \n    # The standard approach usually pairs (R, H) for removal\n    # Re-logic: (L, -H), (R, H). Sort.\n    events = []\n    for l, r, h in buildings:\n        events.append((l, -h))\n        events.append((r, h))\n    events.sort()\n    \n    res = [[0, 0]]\n    live = [0] # Max heap (using negative values in python)\n    prev_max = 0\n    \n    for x, h in events:\n        if h < 0:\n            heapq.heappush(live, h)\n        else:\n            # Lazy removal usually requires a remove dict or multiset\n            # Python heapq doesn't support arbitrary remove efficiently.\n            # Standard trick: Use a dictionary to count 'delayed' removals.\n            # This logic snippet is conceptual. Full impl requires lazy removal.\n            pass \n            \n    # Correct Python Lazy Removal Logic:\n    # Map heights to end points. Only pop from heap if top's end point <= current x\n    points = []\n    for l, r, h in buildings:\n        points.append((l, -h, r))\n        points.append((r, h, 0))\n    points.sort()\n    \n    result = []\n    max_heap = [(0, float('inf'))] # (height, right_edge)\n    \n    for x, h, r in points:\n        while max_heap[0][1] <= x:\n            heapq.heappop(max_heap)\n        \n        if h < 0:\n            heapq.heappush(max_heap, (h, r))\n            \n        curr_max = -max_heap[0][0]\n        if not result or result[-1][1] != curr_max:\n            result.append([x, curr_max])\n            \n    return result\n```",
+    "hints": [
+      "Critical points exist only at the left and right edges of buildings.",
+      "Separate edges into start and end events.",
+      "Sort the events. Be careful with tie-breaking: Start of a building should come before end of another at the same x?",
+      "Use a Max Heap to keep track of the current tallest building.",
+      "Lazy removal from the heap is necessary in Python since random deletion is O(N)."
+    ],
+    "boilerplate_python": "import sys\nimport heapq\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    \n    try:\n        N = int(next(iterator))\n        buildings = []\n        for _ in range(N):\n            l = int(next(iterator))\n            r = int(next(iterator))\n            h = int(next(iterator))\n            buildings.append([l, r, h])\n            \n        # Solve logic\n        \n        # Print output format: x y\n    except StopIteration:\n        pass\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNext()) return;\n        int N = sc.nextInt();\n        int[][] buildings = new int[N][3];\n        for(int i=0; i<N; i++){\n            buildings[i][0] = sc.nextInt();\n            buildings[i][1] = sc.nextInt();\n            buildings[i][2] = sc.nextInt();\n        }\n        \n        // Solve and print\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "5\n2 9 10\n3 7 15\n5 12 12\n15 20 10\n19 24 8",
+        "expected_output": "2 10\n3 15\n7 12\n12 0\n15 10\n20 8\n24 0",
+        "is_public": true
+      },
+      {
+        "input_data": "2\n0 2 3\n2 5 3",
+        "expected_output": "0 3\n5 0",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n1 5 10",
+        "expected_output": "1 10\n5 0",
+        "is_public": false
+      },
+      {
+        "input_data": "3\n1 5 10\n1 5 10\n1 5 10",
+        "expected_output": "1 10\n5 0",
+        "is_public": false
+      },
+      {
+        "input_data": "3\n1 5 10\n2 6 20\n3 7 30",
+        "expected_output": "1 10\n2 20\n3 30\n7 0",
+        "is_public": false
+      },
+      {
+        "input_data": "2\n1 10 10\n4 6 5",
+        "expected_output": "1 10\n10 0",
+        "is_public": false
+      },
+      {
+        "input_data": "0\n",
+        "expected_output": "",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": "137",
+    "title": "Single Number II",
+    "description": "Given an integer array **nums** where every element appears **three times** except for one, which appears exactly once. Find the single element and return it.\n\nYou must implement a solution with a linear runtime complexity and use only constant extra space.",
+    "input_format": "First line: N (size of array).\nSecond line: N space-separated integers.",
+    "output_format": "Print the single integer.",
+    "difficulty": "Medium",
+    "tags": [
+      "array"
+    ],
+    "solution": "### Observations\nWe cannot use a hash map because of the space constraint ($O(1)$ space). We need to count bits.\n\n### Approach\nConsider the bits of the numbers. If a number appears 3 times, the sum of the $i$-th bit of all such numbers will be divisible by 3 (either 0 or 3). \nTherefore, if we sum the bits at every position $i$ for all numbers:\n* `sum % 3 == 0` implies the single number has a 0 at this bit.\n* `sum % 3 == 1` implies the single number has a 1 at this bit.\n\nWe can reconstruct the number bit by bit, or use a digital logic design approach with variables `ones` (bits appearing once) and `twos` (bits appearing twice).\n\n### Complexity Analysis\n* **Time**: $O(N)$ (one pass).\n* **Space**: $O(1)$.\n\n### Code Logic\n```python\ndef solve(nums):\n    ones = 0\n    twos = 0\n    for x in nums:\n        # ones tracks bits that have appeared 1st time or 4th time (mod 3 = 1)\n        # twos tracks bits that have appeared 2nd time or 5th time (mod 3 = 2)\n        ones = (ones ^ x) & ~twos\n        twos = (twos ^ x) & ~ones\n    return ones\n```",
+    "hints": [
+      "Think about the binary representation of the numbers.",
+      "If you sum the bits at the ith position for all numbers, what should the sum be modulo 3?",
+      "Design a logic circuit: A bit can be in state 0, 1, or 2 (represented by two integers 'ones' and 'twos').",
+      "Using XOR and AND can help transition states."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    \n    try:\n        N = int(next(iterator))\n        nums = []\n        for _ in range(N):\n            nums.append(int(next(iterator)))\n        \n        # Logic\n        \n    except StopIteration:\n        pass\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNext()) return;\n        int N = sc.nextInt();\n        int[] nums = new int[N];\n        for(int i=0; i<N; i++) nums[i] = sc.nextInt();\n        \n        // Logic\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "4\n2 2 3 2",
+        "expected_output": "3",
+        "is_public": true
+      },
+      {
+        "input_data": "7\n0 1 0 1 0 1 99",
+        "expected_output": "99",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n-5",
+        "expected_output": "-5",
+        "is_public": false
+      },
+      {
+        "input_data": "4\n-2 -2 -2 5",
+        "expected_output": "5",
+        "is_public": false
+      },
+      {
+        "input_data": "10\n1 1 1 2 2 2 3 3 3 4",
+        "expected_output": "4",
+        "is_public": false
+      },
+      {
+        "input_data": "13\n10 20 10 30 10 30 20 20 30 500 600 500 500",
+        "expected_output": "600",
+        "is_public": false
+      },
+      {
+        "input_data": "4\n2147483647 2147483647 2147483647 1",
+        "expected_output": "1",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": "371",
+    "title": "Sum of Two Integers",
+    "description": "Given two integers **a** and **b**, return the sum of the two integers without using the operators `+` and `-`.",
+    "input_format": "First line: Two integers a and b.",
+    "output_format": "Print the sum.",
+    "difficulty": "Medium",
+    "tags": [],
+    "solution": "### Observations\nComputer hardware performs addition using bitwise logic (Full Adder). We can simulate this using XOR and AND.\n\n### Approach\n1.  **Sum without carry**: The XOR operation (`a ^ b`) gives the sum of two bits ignoring the carry.\n2.  **Carry**: The AND operation (`a & b`) identifies positions where both bits are 1, generating a carry. This carry needs to be shifted left by one (`<< 1`).\n3.  **Iteration**: Repeat the process with the new sum (XOR result) and the carry until the carry becomes 0.\n\n*Note*: In Python, integers have arbitrary precision, so handling negative numbers (Two's Complement) requires masking (e.g., with 0xFFFFFFFF).\n\n### Complexity Analysis\n* **Time**: $O(1)$ (bounded by the number of bits, e.g., 32).\n* **Space**: $O(1)$.\n\n### Code Logic\n```python\ndef solve(a, b):\n    mask = 0xFFFFFFFF\n    while b != 0:\n        # a ^ b sums without carry\n        # (a & b) << 1 calculates carry\n        sum_val = (a ^ b) & mask\n        carry = ((a & b) << 1) & mask\n        a, b = sum_val, carry\n    \n    # Handle negative overflow for Python\n    # If the 32nd bit is 1, it's a negative number in 32-bit world\n    max_int = 0x7FFFFFFF\n    return a if a <= max_int else ~(a ^ mask)\n```",
+    "hints": [
+      "XOR (^) simulates addition without carry.",
+      "AND (&) followed by Left Shift (<<) simulates the carry.",
+      "Repeat until carry is zero.",
+      "Be careful with negative numbers in languages with infinite precision integers (like Python)."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    \n    try:\n        a = int(input_data[0])\n        b = int(input_data[1])\n        \n        # Logic\n        \n    except IndexError:\n        pass\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNext()) return;\n        int a = sc.nextInt();\n        int b = sc.nextInt();\n        System.out.println(add(a, b));\n    }\n    \n    public static int add(int a, int b) {\n        // Logic\n        return 0;\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "1 2",
+        "expected_output": "3",
+        "is_public": true
+      },
+      {
+        "input_data": "2 3",
+        "expected_output": "5",
+        "is_public": true
+      },
+      {
+        "input_data": "-1 1",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "-10 -20",
+        "expected_output": "-30",
+        "is_public": false
+      },
+      {
+        "input_data": "2147483647 0",
+        "expected_output": "2147483647",
+        "is_public": false
+      },
+      {
+        "input_data": "0 0",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "100 -100",
+        "expected_output": "0",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": "149",
+    "title": "Max Points on a Line",
+    "description": "Given an array of **points** where **points[i] = [xi, yi]** represents a point on the X-Y plane, return the maximum number of points that lie on the same straight line.",
+    "input_format": "First line: N (number of points).\nNext N lines: x y coordinates for each point.",
+    "output_format": "Print the integer maximum number of points.",
+    "difficulty": "Hard",
+    "tags": [
+      "map",
+      "array"
+    ],
+    "solution": "### Observations\nA line is defined by a slope and a point. If three points $A, B, C$ are collinear, the slope of $AB$ is equal to the slope of $AC$. \n\n### Approach\n1.  Iterate through every point $i$ and treat it as the \"anchor\".\n2.  For every other point $j$, calculate the slope between $i$ and $j$.\n3.  Use a Hash Map to store `slope -> count`.\n4.  Update the global maximum with the max value in the map + 1 (for point $i$ itself).\n5.  **Handling Slopes**: Floating point precision issues can be avoided by storing the slope as a reduced fraction $(dy, dx)$ where $dy/dx$ is the slope. Use GCD to reduce.\n\n### Complexity Analysis\n* **Time**: $O(N^2)$.\n* **Space**: $O(N)$ for the hash map.\n\n### Code Logic\n```python\nimport math\nfrom collections import defaultdict\n\ndef solve(points):\n    n = len(points)\n    if n <= 2: return n\n    \n    ans = 0\n    for i in range(n):\n        slopes = defaultdict(int)\n        for j in range(i + 1, n):\n            dx = points[j][0] - points[i][0]\n            dy = points[j][1] - points[i][1]\n            \n            g = math.gcd(dx, dy)\n            # Slope as tuple (dy/gcd, dx/gcd)\n            slope = (dy // g, dx // g)\n            slopes[slope] += 1\n            \n        if slopes:\n            ans = max(ans, max(slopes.values()) + 1)\n        else:\n            # Case where only duplicates or just one point compared\n             ans = max(ans, 1)\n             \n    return ans\n```",
+    "hints": [
+      "For each point, calculate the slope to every other point.",
+      "Use a hash map to count points with the same slope.",
+      "Beware of vertical lines (slope is infinity).",
+      "Beware of floating point precision. Store slope as a GCD-reduced fraction (dy, dx).",
+      "Duplicate points should be handled correctly (though constraints often say distinct points)."
+    ],
+    "boilerplate_python": "import sys\nimport math\nfrom collections import defaultdict\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    \n    try:\n        N = int(next(iterator))\n        points = []\n        for _ in range(N):\n            x = int(next(iterator))\n            y = int(next(iterator))\n            points.append([x, y])\n            \n        # Logic here\n        \n    except StopIteration:\n        pass\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNext()) return;\n        int N = sc.nextInt();\n        int[][] points = new int[N][2];\n        for(int i=0; i<N; i++) {\n            points[i][0] = sc.nextInt();\n            points[i][1] = sc.nextInt();\n        }\n        \n        // Logic\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "3\n1 1\n2 2\n3 3",
+        "expected_output": "3",
+        "is_public": true
+      },
+      {
+        "input_data": "6\n1 1\n3 2\n5 3\n4 1\n2 3\n1 4",
+        "expected_output": "4",
+        "is_public": true
+      },
+      {
+        "input_data": "2\n1 1\n2 2",
+        "expected_output": "2",
+        "is_public": false
+      },
+      {
+        "input_data": "3\n0 0\n0 1\n0 2",
+        "expected_output": "3",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n0 0\n1 1\n0 0\n1 1\n2 2",
+        "expected_output": "5",
+        "is_public": false
+      },
+      {
+        "input_data": "4\n1 1\n1 2\n2 2\n2 1",
+        "expected_output": "2",
+        "is_public": false
+      },
+      {
+        "input_data": "1\n0 0",
+        "expected_output": "1",
+        "is_public": false
+      }
+    ]
+  }
+]

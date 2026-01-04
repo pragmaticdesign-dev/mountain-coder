@@ -1,636 +1,477 @@
 [
   {
-    "id": 743,
-    "title": "Network Delay Time",
-    "description": "You are given a network of `n` nodes, labeled from `1` to `n`. You are also given `times`, a list of travel times as directed edges `times[i] = (ui, vi, wi)`, where `ui` is the source node, `vi` is the target node, and `wi` is the time it takes for a signal to travel from source to target.\n\nWe will send a signal from a given node `k`. Return *the minimum time it takes for all the* `n` *nodes to receive the signal*. If it is impossible for all the `n` nodes to receive the signal, return `-1`.",
-    "input_format": "First line: Two integers N (nodes) and M (edges).\nNext M lines: Three space-separated integers u v w.\nLast line: Integer K (start node).",
-    "output_format": "Integer representing the minimum time.",
+    "id": 322,
+    "title": "Coin Change",
+    "description": "You are given an integer array **coins** representing coins of different denominations and an integer **amount** representing a total amount of money.\n\nReturn the *fewest number of coins* that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return `-1`.\n\nYou may assume that you have an infinite number of each kind of coin.",
+    "input_format": "First line: An integer 'amount'.\nSecond line: An integer 'n' (size of coins array).\nThird line: 'n' space-separated integers representing the coins.",
+    "output_format": "Print a single integer representing the minimum number of coins, or -1 if impossible.",
     "difficulty": "Medium",
     "tags": [
-      "graph",
-      "heap",
-      "searching"
+      "dp",
+      "array"
     ],
-    "solution": "### Observations\nWe need the maximum of the shortest paths from node `k` to all other nodes. This is a classic shortest path problem with non-negative weights.\n\n### Approach\n1. **Algorithm:** Dijkstra's Algorithm is optimal here.\n2. **Data Structures:** Min-Heap to store `(time, node)`, `dist` array initialized to infinity.\n3. **Steps:**\n   - Push `(0, k)` to heap.\n   - While heap is not empty, pop smallest time.\n   - Update neighbors if a shorter path is found.\n   - Push updated neighbors to heap.\n4. **Result:** The answer is `max(dist.values())`. If any node is unreachable (dist is infinite), return -1.\n\n### Complexity Analysis\n* **Time:** $O(E \\log V)$ or $O(E + V \\log V)$.\n* **Space:** $O(V + E)$.\n\n### Code Logic (Python)\n```python\nimport heapq\ndist = {i: float('inf') for i in range(1, n + 1)}\ndist[k] = 0\npq = [(0, k)]\n\nwhile pq:\n    d, u = heapq.heappop(pq)\n    if d > dist[u]: continue\n    for v, w in graph[u]:\n        if dist[u] + w < dist[v]:\n            dist[v] = dist[u] + w\n            heapq.heappush(pq, (dist[v], v))\n\nans = max(dist.values())\nreturn ans if ans != float('inf') else -1\n```",
+    "solution": "### Observations\nThis is a classic unbounded knapsack problem. We want to minimize the number of items (coins) to reach a target weight (amount). Since we want the minimum count, a greedy approach might fail (e.g., coins [1, 3, 4], amount 6 -> greedy takes 4+1+1 (3 coins), optimal is 3+3 (2 coins)).\n\n### Approach\n1.  **Define State:** Let `dp[i]` be the minimum coins needed to make amount `i`.\n2.  **Base Case:** `dp[0] = 0` (0 coins needed for 0 amount).\n3.  **Transition:** For every amount `i` from 1 to `amount`, iterate through all `c` in `coins`. If `i >= c`, then `dp[i] = min(dp[i], dp[i - c] + 1)`.\n4.  **Initialization:** Initialize `dp` array with `amount + 1` (infinity).\n\n### Complexity Analysis\n- **Time:** O(S * n), where S is the amount and n is the number of coin denominations.\n- **Space:** O(S) for the DP table.\n\n### Code Logic\n```python\ndef solve(coins, amount):\n    dp = [float('inf')] * (amount + 1)\n    dp[0] = 0\n    \n    for i in range(1, amount + 1):\n        for c in coins:\n            if i - c >= 0:\n                dp[i] = min(dp[i], dp[i - c] + 1)\n                \n    return dp[amount] if dp[amount] != float('inf') else -1\n```",
     "hints": [
-      "Use Dijkstra's algorithm to find the shortest path from K to all other nodes.",
-      "The time taken for the signal to reach the last node is the maximum of the shortest paths.",
-      "Initialize distances to infinity and the start node to 0."
+      "Try to solve sub-problems: what is the minimum coins for amount 1, amount 2...?",
+      "If you know the answer for amount `x - coin_value`, can you find the answer for `x`?",
+      "Initialize your DP array with a value larger than the maximum possible coins (amount + 1).",
+      "Don't forget the base case: 0 coins are needed for amount 0."
     ],
-    "boilerplate_python": "import sys\nimport heapq\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        m = int(next(iterator))\n        times = []\n        for _ in range(m):\n            u = int(next(iterator))\n            v = int(next(iterator))\n            w = int(next(iterator))\n            times.append((u, v, w))\n        k = int(next(iterator))\n    except StopIteration: return\n\n    # Logic\n    # print(result)\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNext()) return;\n        int n = sc.nextInt();\n        int m = sc.nextInt();\n        List<int[]> times = new ArrayList<>();\n        for(int i=0; i<m; i++){\n            times.add(new int[]{sc.nextInt(), sc.nextInt(), sc.nextInt()});\n        }\n        int k = sc.nextInt();\n        // Logic\n    }\n}",
+    "boilerplate_python": "import sys\n\ndef solve():\n    try:\n        input_data = sys.stdin.read().split()\n        if not input_data: return\n        \n        amount = int(input_data[0])\n        n = int(input_data[1])\n        coins = []\n        for i in range(n):\n            coins.append(int(input_data[2 + i]))\n            \n        # Write your logic here\n        dp = [amount + 1] * (amount + 1)\n        dp[0] = 0\n        \n        for i in range(1, amount + 1):\n            for c in coins:\n                if i - c >= 0:\n                    dp[i] = min(dp[i], dp[i - c] + 1)\n                    \n        result = dp[amount] if dp[amount] <= amount else -1\n        print(result)\n        \n    except Exception:\n        return\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNext()) return;\n        \n        int amount = sc.nextInt();\n        int n = sc.nextInt();\n        int[] coins = new int[n];\n        for (int i = 0; i < n; i++) {\n            coins[i] = sc.nextInt();\n        }\n        \n        // Write Logic Here\n        int[] dp = new int[amount + 1];\n        Arrays.fill(dp, amount + 1);\n        dp[0] = 0;\n        \n        for (int i = 1; i <= amount; i++) {\n            for (int c : coins) {\n                if (i >= c) {\n                    dp[i] = Math.min(dp[i], dp[i - c] + 1);\n                }\n            }\n        }\n        \n        System.out.println(dp[amount] > amount ? -1 : dp[amount]);\n    }\n}",
     "test_cases": [
       {
-        "input_data": "4 3\n2 1 1\n2 3 1\n3 4 1\n2",
-        "expected_output": "2",
+        "input_data": "11\n3\n1 2 5",
+        "expected_output": "3",
         "is_public": true
       },
       {
-        "input_data": "2 1\n1 2 1\n2",
+        "input_data": "3\n1\n2",
         "expected_output": "-1",
         "is_public": true
       },
       {
-        "input_data": "2 1\n1 2 1\n1",
-        "expected_output": "1",
-        "is_public": true
-      },
-      {
-        "input_data": "1 0\n1",
+        "input_data": "0\n1\n1",
         "expected_output": "0",
         "is_public": false
       },
       {
-        "input_data": "3 2\n1 2 10\n1 3 5\n1",
-        "expected_output": "10",
+        "input_data": "100\n3\n1 2 5",
+        "expected_output": "20",
         "is_public": false
       },
       {
-        "input_data": "3 1\n1 2 1\n3",
-        "expected_output": "-1",
+        "input_data": "6\n3\n1 3 4",
+        "expected_output": "2",
+        "is_public": false
+      },
+      {
+        "input_data": "6249\n3\n186 419 83",
+        "expected_output": "20",
         "is_public": false
       }
     ]
   },
   {
-    "id": 1514,
-    "title": "Path with Maximum Probability",
-    "description": "You are given an undirected weighted graph of `n` nodes (0-indexed), represented by an edge list where `edges[i] = [a, b]` is an undirected edge connecting the nodes `a` and `b` with a probability of success of traversing that edge `succProb[i]`.\n\nGiven two nodes `start` and `end`, find the path with the maximum probability of success to go from `start` to `end` and return its success probability. (If there is no path, return 0).",
-    "input_format": "First line: N M.\nNext M lines: u v p (nodes and probability).\nLast line: start end.",
-    "output_format": "Float representing maximum probability (error margin 1e-5).",
+    "id": 300,
+    "title": "Longest Increasing Subsequence",
+    "description": "Given an integer array **nums**, return the length of the longest strictly increasing subsequence.\n\nA subsequence is a sequence that can be derived from an array by deleting some or no elements without changing the order of the remaining elements.",
+    "input_format": "First line: Integer 'N' (size of array).\nSecond line: 'N' space-separated integers.",
+    "output_format": "Print a single integer representing the length of the longest increasing subsequence.",
     "difficulty": "Medium",
     "tags": [
-      "graph",
-      "heap",
-      "searching"
+      "dp",
+      "binary_search",
+      "array"
     ],
-    "solution": "### Observations\nStandard shortest path finds the *minimum sum* of weights. Here we want the *maximum product* of probabilities. \nSince probabilities are $\\le 1$, the product decreases as path length increases, similar to sum increasing. We can use a modified Dijkstra.\n\n### Approach\n1. **Algorithm:** Max-Heap Dijkstra.\n2. **State:** `(current_prob, node)`. Note: Python's heap is min-heap, so store `(-prob, node)`.\n3. **Relaxation:** If `curr_prob * edge_prob > recorded_prob[neighbor]`, update and push.\n\n### Complexity Analysis\n* **Time:** $O(E \\log V)$.\n* **Space:** $O(V + E)$.\n\n### Code Logic (Python)\n```python\nprobs = [0.0] * n\nprobs[start] = 1.0\npq = [(-1.0, start)] # Max heap using negative\n\nwhile pq:\n    curr_p, u = heapq.heappop(pq)\n    curr_p = -curr_p\n    if u == end: return curr_p\n    if curr_p < probs[u]: continue\n    \n    for v, p in adj[u]:\n        if curr_p * p > probs[v]:\n            probs[v] = curr_p * p\n            heapq.heappush(pq, (-probs[v], v))\nreturn 0.0\n```",
+    "solution": "### Observations\nA naive DP solution takes O(N^2), but we can optimize this by maintaining the \"tails\" of increasing subsequences found so far.\n\n### Approach (Patience Sorting / Binary Search)\n1.  Maintain an array `tails`. `tails[i]` stores the *smallest tail of all increasing subsequences of length i+1* found so far.\n2.  For each number `x` in `nums`:\n    -   If `x` is larger than all tails, append it.\n    -   If `x` can extend an existing subsequence but with a smaller tail value, update the existing tail using Binary Search (specifically `bisect_left`).\n3.  The length of `tails` is the answer.\n\n### Complexity Analysis\n- **Time:** O(N log N) because of binary search inside the loop.\n- **Space:** O(N) to store the tails array.\n\n### Code Logic\n```python\nfrom bisect import bisect_left\ndef lengthOfLIS(nums):\n    tails = []\n    for x in nums:\n        if not tails or x > tails[-1]:\n            tails.append(x)\n        else:\n            idx = bisect_left(tails, x)\n            tails[idx] = x\n    return len(tails)\n```",
     "hints": [
-      "Multiplication of probabilities is similar to addition of logs.",
-      "Use Dijkstra's algorithm but prioritize the path with the highest probability.",
-      "Store probabilities in a max-heap."
+      "Consider the O(N^2) DP approach: dp[i] = max(dp[j]) + 1 for all j < i where nums[j] < nums[i].",
+      "Can we speed up finding the previous element using Binary Search?",
+      "Think about maintaining a list of 'potential' candidates that start an increasing subsequence.",
+      "If you have a subsequence ending in 5, and you find a 3, replacing 5 with 3 allows for more potential future numbers."
     ],
-    "boilerplate_python": "import sys\nimport heapq\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        m = int(next(iterator))\n        adj = [[] for _ in range(n)]\n        for _ in range(m):\n            u = int(next(iterator))\n            v = int(next(iterator))\n            p = float(next(iterator))\n            adj[u].append((v, p))\n            adj[v].append((u, p))\n        start = int(next(iterator))\n        end = int(next(iterator))\n    except StopIteration: return\n\n    # Logic\n    # print(f\"{result:.5f}\")\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNext()) return;\n        int n = sc.nextInt();\n        int m = sc.nextInt();\n        // Store graph logic\n        // Logic\n    }\n}",
+    "boilerplate_python": "import sys\nfrom bisect import bisect_left\n\ndef solve():\n    try:\n        input_data = sys.stdin.read().split()\n        if not input_data: return\n        \n        n = int(input_data[0])\n        nums = [int(x) for x in input_data[1:n+1]]\n        \n        tails = []\n        for x in nums:\n            if not tails or x > tails[-1]:\n                tails.append(x)\n            else:\n                idx = bisect_left(tails, x)\n                tails[idx] = x\n                \n        print(len(tails))\n    except Exception:\n        return\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNext()) return;\n        \n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        \n        ArrayList<Integer> tails = new ArrayList<>();\n        for (int num : nums) {\n            int idx = Collections.binarySearch(tails, num);\n            if (idx < 0) idx = -(idx + 1);\n            \n            if (idx == tails.size()) {\n                tails.add(num);\n            } else {\n                tails.set(idx, num);\n            }\n        }\n        \n        System.out.println(tails.size());\n    }\n}",
     "test_cases": [
       {
-        "input_data": "3 3\n0 1 0.5\n1 2 0.5\n0 2 0.2\n0 2",
-        "expected_output": "0.25000",
+        "input_data": "6\n10 9 2 5 3 7 101 18",
+        "expected_output": "4",
         "is_public": true
       },
       {
-        "input_data": "3 3\n0 1 0.5\n1 2 0.5\n0 2 0.3\n0 2",
-        "expected_output": "0.30000",
+        "input_data": "6\n0 1 0 3 2 3",
+        "expected_output": "4",
         "is_public": true
       },
       {
-        "input_data": "3 1\n0 1 0.5\n0 2",
-        "expected_output": "0.00000",
-        "is_public": true
-      },
-      {
-        "input_data": "2 1\n0 1 1.0\n0 1",
-        "expected_output": "1.00000",
+        "input_data": "1\n7",
+        "expected_output": "1",
         "is_public": false
       },
       {
-        "input_data": "2 1\n0 1 0.1\n0 1",
-        "expected_output": "0.10000",
+        "input_data": "5\n7 7 7 7 7",
+        "expected_output": "1",
         "is_public": false
       },
       {
-        "input_data": "4 3\n0 1 0.9\n1 2 0.9\n2 3 0.9\n0 3",
-        "expected_output": "0.72900",
+        "input_data": "4\n4 3 2 1",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "8\n10 20 1 2 3 4 5 6",
+        "expected_output": "6",
         "is_public": false
       }
     ]
   },
   {
-    "id": 787,
-    "title": "Cheapest Flights Within K Stops",
-    "description": "There are `n` cities connected by some number of flights. You are given an array `flights` where `flights[i] = [from, to, price]` indicates that there is a flight from city `from` to city `to` with cost `price`.\n\nYou are also given three integers `src`, `dst`, and `k`, return the **cheapest price** from `src` to `dst` with at most `k` stops. If there is no such route, return `-1`.",
-    "input_format": "First line: N M.\nNext M lines: u v w.\nLast line: src dst k.",
-    "output_format": "Integer price.",
+    "id": 152,
+    "title": "Maximum Product Subarray",
+    "description": "Given an integer array **nums**, find a contiguous non-empty subarray within the array that has the largest product, and return the product.\n\nThe test cases are generated so that the answer will fit in a 32-bit integer.",
+    "input_format": "First line: Integer 'N'.\nSecond line: 'N' space-separated integers.",
+    "output_format": "Print the maximum product.",
     "difficulty": "Medium",
     "tags": [
-      "graph",
-      "heap",
+      "array",
       "dp"
     ],
-    "solution": "### Observations\nWe need the shortest path but with a constraint on the number of edges (stops). Standard Dijkstra doesn't count edges efficiently for this constraint.\n\n### Approach\n1. **Bellman-Ford / SPFA**: Run relaxation `K+1` times. This ensures we process paths with at most `K+1` edges (which means `K` stops).\n2. **Dijkstra variant**: Store `stops` in the priority queue state `(cost, stops, node)`. Only process if `stops <= k` and we found a cheaper way to reach `node` with similar or fewer stops.\n\n### Complexity Analysis\n* **Time:** $O((N+E) \\cdot K)$ for Bellman-Ford.\n* **Space:** $O(N)$.\n\n### Code Logic (Python)\n```python\n# Using Bellman-Ford style relaxation\nprices = [float('inf')] * n\nprices[src] = 0\n\nfor _ in range(k + 1):\n    temp_prices = prices[:]\n    for u, v, w in flights:\n        if prices[u] == float('inf'): continue\n        if prices[u] + w < temp_prices[v]:\n            temp_prices[v] = prices[u] + w\n    prices = temp_prices\nreturn prices[dst] if prices[dst] != float('inf') else -1\n```",
+    "solution": "### Observations\nUnlike sum, a product can flip from negative to positive if multiplied by a negative number. This means a very small (negative) current product could become the maximum product in the next step.\n\n### Approach\n1.  Maintain both `max_so_far` and `min_so_far` because a negative number multiplied by `min_so_far` (which could be a large negative) becomes a large positive.\n2.  Iterate through the array. If the current number is negative, swap `max_so_far` and `min_so_far`.\n3.  Update `max_so_far` = `max(current, max_so_far * current)`.\n4.  Update `min_so_far` = `min(current, min_so_far * current)`.\n5.  Keep track of the global maximum.\n\n### Complexity Analysis\n- **Time:** O(N) single pass.\n- **Space:** O(1) variables only.\n\n### Code Logic\n```python\ndef maxProduct(nums):\n    res = max(nums)\n    curMin, curMax = 1, 1\n    for n in nums:\n        if n == 0:\n            curMin, curMax = 1, 1\n            continue\n        tmp = curMax * n\n        curMax = max(n * curMax, n * curMin, n)\n        curMin = min(tmp, n * curMin, n)\n        res = max(res, curMax)\n    return res\n```",
     "hints": [
-      "The constraint is on the number of edges (K stops means K+1 edges).",
-      "Dijkstra alone might fail if a cheaper path has more stops than allowed.",
-      "Try Bellman-Ford algorithm running K+1 iterations or BFS carrying (cost, stops) state."
+      "This is similar to Kadane's algorithm for Maximum Sum Subarray.",
+      "The problem is the negative numbers. A negative times a negative is positive.",
+      "Track both the maximum AND the minimum product ending at the current position.",
+      "Handle zeros carefully; they reset the subarray product chain."
     ],
-    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        m = int(next(iterator))\n        flights = []\n        for _ in range(m):\n            u = int(next(iterator))\n            v = int(next(iterator))\n            w = int(next(iterator))\n            flights.append((u, v, w))\n        src = int(next(iterator))\n        dst = int(next(iterator))\n        k = int(next(iterator))\n    except StopIteration: return\n\n    # Logic\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNext()) return;\n        int n = sc.nextInt();\n        int m = sc.nextInt();\n        int[][] flights = new int[m][3];\n        for(int i=0; i<m; i++){\n            flights[i][0] = sc.nextInt();\n            flights[i][1] = sc.nextInt();\n            flights[i][2] = sc.nextInt();\n        }\n        int src = sc.nextInt();\n        int dst = sc.nextInt();\n        int k = sc.nextInt();\n        // Logic\n    }\n}",
+    "boilerplate_python": "import sys\n\ndef solve():\n    try:\n        input_data = sys.stdin.read().split()\n        if not input_data: return\n        \n        n = int(input_data[0])\n        nums = [int(x) for x in input_data[1:n+1]]\n        \n        # Logic\n        res = nums[0]\n        curMax, curMin = 1, 1\n        \n        for x in nums:\n            vals = (x, x * curMax, x * curMin)\n            curMax = max(vals)\n            curMin = min(vals)\n            res = max(res, curMax)\n            \n        print(res)\n    except Exception:\n        return\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNext()) return;\n        \n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        \n        long res = nums[0];\n        long curMax = 1, curMin = 1;\n        \n        for (int x : nums) {\n            long tempMax = curMax;\n            curMax = Math.max(x, Math.max(x * curMax, x * curMin));\n            curMin = Math.min(x, Math.min(x * tempMax, x * curMin));\n            res = Math.max(res, curMax);\n        }\n        \n        System.out.println(res);\n    }\n}",
     "test_cases": [
       {
-        "input_data": "4 5\n0 1 100\n1 2 100\n2 0 100\n1 3 600\n2 3 200\n0 3 1",
-        "expected_output": "700",
-        "is_public": true
-      },
-      {
-        "input_data": "3 3\n0 1 100\n1 2 100\n0 2 500\n0 2 1",
-        "expected_output": "200",
-        "is_public": true
-      },
-      {
-        "input_data": "3 3\n0 1 100\n1 2 100\n0 2 500\n0 2 0",
-        "expected_output": "500",
-        "is_public": true
-      },
-      {
-        "input_data": "2 1\n0 1 100\n0 1 0",
-        "expected_output": "100",
-        "is_public": false
-      },
-      {
-        "input_data": "3 2\n0 1 10\n1 2 10\n0 2 0",
-        "expected_output": "-1",
-        "is_public": false
-      },
-      {
-        "input_data": "4 3\n0 1 100\n1 2 100\n2 3 100\n0 3 1",
-        "expected_output": "-1",
-        "is_public": false
-      }
-    ]
-  },
-  {
-    "id": 752,
-    "title": "Open the Lock",
-    "description": "You have a lock with 4 wheels (0-9). From '0000', you can turn any wheel +1 or -1. Given `deadends` which block movement, find minimum turns to reach `target`.\n\nDeadends stop you immediately. If '0000' is a deadend, return -1.",
-    "input_format": "First line: Space-separated deadends strings.\nSecond line: target string.",
-    "output_format": "Integer turns.",
-    "difficulty": "Medium",
-    "tags": [
-      "graph",
-      "searching",
-      "queue"
-    ],
-    "solution": "### Observations\nShortest path in an unweighted graph -> BFS.\n\n### Approach\n1. Queue `q` initialized with `('0000', 0)`.\n2. Visited set containing `deadends` and `'0000'`.\n3. Expand current node: change each of 4 digits by +1 and -1 (modulo 10).\n4. If neighbor == target, return moves.\n\n### Complexity Analysis\n* **Time:** $O(10^4 \\cdot 4 \\cdot 2) = O(1)$. Finite state space.\n* **Space:** $O(10^4)$.\n\n### Code Logic (Python)\n```python\nif \"0000\" in deads: return -1\nq = deque([(\"0000\", 0)])\nvisited = set(deads)\nvisited.add(\"0000\")\nwhile q:\n    curr, step = q.popleft()\n    if curr == target: return step\n    for i in range(4):\n        x = int(curr[i])\n        for d in (-1, 1):\n            nxt_digit = (x + d) % 10\n            nxt = curr[:i] + str(nxt_digit) + curr[i+1:]\n            if nxt not in visited:\n                visited.add(nxt)\n                q.append((nxt, step + 1))\nreturn -1\n```",
-    "hints": [
-      "BFS for shortest path.",
-      "Handle the 0000 deadend case.",
-      "Use modulo 10 for wrapping around."
-    ],
-    "boilerplate_python": "import sys\nfrom collections import deque\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    # Logic to parse deadends list and target\n    # If only 1 line input, handle carefully\n    pass\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        // Logic\n    }\n}",
-    "test_cases": [
-      {
-        "input_data": "0201 0101 0102 1212 2002\n0202",
+        "input_data": "4\n2 3 -2 4",
         "expected_output": "6",
         "is_public": true
       },
       {
-        "input_data": "8888\n0009",
-        "expected_output": "1",
-        "is_public": true
-      },
-      {
-        "input_data": "0000\n8888",
-        "expected_output": "-1",
-        "is_public": false
-      },
-      {
-        "input_data": "1111\n0000",
+        "input_data": "3\n-2 0 -1",
         "expected_output": "0",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n-5",
+        "expected_output": "-5",
         "is_public": false
       },
       {
-        "input_data": "8887 8889 8878 8898 8788 8988 7888 9888\n8888",
-        "expected_output": "-1",
+        "input_data": "5\n-2 -3 -4 -5 -6",
+        "expected_output": "720",
         "is_public": false
       },
       {
-        "input_data": "1234\n0002",
-        "expected_output": "2",
+        "input_data": "4\n-2 3 -4 0",
+        "expected_output": "24",
+        "is_public": false
+      },
+      {
+        "input_data": "6\n2 -5 -2 -4 3 0",
+        "expected_output": "24",
         "is_public": false
       }
     ]
   },
   {
-    "id": 1091,
-    "title": "Shortest Path in Binary Matrix",
-    "description": "Given an `n x n` binary matrix `grid`, return the length of the shortest clear path in the matrix. If there is no clear path, return `-1`.\n\nA clear path in a binary matrix is a path from the top-left cell (i.e., `(0, 0)`) to the bottom-right cell (i.e., `(n - 1, n - 1)`) such that:\n- All the visited cells of the path are `0`.\n- All the adjacent cells of the path are **8-directionally** connected (i.e., they are different and they share an edge or a corner).",
-    "input_format": "First line: N.\nNext N lines: N space-separated integers (0 or 1).",
-    "output_format": "Integer length.",
-    "difficulty": "Medium",
-    "tags": [
-      "graph",
-      "searching",
-      "queue"
-    ],
-    "solution": "### Observations\nUnweighted grid shortest path with 8 directions -> BFS.\n\n### Approach\n1. Check if `grid[0][0]` or `grid[n-1][n-1]` is 1. If so, return -1.\n2. **BFS:** Queue `[(0, 0, 1)]`. Mark visited.\n3. Iterate 8 neighbors. Valid if within bounds, `0`, and not visited.\n\n### Complexity Analysis\n* **Time:** $O(N^2)$.\n* **Space:** $O(N^2)$.\n\n### Code Logic (Python)\n```python\nif grid[0][0] == 1 or grid[n-1][n-1] == 1: return -1\nq = deque([(0, 0, 1)])\ngrid[0][0] = 1 # mark visited\ndirs = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]\n\nwhile q:\n    r, c, d = q.popleft()\n    if r == n-1 and c == n-1: return d\n    for dr, dc in dirs:\n        nr, nc = r+dr, c+dc\n        if 0 <= nr < n and 0 <= nc < n and grid[nr][nc] == 0:\n            grid[nr][nc] = 1\n            q.append((nr, nc, d+1))\nreturn -1\n```",
-    "hints": [
-      "BFS is suitable for shortest path in unweighted graphs.",
-      "Remember to check 8 directions.",
-      "Check starting and ending cells first."
-    ],
-    "boilerplate_python": "import sys\nfrom collections import deque\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        grid = []\n        for _ in range(n):\n            row = [int(next(iterator)) for _ in range(n)]\n            grid.append(row)\n    except StopIteration: return\n\n    # Logic\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        // Logic\n    }\n}",
-    "test_cases": [
-      {
-        "input_data": "2\n0 1\n1 0",
-        "expected_output": "2",
-        "is_public": true
-      },
-      {
-        "input_data": "3\n0 0 0\n1 1 0\n1 1 0",
-        "expected_output": "4",
-        "is_public": true
-      },
-      {
-        "input_data": "3\n1 0 0\n1 1 0\n1 1 0",
-        "expected_output": "-1",
-        "is_public": true
-      },
-      {
-        "input_data": "1\n0",
-        "expected_output": "1",
-        "is_public": false
-      },
-      {
-        "input_data": "1\n1",
-        "expected_output": "-1",
-        "is_public": false
-      },
-      {
-        "input_data": "2\n0 0\n0 0",
-        "expected_output": "2",
-        "is_public": false
-      }
-    ]
-  },
-  {
-    "id": 127,
-    "title": "Word Ladder",
-    "description": "A **transformation sequence** from word `beginWord` to word `endWord` using a dictionary `wordList` is a sequence of words `beginWord -> s1 -> s2 -> ... -> sk` such that:\n- Every adjacent pair of words differs by a single letter.\n- Every `si` for `1 <= i <= k` is in `wordList`. Note that `beginWord` does not need to be in `wordList`.\n- `sk == endWord`.\n\nGiven two words, `beginWord` and `endWord`, and a dictionary `wordList`, return *the number of words in the **shortest transformation sequence** from* `beginWord` *to* `endWord`, or `0` if no such sequence exists.",
-    "input_format": "First line: beginWord endWord.\nSecond line: N (list size).\nThird line: N space-separated words.",
-    "output_format": "Integer length.",
+    "id": 72,
+    "title": "Edit Distance",
+    "description": "Given two strings **word1** and **word2**, return the minimum number of operations required to convert **word1** to **word2**.\n\nYou have the following three operations permitted on a word:\n1. Insert a character\n2. Delete a character\n3. Replace a character",
+    "input_format": "First line: String 'word1'.\nSecond line: String 'word2'.",
+    "output_format": "Print the minimum integer operations.",
     "difficulty": "Hard",
     "tags": [
-      "graph",
-      "searching",
-      "string"
+      "string",
+      "dp"
     ],
-    "solution": "### Observations\nShortest path in graph where words are nodes and edges exist if 1 char differs.\n\n### Approach\n1. **BFS** from `beginWord`.\n2. **Optimization:** Instead of comparing every word (O(N^2)), generate all possible variations of the current word by changing one letter `a-z` and check if in set (O(L * 26)).\n3. Use a Set for `wordList` for O(1) lookups.\n\n### Complexity Analysis\n* **Time:** $O(N \\cdot L^2)$ or $O(M^2 \\cdot N)$ where L is word length.\n* **Space:** $O(N \\cdot L)$.\n\n### Code Logic (Python)\n```python\nwordSet = set(wordList)\nif endWord not in wordSet: return 0\nq = deque([(beginWord, 1)])\n\nwhile q:\n    word, length = q.popleft()\n    if word == endWord: return length\n    for i in range(len(word)):\n        for c in 'abcdefghijklmnopqrstuvwxyz':\n            new_word = word[:i] + c + word[i+1:]\n            if new_word in wordSet:\n                wordSet.remove(new_word)\n                q.append((new_word, length + 1))\nreturn 0\n```",
+    "solution": "### Observations\nWe are comparing two strings and need optimal steps. This suggests 2D Dynamic Programming.\n\n### Approach\n1.  **State:** `dp[i][j]` = min operations to convert `word1[0...i-1]` to `word2[0...j-1]`.\n2.  **Base Case:** \n    -   If `word1` is empty, insert all chars of `word2` (`dp[0][j] = j`).\n    -   If `word2` is empty, delete all chars of `word1` (`dp[i][0] = i`).\n3.  **Transition:**\n    -   If `word1[i-1] == word2[j-1]`: No op needed -> `dp[i][j] = dp[i-1][j-1]`.\n    -   Else take min of: `dp[i-1][j]` (Delete), `dp[i][j-1]` (Insert), `dp[i-1][j-1]` (Replace) + 1.\n\n### Complexity Analysis\n- **Time:** O(N * M)\n- **Space:** O(N * M)\n\n### Code Logic\n```python\ndef minDistance(word1, word2):\n    m, n = len(word1), len(word2)\n    dp = [[0] * (n + 1) for _ in range(m + 1)]\n    \n    for i in range(m + 1):\n        dp[i][0] = i\n    for j in range(n + 1):\n        dp[0][j] = j\n        \n    for i in range(1, m + 1):\n        for j in range(1, n + 1):\n            if word1[i-1] == word2[j-1]:\n                dp[i][j] = dp[i-1][j-1]\n            else:\n                dp[i][j] = 1 + min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])\n    return dp[m][n]\n```",
     "hints": [
-      "Find the shortest path -> BFS.",
-      "Pre-process wordList into a Set.",
-      "Generate neighbors by changing 1 character at a time."
+      "Create a 2D table where rows represent prefixes of word1 and columns prefixes of word2.",
+      "Consider the last character of both words. If they are equal, we don't need to do anything.",
+      "If they are different, we can insert, delete, or replace. Which corresponds to moving left, up, or diagonal in the DP table?",
+      "Base cases: transforming an empty string to a string of length L requires L insertions."
     ],
-    "boilerplate_python": "import sys\nfrom collections import deque\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    try:\n        begin = next(iterator)\n        end = next(iterator)\n        n = int(next(iterator))\n        words = [next(iterator) for _ in range(n)]\n    except StopIteration: return\n\n    # Logic\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNext()) return;\n        String begin = sc.next();\n        String end = sc.next();\n        int n = sc.nextInt();\n        List<String> wordList = new ArrayList<>();\n        for(int i=0; i<n; i++) wordList.add(sc.next());\n        // Logic\n    }\n}",
+    "boilerplate_python": "import sys\n\ndef solve():\n    try:\n        input_data = sys.stdin.read().split()\n        if len(input_data) < 2: \n             # Handle empty string cases if input parsing fails usually means empty strings\n             word1 = \"\" if len(input_data) == 0 else input_data[0]\n             word2 = \"\"\n        else:\n             word1 = input_data[0]\n             word2 = input_data[1]\n             \n        m, n = len(word1), len(word2)\n        dp = [[0] * (n + 1) for _ in range(m + 1)]\n        \n        for i in range(m + 1): dp[i][0] = i\n        for j in range(n + 1): dp[0][j] = j\n        \n        for i in range(1, m + 1):\n            for j in range(1, n + 1):\n                if word1[i-1] == word2[j-1]:\n                    dp[i][j] = dp[i-1][j-1]\n                else:\n                    dp[i][j] = 1 + min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])\n                    \n        print(dp[m][n])\n    except Exception:\n        return\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String word1 = sc.hasNext() ? sc.next() : \"\";\n        String word2 = sc.hasNext() ? sc.next() : \"\";\n        \n        int m = word1.length();\n        int n = word2.length();\n        int[][] dp = new int[m + 1][n + 1];\n        \n        for (int i = 0; i <= m; i++) dp[i][0] = i;\n        for (int j = 0; j <= n; j++) dp[0][j] = j;\n        \n        for (int i = 1; i <= m; i++) {\n            for (int j = 1; j <= n; j++) {\n                if (word1.charAt(i - 1) == word2.charAt(j - 1)) {\n                    dp[i][j] = dp[i - 1][j - 1];\n                } else {\n                    dp[i][j] = 1 + Math.min(dp[i - 1][j - 1], \n                                   Math.min(dp[i - 1][j], dp[i][j - 1]));\n                }\n            }\n        }\n        System.out.println(dp[m][n]);\n    }\n}",
     "test_cases": [
       {
-        "input_data": "hit cog\n6\nhot dot dog lot log cog",
+        "input_data": "horse\nros",
+        "expected_output": "3",
+        "is_public": true
+      },
+      {
+        "input_data": "intention\nexecution",
         "expected_output": "5",
         "is_public": true
       },
       {
-        "input_data": "hit cog\n5\nhot dot dog lot log",
-        "expected_output": "0",
-        "is_public": true
-      },
-      {
-        "input_data": "a c\n1\nb",
-        "expected_output": "0",
-        "is_public": true
-      },
-      {
-        "input_data": "a c\n1\nc",
-        "expected_output": "2",
-        "is_public": false
-      },
-      {
-        "input_data": "hot dog\n2\nhot dog",
+        "input_data": "a\na",
         "expected_output": "0",
         "is_public": false
       },
       {
-        "input_data": "cat bat\n1\nbat",
-        "expected_output": "2",
+        "input_data": "abc\n\n",
+        "expected_output": "3",
+        "is_public": false
+      },
+      {
+        "input_data": "plasma\naltruism",
+        "expected_output": "6",
+        "is_public": false
+      },
+      {
+        "input_data": "food\nmoney",
+        "expected_output": "4",
         "is_public": false
       }
     ]
   },
   {
-    "id": 1334,
-    "title": "Find the City With the Smallest Number of Neighbors at a Threshold Distance",
-    "description": "There are `n` cities numbered from `0` to `n-1`. Given the array `edges` where `edges[i] = [from, to, weight]`, and an integer `distanceThreshold`.\n\nReturn the city with the smallest number of cities that are reachable through some path and whose distance is **at most** `distanceThreshold`.\n\nIf there are multiple such cities, return the city with the **greatest** number.",
-    "input_format": "First line: n.\nSecond line: m.\nNext m lines: u v w.\nLast line: threshold.",
-    "output_format": "Integer city index.",
+    "id": 416,
+    "title": "Partition Equal Subset Sum",
+    "description": "Given an integer array **nums**, return true if you can partition the array into two subsets such that the sum of the elements in both subsets is equal or false otherwise.",
+    "input_format": "First line: Integer 'N'.\nSecond line: 'N' space-separated integers.",
+    "output_format": "Print 'true' or 'false'.",
     "difficulty": "Medium",
     "tags": [
-      "graph",
       "dp",
-      "searching"
-    ],
-    "solution": "### Observations\nWe need the shortest distance between ALL pairs of cities to check the threshold. N is usually small (~100).\n\n### Approach\n1. **Floyd-Warshall Algorithm:** Compute all-pairs shortest paths.\n   - Init `dist[i][j] = inf`, `dist[i][i] = 0`.\n   - Update `dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])` for all k, i, j.\n2. **Count:** For each city, count reachable cities within threshold.\n3. **Select:** Filter for min count, break ties with max index.\n\n### Complexity Analysis\n* **Time:** $O(N^3)$.\n* **Space:** $O(N^2)$.\n\n### Code Logic (Python)\n```python\ndist = [[float('inf')] * n for _ in range(n)]\nfor i in range(n): dist[i][i] = 0\nfor u, v, w in edges:\n    dist[u][v] = dist[v][u] = w\n\nfor k in range(n):\n    for i in range(n):\n        for j in range(n):\n            dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])\n\nres, min_count = -1, float('inf')\nfor i in range(n):\n    count = sum(1 for d in dist[i] if d <= threshold)\n    if count <= min_count:\n        min_count = count\n        res = i\nreturn res\n```",
-    "hints": [
-      "Use Floyd-Warshall for all-pairs shortest path if N is small (< 100).",
-      "Alternatively, run Dijkstra from every node.",
-      "Iterate through the distance matrix to count neighbors for each city."
-    ],
-    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        m = int(next(iterator))\n        edges = []\n        for _ in range(m):\n            u = int(next(iterator))\n            v = int(next(iterator))\n            w = int(next(iterator))\n            edges.append((u, v, w))\n        threshold = int(next(iterator))\n    except StopIteration: return\n\n    # Logic\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNext()) return;\n        int n = sc.nextInt();\n        int m = sc.nextInt();\n        // Store edges\n        int threshold = sc.nextInt();\n        // Logic\n    }\n}",
-    "test_cases": [
-      {
-        "input_data": "4 4\n0 1 3\n1 2 1\n1 3 4\n2 3 1\n4",
-        "expected_output": "3",
-        "is_public": true
-      },
-      {
-        "input_data": "5 6\n0 1 2\n0 4 8\n1 2 3\n1 4 2\n2 3 1\n3 4 1\n2",
-        "expected_output": "0",
-        "is_public": true
-      },
-      {
-        "input_data": "2 1\n0 1 1\n1",
-        "expected_output": "1",
-        "is_public": false
-      },
-      {
-        "input_data": "2 1\n0 1 10\n1",
-        "expected_output": "1",
-        "is_public": false
-      },
-      {
-        "input_data": "3 2\n0 1 1\n1 2 1\n2",
-        "expected_output": "2",
-        "is_public": false
-      },
-      {
-        "input_data": "1 0\n10",
-        "expected_output": "0",
-        "is_public": false
-      }
-    ]
-  },
-  {
-    "id": 1584,
-    "title": "Min Cost to Connect All Points",
-    "description": "You are given an array **points** representing integer coordinates of some points on a 2D-plane, where **points[i] = [xi, yi]**.\n\nThe cost of connecting two points **[xi, yi]** and **[xj, yj]** is the **Manhattan distance** between them: **|xi - xj| + |yi - yj|**.\n\nReturn the minimum cost to make all points connected. All points are connected if there is exactly one simple path between any two points.",
-    "input_format": "First line: Integer N (number of points)\nNext N lines: Two integers x y per line",
-    "output_format": "Print a single integer representing the minimum cost.",
-    "difficulty": "Medium",
-    "tags": [
-      "graph",
-      "heap",
       "array"
     ],
-    "solution": "### Observations\nThis is a Minimum Spanning Tree (MST) problem. The graph is dense (complete graph) because every point can connect to every other point. There are $N^2$ edges.\n\n### Approach\n1.  **Prim's Algorithm:** Start from an arbitrary node (0). Maintain a `min_dist` array tracking the shortest edge to connect non-visited nodes to the MST.\n2.  Use a Min-Heap or an array scan to find the next closest node.\n3.  Since it's dense ($E \\approx N^2$), an $O(N^2)$ array implementation is often faster than $O(E \\log V)$ heap implementation in Python, but Heap is standard.\n\n### Complexity Analysis\n- **Time:** O(N^2) or O(N^2 log N) depending on implementation.\n- **Space:** O(N) to store distances/visited status.\n\n### Code Logic\n**Python:**\n```python\nimport heapq\nn = len(points)\nvisited = [False] * n\nmin_heap = [(0, 0)] # cost, node\ncost = 0\nedges_used = 0\nwhile edges_used < n:\n    d, u = heapq.heappop(min_heap)\n    if visited[u]: continue\n    visited[u] = True\n    cost += d\n    edges_used += 1\n    for v in range(n):\n        if not visited[v]:\n            dist = abs(points[u][0] - points[v][0]) + abs(points[u][1] - points[v][1])\n            heapq.heappush(min_heap, (dist, v))\nreturn cost\n```",
+    "solution": "### Observations\nIf the total sum is odd, we cannot split it into two equal integers. If even, we need to find if there exists a subset with sum = `total_sum / 2`.\n\n### Approach (0/1 Knapsack)\n1.  Calculate `total_sum`. If `total_sum % 2 != 0`, return False.\n2.  Target = `total_sum // 2`.\n3.  Use a set or DP array to track all reachable sums.\n4.  Iterate through `nums`. For each num, update the set of reachable sums: `new_sums = {s + num for s in reachable_sums}`.\n\n### Complexity Analysis\n- **Time:** O(N * Target)\n- **Space:** O(Target)\n\n### Code Logic\n```python\ndef canPartition(nums):\n    total = sum(nums)\n    if total % 2 != 0:\n        return False\n    target = total // 2\n    dp = {0}\n    for n in nums:\n        dp.update({v + n for v in dp})\n        if target in dp: return True\n    return False\n```",
     "hints": [
-      "Model this as a graph with N vertices and N*(N-1)/2 edges.",
-      "The weight of an edge is the Manhattan distance.",
-      "Use Prim's or Kruskal's algorithm to find the MST."
+      "Calculate the sum of the array. If it's odd, can we partition it?",
+      "This is a variation of the 0/1 Knapsack problem.",
+      "We are looking for a subset that sums up to `total_sum / 2`.",
+      "You can use a boolean DP array where `dp[i]` is true if sum `i` can be formed."
     ],
-    "boilerplate_python": "import sys\nimport heapq\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        points = []\n        for _ in range(n):\n            x = int(next(iterator))\n            y = int(next(iterator))\n            points.append([x, y])\n        # Write solution here\n        # print(result)\n    except StopIteration:\n        pass\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNextInt()) return;\n        int n = scanner.nextInt();\n        int[][] points = new int[n][2];\n        for(int i=0; i<n; i++) {\n            points[i][0] = scanner.nextInt();\n            points[i][1] = scanner.nextInt();\n        }\n        // Write solution here\n    }\n}",
+    "boilerplate_python": "import sys\n\ndef solve():\n    try:\n        input_data = sys.stdin.read().split()\n        if not input_data: return\n        \n        n = int(input_data[0])\n        nums = [int(x) for x in input_data[1:n+1]]\n        \n        total = sum(nums)\n        if total % 2 != 0:\n            print(\"false\")\n            return\n            \n        target = total // 2\n        dp = {0}\n        possible = False\n        \n        for num in nums:\n            next_dp = set()\n            for t in dp:\n                if t + num == target:\n                    possible = True\n                    break\n                if t + num < target:\n                    next_dp.add(t + num)\n            if possible: break\n            dp.update(next_dp)\n            \n        print(\"true\" if possible else \"false\")\n    except Exception:\n        return\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNext()) return;\n        \n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        int total = 0;\n        for(int i=0; i<n; i++) {\n            nums[i] = sc.nextInt();\n            total += nums[i];\n        }\n        \n        if (total % 2 != 0) {\n            System.out.println(\"false\");\n            return;\n        }\n        \n        int target = total / 2;\n        boolean[] dp = new boolean[target + 1];\n        dp[0] = true;\n        \n        for (int num : nums) {\n            for (int i = target; i >= num; i--) {\n                dp[i] = dp[i] || dp[i - num];\n            }\n        }\n        \n        System.out.println(dp[target] ? \"true\" : \"false\");\n    }\n}",
     "test_cases": [
       {
-        "input_data": "5\n0 0\n2 2\n3 10\n5 2\n7 0",
-        "expected_output": "20",
+        "input_data": "4\n1 5 11 5",
+        "expected_output": "true",
         "is_public": true
       },
       {
-        "input_data": "3\n3 12\n-2 5\n-4 1",
-        "expected_output": "18",
+        "input_data": "4\n1 2 3 5",
+        "expected_output": "false",
         "is_public": true
       },
       {
-        "input_data": "1\n0 0",
-        "expected_output": "0",
+        "input_data": "2\n1 1",
+        "expected_output": "true",
         "is_public": false
       },
       {
-        "input_data": "2\n1 1\n100 100",
-        "expected_output": "198",
+        "input_data": "3\n10 20 30",
+        "expected_output": "true",
         "is_public": false
       },
       {
-        "input_data": "4\n0 0\n1 1\n1 0\n0 1",
-        "expected_output": "4",
+        "input_data": "5\n1 2 5 9 100",
+        "expected_output": "false",
         "is_public": false
       },
       {
-        "input_data": "3\n0 0\n1 1\n2 2",
-        "expected_output": "4",
+        "input_data": "6\n1 1 1 1 1 1",
+        "expected_output": "true",
         "is_public": false
       }
     ]
   },
   {
-    "id": 1135,
-    "title": "Connecting Cities With Minimum Cost",
-    "description": "There are **N** cities labeled from 1 to N. You are given the integer **N** and an array **connections**, where **connections[i] = [city1, city2, cost]** represents the cost to connect city1 and city2.\n\nReturn the minimum cost so that for every pair of cities, there exists a path of connections (possibly of length 1) that connects those two cities. If it is impossible, return -1.",
-    "input_format": "First line: Integer N\nSecond line: Integer M (number of connections)\nNext M lines: u v cost",
-    "output_format": "Print single integer (min cost) or -1.",
+    "id": 1143,
+    "title": "Longest Common Subsequence",
+    "description": "Given two strings **text1** and **text2**, return the length of their longest common subsequence. If there is no common subsequence, return 0.\n\nA subsequence of a string is a new string generated from the original string with some characters (can be none) deleted without changing the relative order of the remaining characters.",
+    "input_format": "First line: String 'text1'.\nSecond line: String 'text2'.",
+    "output_format": "Print the integer length.",
     "difficulty": "Medium",
     "tags": [
-      "graph",
-      "heap",
+      "string",
+      "dp"
+    ],
+    "solution": "### Observations\nStandard 2D DP problem. We want to maximize the length of matches.\n\n### Approach\n1.  `dp[i][j]` = LCS of `text1[0..i]` and `text2[0..j]`.\n2.  If `text1[i] == text2[j]`, then `dp[i][j] = 1 + dp[i-1][j-1]`.\n3.  Else, `dp[i][j] = max(dp[i-1][j], dp[i][j-1])`.\n\n### Complexity Analysis\n- **Time:** O(N * M)\n- **Space:** O(N * M)\n\n### Code Logic\n```python\ndef longestCommonSubsequence(text1, text2):\n    m, n = len(text1), len(text2)\n    dp = [[0] * (n + 1) for _ in range(m + 1)]\n    \n    for i in range(1, m + 1):\n        for j in range(1, n + 1):\n            if text1[i - 1] == text2[j - 1]:\n                dp[i][j] = 1 + dp[i - 1][j - 1]\n            else:\n                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])\n    return dp[m][n]\n```",
+    "hints": [
+      "Use a 2D grid where `grid[i][j]` represents the LCS of the first `i` chars of string 1 and first `j` chars of string 2.",
+      "If characters match, the answer is 1 + the answer without those characters.",
+      "If characters don't match, we carry forward the best result from excluding one character from either string."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    try:\n        input_data = sys.stdin.read().split()\n        if len(input_data) < 2:\n             text1 = \"\" if len(input_data) == 0 else input_data[0]\n             text2 = \"\"\n        else:\n             text1 = input_data[0]\n             text2 = input_data[1]\n             \n        m, n = len(text1), len(text2)\n        dp = [[0] * (n + 1) for _ in range(m + 1)]\n        \n        for i in range(1, m + 1):\n            for j in range(1, n + 1):\n                if text1[i - 1] == text2[j - 1]:\n                    dp[i][j] = 1 + dp[i - 1][j - 1]\n                else:\n                    dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])\n                    \n        print(dp[m][n])\n    except Exception:\n        return\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String t1 = sc.hasNext() ? sc.next() : \"\";\n        String t2 = sc.hasNext() ? sc.next() : \"\";\n        \n        int m = t1.length();\n        int n = t2.length();\n        int[][] dp = new int[m + 1][n + 1];\n        \n        for (int i = 1; i <= m; i++) {\n            for (int j = 1; j <= n; j++) {\n                if (t1.charAt(i - 1) == t2.charAt(j - 1)) {\n                    dp[i][j] = 1 + dp[i - 1][j - 1];\n                } else {\n                    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);\n                }\n            }\n        }\n        System.out.println(dp[m][n]);\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "abcde\nace",
+        "expected_output": "3",
+        "is_public": true
+      },
+      {
+        "input_data": "abc\nabc",
+        "expected_output": "3",
+        "is_public": true
+      },
+      {
+        "input_data": "abc\ndef",
+        "expected_output": "0",
+        "is_public": true
+      },
+      {
+        "input_data": "ezupkr\nubmrapg",
+        "expected_output": "2",
+        "is_public": false
+      },
+      {
+        "input_data": "ylqpejqbalahwr\nyrkzavgdmdgtqpg",
+        "expected_output": "3",
+        "is_public": false
+      },
+      {
+        "input_data": "a\na",
+        "expected_output": "1",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 188,
+    "title": "Best Time to Buy and Sell Stock IV",
+    "description": "You are given an integer array **prices** where `prices[i]` is the price of a given stock on the `ith` day, and an integer **k**.\n\nFind the maximum profit you can achieve. You may complete at most **k** transactions.",
+    "input_format": "First line: Integer 'k'.\nSecond line: Integer 'n' (size of prices).\nThird line: 'n' space-separated integers.",
+    "output_format": "Print the maximum profit.",
+    "difficulty": "Hard",
+    "tags": [
+      "dp",
       "array"
     ],
-    "solution": "### Observations\nThis is a standard Minimum Spanning Tree (MST) problem. If the MST has fewer than $N-1$ edges, the graph is disconnected.\n\n### Approach\n1.  **Kruskal's Algorithm:** Sort all edges by cost.\n2.  Iterate through sorted edges and use a **Union-Find** (Disjoint Set) data structure to connect cities.\n3.  If adding an edge connects two previously unconnected components, add its cost and decrement the component count.\n4.  Stop when components == 1. If loop finishes and components > 1, return -1.\n\n### Complexity Analysis\n- **Time:** O(M log M) for sorting.\n- **Space:** O(N) for Union-Find.\n\n### Code Logic\n**Python:**\n```python\nparent = list(range(n + 1))\ndef find(i):\n    if parent[i] != i: parent[i] = find(parent[i])\n    return parent[i]\n\ndef union(i, j):\n    root_i, root_j = find(i), find(j)\n    if root_i != root_j:\n        parent[root_i] = root_j\n        return True\n    return False\n\nconnections.sort(key=lambda x: x[2])\ncost = 0\nedges = 0\nfor u, v, w in connections:\n    if union(u, v):\n        cost += w\n        edges += 1\nreturn cost if edges == n - 1 else -1\n```",
+    "solution": "### Observations\nIf `k >= n/2`, we can perform as many transactions as we want (infinite transaction case). Otherwise, we need a DP table tracking `k` transactions.\n\n### Approach\n1.  **State:** `dp[i][j]` = max profit on day `j` with at most `i` transactions.\n2.  **Transition:** `dp[i][j] = max(dp[i][j-1], price[j] + max_diff)`, where `max_diff` tracks the best buying opportunity `dp[i-1][prev] - price[prev]`.\n\n### Complexity Analysis\n- **Time:** O(k * n)\n- **Space:** O(k * n) or O(n) optimized.\n\n### Code Logic\n```python\ndef maxProfit(k, prices):\n    if not prices: return 0\n    n = len(prices)\n    if k >= n // 2: # Infinite transactions case\n        return sum(max(0, prices[i+1]-prices[i]) for i in range(n-1))\n    \n    dp = [[0] * n for _ in range(k + 1)]\n    for i in range(1, k + 1):\n        max_diff = -prices[0]\n        for j in range(1, n):\n            dp[i][j] = max(dp[i][j-1], prices[j] + max_diff)\n            max_diff = max(max_diff, dp[i-1][j] - prices[j])\n    return dp[k][n-1]\n```",
     "hints": [
-      "What if we modeled the cities as nodes and connections as weighted edges?",
-      "Can we use Kruskal's algorithm with Union-Find?",
-      "Sort edges by weight."
+      "If k is very large (k >= n/2), the problem becomes 'Best Time to Buy and Sell Stock II'.",
+      "Otherwise, use DP. Let `dp[i][j]` be the max profit using at most `i` transactions up to day `j`.",
+      "The recurrence involves deciding whether to sell on day `j` or not.",
+      "Optimize the inner loop by keeping a running maximum of (previous profit - purchase price)."
     ],
-    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        m = int(next(iterator))\n        connections = []\n        for _ in range(m):\n            u = int(next(iterator))\n            v = int(next(iterator))\n            c = int(next(iterator))\n            connections.append([u, v, c])\n        # Write solution here\n    except StopIteration:\n        pass\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNextInt()) return;\n        int n = scanner.nextInt();\n        int m = scanner.nextInt();\n        int[][] connections = new int[m][3];\n        for(int i=0; i<m; i++) {\n            connections[i][0] = scanner.nextInt();\n            connections[i][1] = scanner.nextInt();\n            connections[i][2] = scanner.nextInt();\n        }\n        // Write solution here\n    }\n}",
+    "boilerplate_python": "import sys\n\ndef solve():\n    try:\n        input_data = sys.stdin.read().split()\n        if not input_data: return\n        \n        k = int(input_data[0])\n        n = int(input_data[1])\n        if n == 0: \n            print(0)\n            return\n        prices = [int(x) for x in input_data[2:n+2]]\n        \n        if k >= n // 2:\n            print(sum(max(0, prices[i+1]-prices[i]) for i in range(n-1)))\n            return\n            \n        dp = [0] * n\n        for i in range(k):\n            max_diff = -prices[0]\n            prev_dp = list(dp) # copy previous transaction row\n            for j in range(1, n):\n                dp[j] = max(dp[j-1], prices[j] + max_diff)\n                max_diff = max(max_diff, prev_dp[j] - prices[j])\n        \n        print(dp[n-1])\n    except Exception:\n        return\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNext()) return;\n        int k = sc.nextInt();\n        int n = sc.nextInt();\n        int[] prices = new int[n];\n        for(int i=0; i<n; i++) prices[i] = sc.nextInt();\n        \n        if (n == 0) {\n            System.out.println(0);\n            return;\n        }\n\n        if (k >= n / 2) {\n            int profit = 0;\n            for (int i = 1; i < n; i++) \n                if (prices[i] > prices[i-1]) profit += prices[i] - prices[i-1];\n            System.out.println(profit);\n            return;\n        }\n\n        int[] dp = new int[n];\n        for (int i = 0; i < k; i++) {\n            int maxDiff = -prices[0];\n            int[] nextDp = new int[n];\n            for (int j = 1; j < n; j++) {\n                nextDp[j] = Math.max(nextDp[j-1], prices[j] + maxDiff);\n                maxDiff = Math.max(maxDiff, dp[j] - prices[j]);\n            }\n            dp = nextDp;\n        }\n        System.out.println(dp[n-1]);\n    }\n}",
     "test_cases": [
       {
-        "input_data": "3\n3\n1 2 5\n1 3 6\n2 3 1",
-        "expected_output": "6",
+        "input_data": "2\n3\n2 4 1",
+        "expected_output": "2",
         "is_public": true
       },
       {
-        "input_data": "4\n3\n1 2 3\n3 4 4\n2 3 5",
-        "expected_output": "12",
+        "input_data": "2\n6\n3 2 6 5 0 3",
+        "expected_output": "7",
         "is_public": true
       },
       {
-        "input_data": "4\n2\n1 2 3\n3 4 4",
-        "expected_output": "-1",
-        "is_public": false
-      },
-      {
-        "input_data": "1\n0",
+        "input_data": "0\n3\n1 2 3",
         "expected_output": "0",
         "is_public": false
       },
       {
-        "input_data": "5\n4\n1 2 1\n2 3 2\n3 4 3\n4 5 4",
-        "expected_output": "10",
+        "input_data": "2\n2\n3 1",
+        "expected_output": "0",
         "is_public": false
       },
       {
-        "input_data": "2\n1\n1 2 100",
-        "expected_output": "100",
-        "is_public": false
-      }
-    ]
-  },
-  {
-    "id": 236,
-    "title": "Lowest Common Ancestor of a Binary Tree",
-    "description": "Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in the tree.\n\nThe LCA is defined between two nodes p and q as the lowest node in T that has both p and q as descendants (where we allow a node to be a descendant of itself).",
-    "input_format": "First line: Level order traversal (null for empty nodes)\nSecond line: Integer p\nThird line: Integer q",
-    "output_format": "Print the value of the LCA node.",
-    "difficulty": "Medium",
-    "tags": [
-      "tree",
-      "traversal",
-      "searching"
-    ],
-    "solution": "### Observations\nWe need to find the node where the paths to `p` and `q` diverge from the bottom up, or the first node that sees `p` in one branch and `q` in the other.\n\n### Approach\n1.  **DFS Recursion:** Function `lca(node)`.\n2.  **Base Case:** If `node` is `None`, return `None`. If `node.val` is `p` or `q`, return `node`.\n3.  **Recursive Step:** Call `lca` on left and right children.\n4.  **Logic:**\n    - If both left and right return a node, `node` is the LCA.\n    - If only one returns a node, pass that up (it's either the LCA or one of the targets).\n\n### Complexity Analysis\n- **Time:** O(N) visit every node.\n- **Space:** O(H) recursion stack.\n\n### Code Logic\n**Python:**\n```python\ndef dfs(root):\n    if not root or root.val == p or root.val == q:\n        return root\n    left = dfs(root.left)\n    right = dfs(root.right)\n    if left and right:\n        return root\n    return left if left else right\nresult = dfs(root)\nprint(result.val)\n```",
-    "hints": [
-      "Perform a post-order traversal.",
-      "If you find p or q, return it up.",
-      "If a node receives non-null values from both left and right, it is the LCA."
-    ],
-    "boilerplate_python": "import sys\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef build_tree(nodes):\n    if not nodes or nodes[0] == 'null': return None\n    root = TreeNode(int(nodes[0]))\n    queue = [root]\n    i = 1\n    while i < len(nodes):\n        curr = queue.pop(0)\n        if i < len(nodes) and nodes[i] != 'null':\n            curr.left = TreeNode(int(nodes[i]))\n            queue.append(curr.left)\n        i += 1\n        if i < len(nodes) and nodes[i] != 'null':\n            curr.right = TreeNode(int(nodes[i]))\n            queue.append(curr.right)\n        i += 1\n    return root\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    # Assuming input stream has enough data for tree and p, q\n    # This part is tricky as tree size is dynamic, but boilerplate assumes \n    # p and q are the last two integers in the stream.\n    p_val = int(input_data[-2])\n    q_val = int(input_data[-1])\n    tree_data = input_data[:-2]\n    root = build_tree(tree_data)\n    \n    # Write solution here (assign p and q based on values if needed)\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\nclass TreeNode {\n    int val;\n    TreeNode left;\n    TreeNode right;\n    TreeNode(int x) { val = x; }\n}\n\npublic class Solution {\n    public static TreeNode buildTree(String[] nodes) {\n        if (nodes.length == 0 || nodes[0].equals(\"null\")) return null;\n        TreeNode root = new TreeNode(Integer.parseInt(nodes[0]));\n        Queue<TreeNode> q = new LinkedList<>();\n        q.add(root);\n        int i = 1;\n        while (i < nodes.length) {\n            TreeNode curr = q.poll();\n            if (i < nodes.length && !nodes[i].equals(\"null\")) {\n                curr.left = new TreeNode(Integer.parseInt(nodes[i]));\n                q.add(curr.left);\n            }\n            i++;\n            if (i < nodes.length && !nodes[i].equals(\"null\")) {\n                curr.right = new TreeNode(Integer.parseInt(nodes[i]));\n                q.add(curr.right);\n            }\n            i++;\n        }\n        return root;\n    }\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNext()) return;\n        List<String> parts = new ArrayList<>();\n        while(scanner.hasNext()) parts.add(scanner.next());\n        int qVal = Integer.parseInt(parts.remove(parts.size()-1));\n        int pVal = Integer.parseInt(parts.remove(parts.size()-1));\n        String[] treeNodes = parts.toArray(new String[0]);\n        TreeNode root = buildTree(treeNodes);\n        // Write solution here\n    }\n}",
-    "test_cases": [
-      {
-        "input_data": "3 5 1 6 2 0 8 null null 7 4\n5\n1",
-        "expected_output": "3",
-        "is_public": true
-      },
-      {
-        "input_data": "3 5 1 6 2 0 8 null null 7 4\n5\n4",
-        "expected_output": "5",
-        "is_public": true
-      },
-      {
-        "input_data": "1 2\n1\n2",
-        "expected_output": "1",
-        "is_public": false
-      },
-      {
-        "input_data": "2 1 null\n2\n1",
-        "expected_output": "2",
-        "is_public": false
-      },
-      {
-        "input_data": "10 5 20 3 8 15 25\n3\n8",
-        "expected_output": "5",
-        "is_public": false
-      },
-      {
-        "input_data": "10 5 20\n5\n20",
-        "expected_output": "10",
-        "is_public": false
-      }
-    ]
-  },
-  {
-    "id": 235,
-    "title": "Lowest Common Ancestor of a Binary Search Tree",
-    "description": "Given a binary search tree (BST), find the lowest common ancestor (LCA) of two given nodes in the BST.\n\nThe LCA is defined between two nodes p and q as the lowest node in T that has both p and q as descendants.",
-    "input_format": "First line: Level order traversal\nSecond line: Integer p\nThird line: Integer q",
-    "output_format": "Print the value of the LCA.",
-    "difficulty": "Easy",
-    "tags": [
-      "bst",
-      "tree",
-      "traversal"
-    ],
-    "solution": "### Observations\nIn a BST, all values in the left subtree are smaller, and all values in the right are larger. The LCA is the split point.\n\n### Approach\n1.  Start at `root`.\n2.  If both `p` and `q` are less than `root.val`, LCA must be in the **left** subtree.\n3.  If both `p` and `q` are greater than `root.val`, LCA must be in the **right** subtree.\n4.  Otherwise, `root` is the split point (or one of the nodes is the root), so `root` is the LCA.\n\n### Complexity Analysis\n- **Time:** O(H), where H is height of the tree.\n- **Space:** O(1) iterative.\n\n### Code Logic\n**Python:**\n```python\nwhile root:\n    if p > root.val and q > root.val:\n        root = root.right\n    elif p < root.val and q < root.val:\n        root = root.left\n    else:\n        return root.val\n```",
-    "hints": [
-      "Utilize the BST property: Left < Root < Right.",
-      "If both p and q are smaller than root, go left.",
-      "If both p and q are larger than root, go right."
-    ],
-    "boilerplate_python": "import sys\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef build_tree(nodes):\n    if not nodes or nodes[0] == 'null': return None\n    root = TreeNode(int(nodes[0]))\n    queue = [root]\n    i = 1\n    while i < len(nodes):\n        curr = queue.pop(0)\n        if i < len(nodes) and nodes[i] != 'null':\n            curr.left = TreeNode(int(nodes[i]))\n            queue.append(curr.left)\n        i += 1\n        if i < len(nodes) and nodes[i] != 'null':\n            curr.right = TreeNode(int(nodes[i]))\n            queue.append(curr.right)\n        i += 1\n    return root\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    p_val = int(input_data[-2])\n    q_val = int(input_data[-1])\n    tree_data = input_data[:-2]\n    root = build_tree(tree_data)\n    # Write solution here using root, p_val, q_val\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\nclass TreeNode {\n    int val;\n    TreeNode left;\n    TreeNode right;\n    TreeNode(int x) { val = x; }\n}\n\npublic class Solution {\n    public static TreeNode buildTree(String[] nodes) {\n        if (nodes.length == 0 || nodes[0].equals(\"null\")) return null;\n        TreeNode root = new TreeNode(Integer.parseInt(nodes[0]));\n        Queue<TreeNode> q = new LinkedList<>();\n        q.add(root);\n        int i = 1;\n        while (i < nodes.length) {\n            TreeNode curr = q.poll();\n            if (i < nodes.length && !nodes[i].equals(\"null\")) {\n                curr.left = new TreeNode(Integer.parseInt(nodes[i]));\n                q.add(curr.left);\n            }\n            i++;\n            if (i < nodes.length && !nodes[i].equals(\"null\")) {\n                curr.right = new TreeNode(Integer.parseInt(nodes[i]));\n                q.add(curr.right);\n            }\n            i++;\n        }\n        return root;\n    }\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNext()) return;\n        List<String> parts = new ArrayList<>();\n        while(scanner.hasNext()) parts.add(scanner.next());\n        int qVal = Integer.parseInt(parts.remove(parts.size()-1));\n        int pVal = Integer.parseInt(parts.remove(parts.size()-1));\n        String[] treeNodes = parts.toArray(new String[0]);\n        TreeNode root = buildTree(treeNodes);\n        // Write solution here\n    }\n}",
-    "test_cases": [
-      {
-        "input_data": "6 2 8 0 4 7 9 null null 3 5\n2\n8",
+        "input_data": "2\n5\n1 2 4 2 5",
         "expected_output": "6",
-        "is_public": true
-      },
-      {
-        "input_data": "6 2 8 0 4 7 9 null null 3 5\n2\n4",
-        "expected_output": "2",
-        "is_public": true
-      },
-      {
-        "input_data": "2 1\n2\n1",
-        "expected_output": "2",
         "is_public": false
       },
       {
-        "input_data": "5 3 6 2 4\n2\n4",
-        "expected_output": "3",
-        "is_public": false
-      },
-      {
-        "input_data": "20 10 30\n10\n30",
-        "expected_output": "20",
-        "is_public": false
-      },
-      {
-        "input_data": "3 1 4 null 2\n2\n4",
-        "expected_output": "3",
+        "input_data": "100\n4\n1 2 4 7",
+        "expected_output": "6",
         "is_public": false
       }
     ]
   },
   {
-    "id": 1123,
-    "title": "Lowest Common Ancestor of Deepest Leaves",
-    "description": "Given the **root** of a binary tree, return the lowest common ancestor of its deepest leaves.\n\nRecall that:\n* The node of a binary tree is a leaf if and only if it has no children.\n* The depth of the root of the tree is 0. if the depth of a node is d, the depth of each of its children is d + 1.\n* The lowest common ancestor of a set S of nodes, is the node A with the largest depth such that every node in S is in the subtree with root A.",
-    "input_format": "First line: Level order traversal",
-    "output_format": "Print the value of the LCA.",
-    "difficulty": "Medium",
+    "id": 312,
+    "title": "Burst Balloons",
+    "description": "You are given `n` balloons, indexed from `0` to `n - 1`. Each balloon is painted with a number on it represented by an array **nums**.\n\nYou are asked to burst all the balloons. If you burst the `ith` balloon, you will get `nums[i - 1] * nums[i] * nums[i + 1]` coins. If `i - 1` or `i + 1` goes out of bounds of the array, then treat it as if there is a balloon with a **1** painted on it.\n\nReturn the maximum coins you can collect by bursting the balloons wisely.",
+    "input_format": "First line: Integer 'n'.\nSecond line: 'n' space-separated integers.",
+    "output_format": "Print the maximum coins.",
+    "difficulty": "Hard",
     "tags": [
-      "tree",
-      "traversal",
-      "dfs"
+      "dp",
+      "array"
     ],
-    "solution": "### Observations\nWe need a node that is an ancestor of all deepest nodes. This implies determining the height of subtrees.\n\n### Approach\n1.  **DFS Helper:** Create a function `dfs(node)` that returns a pair: `(LCA_Node, Height)`.\n2.  **Recursion:**\n    - If `node` is `None`, return `(None, 0)`.\n    - `left = dfs(node.left)`, `right = dfs(node.right)`.\n3.  **Merge Logic:**\n    - If `left.height == right.height`: The deepest nodes are split, so `node` is the LCA. Height is `left.height + 1`.\n    - If `left.height > right.height`: Deepest nodes are on the left. Return `(left.LCA, left.height + 1)`.\n    - Else: Return `(right.LCA, right.height + 1)`.\n\n### Complexity Analysis\n- **Time:** O(N) one pass.\n- **Space:** O(H) recursion.\n\n### Code Logic\n**Python:**\n```python\ndef dfs(node):\n    if not node: return None, 0\n    l_node, l_h = dfs(node.left)\n    r_node, r_h = dfs(node.right)\n    if l_h == r_h:\n        return node, l_h + 1\n    return (l_node, l_h + 1) if l_h > r_h else (r_node, r_h + 1)\n\nreturn dfs(root)[0].val\n```",
+    "solution": "### Observations\nThinking forward (which balloon to burst first) splits the array into dependent problems. Thinking **backward** (which balloon to burst *last*) splits the array into independent subproblems. The last balloon to burst will be multiplied by the boundaries.\n\n### Approach (Interval DP)\n1.  Add `1` to the start and end of `nums`.\n2.  `dp[i][j]` = max coins from bursting balloons strictly between index `i` and `j`.\n3.  Loop length `l` from 2 to `n+2`.\n4.  Iterate left bound `i`, right bound `j`. Pick last burst balloon `k` between `i` and `j`.\n5.  `dp[i][j] = max(dp[i][k] + dp[k][j] + nums[i]*nums[k]*nums[j])`.\n\n### Complexity Analysis\n- **Time:** O(N^3)\n- **Space:** O(N^2)\n\n### Code Logic\n```python\ndef maxCoins(nums):\n    nums = [1] + nums + [1]\n    n = len(nums)\n    dp = [[0] * n for _ in range(n)]\n\n    for length in range(2, n):\n        for left in range(n - length):\n            right = left + length\n            for k in range(left + 1, right):\n                dp[left][right] = max(\n                    dp[left][right], \n                    nums[left] * nums[k] * nums[right] + dp[left][k] + dp[k][right]\n                )\n    return dp[0][n-1]\n```",
     "hints": [
-      "Calculate the height of the left and right subtrees.",
-      "If left height == right height, the current node is the LCA.",
-      "If heights differ, the LCA is in the deeper subtree."
+      "Don't think about which balloon to burst first. Think about which one to burst LAST.",
+      "If balloon `k` is the last one to burst in the range (i, j), its neighbors will be `i` and `j`.",
+      "Pad the array with 1 at both ends to handle edge cases easily.",
+      "This is Matrix Chain Multiplication (MCM) style Interval DP."
     ],
-    "boilerplate_python": "import sys\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef build_tree(nodes):\n    if not nodes or nodes[0] == 'null': return None\n    root = TreeNode(int(nodes[0]))\n    queue = [root]\n    i = 1\n    while i < len(nodes):\n        curr = queue.pop(0)\n        if i < len(nodes) and nodes[i] != 'null':\n            curr.left = TreeNode(int(nodes[i]))\n            queue.append(curr.left)\n        i += 1\n        if i < len(nodes) and nodes[i] != 'null':\n            curr.right = TreeNode(int(nodes[i]))\n            queue.append(curr.right)\n        i += 1\n    return root\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    root = build_tree(input_data)\n    # Write solution here\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\nclass TreeNode {\n    int val;\n    TreeNode left;\n    TreeNode right;\n    TreeNode(int x) { val = x; }\n}\n\npublic class Solution {\n    public static TreeNode buildTree(String[] nodes) {\n        if (nodes.length == 0 || nodes[0].equals(\"null\")) return null;\n        TreeNode root = new TreeNode(Integer.parseInt(nodes[0]));\n        Queue<TreeNode> q = new LinkedList<>();\n        q.add(root);\n        int i = 1;\n        while (i < nodes.length) {\n            TreeNode curr = q.poll();\n            if (i < nodes.length && !nodes[i].equals(\"null\")) {\n                curr.left = new TreeNode(Integer.parseInt(nodes[i]));\n                q.add(curr.left);\n            }\n            i++;\n            if (i < nodes.length && !nodes[i].equals(\"null\")) {\n                curr.right = new TreeNode(Integer.parseInt(nodes[i]));\n                q.add(curr.right);\n            }\n            i++;\n        }\n        return root;\n    }\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNext()) return;\n        String line = scanner.nextLine();\n        String[] nodes = line.split(\"\\\\s+\");\n        TreeNode root = buildTree(nodes);\n        // Write solution here\n    }\n}",
+    "boilerplate_python": "import sys\n\ndef solve():\n    try:\n        input_data = sys.stdin.read().split()\n        if not input_data: return\n        \n        n = int(input_data[0])\n        nums = [int(x) for x in input_data[1:n+1]]\n        \n        # Padding\n        nums = [1] + nums + [1]\n        new_n = len(nums)\n        dp = [[0] * new_n for _ in range(new_n)]\n        \n        for length in range(2, new_n):\n            for left in range(new_n - length):\n                right = left + length\n                for k in range(left + 1, right):\n                    coins = nums[left] * nums[k] * nums[right]\n                    coins += dp[left][k] + dp[k][right]\n                    dp[left][right] = max(dp[left][right], coins)\n                    \n        print(dp[0][new_n - 1])\n    except Exception:\n        return\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNext()) return;\n        int n = sc.nextInt();\n        int[] raw = new int[n];\n        for(int i=0; i<n; i++) raw[i] = sc.nextInt();\n        \n        int[] nums = new int[n + 2];\n        nums[0] = 1;\n        nums[n + 1] = 1;\n        System.arraycopy(raw, 0, nums, 1, n);\n        \n        int newN = nums.length;\n        int[][] dp = new int[newN][newN];\n        \n        for (int length = 2; length < newN; length++) {\n            for (int left = 0; left < newN - length; left++) {\n                int right = left + length;\n                for (int k = left + 1; k < right; k++) {\n                    int val = nums[left] * nums[k] * nums[right];\n                    val += dp[left][k] + dp[k][right];\n                    dp[left][right] = Math.max(dp[left][right], val);\n                }\n            }\n        }\n        \n        System.out.println(dp[0][newN - 1]);\n    }\n}",
     "test_cases": [
       {
-        "input_data": "3 5 1 6 2 0 8 null null 7 4",
-        "expected_output": "2",
+        "input_data": "4\n3 1 5 8",
+        "expected_output": "167",
         "is_public": true
       },
       {
-        "input_data": "1",
-        "expected_output": "1",
+        "input_data": "2\n1 5",
+        "expected_output": "10",
         "is_public": true
       },
       {
-        "input_data": "0 1 3 null 2",
-        "expected_output": "2",
-        "is_public": true
-      },
-      {
-        "input_data": "1 2 3 4 5",
-        "expected_output": "1",
-        "is_public": false
-      },
-      {
-        "input_data": "1 2 null 3 null 4 null 5",
+        "input_data": "1\n5",
         "expected_output": "5",
         "is_public": false
       },
       {
-        "input_data": "1 2 3 4 null null 5",
-        "expected_output": "1",
+        "input_data": "3\n9 76 64",
+        "expected_output": "49536",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n3 1 5 8 2",
+        "expected_output": "227",
+        "is_public": false
+      },
+      {
+        "input_data": "6\n8 2 6 8 9 5",
+        "expected_output": "3630",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "title": "Regular Expression Matching",
+    "description": "Given an input string `s` and a pattern `p`, implement regular expression matching with support for `.` and `*` where:\n- `.` Matches any single character.\n- `*` Matches zero or more of the preceding element.\n\nThe matching should cover the **entire** input string (not partial).",
+    "input_format": "First line: String 's'.\nSecond line: String 'p'.",
+    "output_format": "Print 'true' or 'false'.",
+    "difficulty": "Hard",
+    "tags": [
+      "string",
+      "dp"
+    ],
+    "solution": "### Observations\nThe `*` is tricky because it looks back at the previous character in the pattern. It can eliminate the previous char (0 occurrences) or repeat it (1+ occurrences).\n\n### Approach\n1.  **State:** `dp[i][j]` = Does `s[:i]` match `p[:j]`?\n2.  **Base Case:** `dp[0][0] = True` (empty matches empty). Handle patterns like `a*b*` matching empty.\n3.  **Transition:**\n    -   If `p[j-1]` is char or `.`: `dp[i][j] = dp[i-1][j-1]` (if char matches).\n    -   If `p[j-1]` is `*`: \n        -   Match 0 times: `dp[i][j-2]`.\n        -   Match 1+ times: `dp[i-1][j]` (provided `s[i-1]` matches the char before `*`).\n\n### Complexity Analysis\n- **Time:** O(N * M)\n- **Space:** O(N * M)\n\n### Code Logic\n```python\ndef isMatch(s, p):\n    dp = [[False] * (len(p) + 1) for _ in range(len(s) + 1)]\n    dp[0][0] = True\n    \n    # Handle patterns like a* or a*b*\n    for j in range(2, len(p) + 1):\n        if p[j-1] == '*':\n            dp[0][j] = dp[0][j-2]\n            \n    for i in range(1, len(s) + 1):\n        for j in range(1, len(p) + 1):\n            if p[j-1] == '*':\n                dp[i][j] = dp[i][j-2] # 0 occurences\n                if p[j-2] == '.' or p[j-2] == s[i-1]:\n                    dp[i][j] |= dp[i-1][j]\n            elif p[j-1] == '.' or p[j-1] == s[i-1]:\n                dp[i][j] = dp[i-1][j-1]\n                \n    return dp[len(s)][len(p)]\n```",
+    "hints": [
+      "Use DP. `dp[i][j]` represents if s[0..i] matches p[0..j].",
+      "Pay attention to the '*' character. It relates to the character *before* it.",
+      "For `*`, you have two choices: ignore the `char*` part (match 0 times), or use it to match the current character in `s` (match 1+ times).",
+      "Initialize base cases for empty strings. `a*` can match an empty string."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    try:\n        input_data = sys.stdin.read().split()\n        # Handle empty string inputs\n        if len(input_data) == 0: s, p = \"\", \"\"\n        elif len(input_data) == 1: s, p = input_data[0], \"\"\n        else: s, p = input_data[0], input_data[1]\n        \n        m, n = len(s), len(p)\n        dp = [[False] * (n + 1) for _ in range(m + 1)]\n        dp[0][0] = True\n        \n        for j in range(2, n + 1):\n            if p[j-1] == '*':\n                dp[0][j] = dp[0][j-2]\n                \n        for i in range(1, m + 1):\n            for j in range(1, n + 1):\n                if p[j-1] == '*':\n                    dp[i][j] = dp[i][j-2]\n                    if p[j-2] == '.' or p[j-2] == s[i-1]:\n                        dp[i][j] = dp[i][j] or dp[i-1][j]\n                elif p[j-1] == '.' or p[j-1] == s[i-1]:\n                    dp[i][j] = dp[i-1][j-1]\n                    \n        print(\"true\" if dp[m][n] else \"false\")\n    except Exception:\n        return\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.hasNext() ? sc.next() : \"\";\n        String p = sc.hasNext() ? sc.next() : \"\";\n        \n        int m = s.length();\n        int n = p.length();\n        boolean[][] dp = new boolean[m + 1][n + 1];\n        dp[0][0] = true;\n        \n        for (int j = 2; j <= n; j++) {\n            if (p.charAt(j - 1) == '*') {\n                dp[0][j] = dp[0][j - 2];\n            }\n        }\n        \n        for (int i = 1; i <= m; i++) {\n            for (int j = 1; j <= n; j++) {\n                if (p.charAt(j - 1) == '*') {\n                    dp[i][j] = dp[i][j - 2];\n                    if (p.charAt(j - 2) == '.' || p.charAt(j - 2) == s.charAt(i - 1)) {\n                        dp[i][j] = dp[i][j] || dp[i - 1][j];\n                    }\n                } else if (p.charAt(j - 1) == '.' || p.charAt(j - 1) == s.charAt(i - 1)) {\n                    dp[i][j] = dp[i - 1][j - 1];\n                }\n            }\n        }\n        \n        System.out.println(dp[m][n] ? \"true\" : \"false\");\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "aa\na",
+        "expected_output": "false",
+        "is_public": true
+      },
+      {
+        "input_data": "aa\na*",
+        "expected_output": "true",
+        "is_public": true
+      },
+      {
+        "input_data": "ab\n.*",
+        "expected_output": "true",
+        "is_public": true
+      },
+      {
+        "input_data": "aab\nc*a*b",
+        "expected_output": "true",
+        "is_public": false
+      },
+      {
+        "input_data": "mississippi\nmis*is*p*.",
+        "expected_output": "false",
+        "is_public": false
+      },
+      {
+        "input_data": "ab\n.*c",
+        "expected_output": "false",
         "is_public": false
       }
     ]

@@ -1,0 +1,297 @@
+[
+  {
+    "id": 295,
+    "title": "Find Median from Data Stream",
+    "description": "The **median** is the middle value in an ordered integer list. If the size of the list is even, there is no middle value, and the median is the mean of the two middle values.\n\nDesign a data structure that supports the following two operations:\n\n1. `addNum(num)`: Add the integer **num** from the data stream to the data structure.\n2. `findMedian()`: Return the median of all elements so far.\n\nYou must implement the logic to process a series of commands.",
+    "input_format": "First line: An integer Q representing the number of operations.\nNext Q lines: Each line contains a command. Either \"add <num>\" where <num> is an integer, or \"find\" to print the current median.",
+    "output_format": "For each \"find\" command, print the median formatted to one decimal place (e.g., 2.0, 5.5) on a new line.",
+    "difficulty": "Hard",
+    "tags": [
+      "heap",
+      "searching"
+    ],
+    "solution": "### Observations\nTo find the median efficiently, we need quick access to the middle elements. Sorting the list every time takes $O(N \\log N)$, which is too slow. If we maintain two halves of the data—a lower half and an upper half—we can access the median in $O(1)$.\n\n### Approach\n1.  **Two Heaps**: Use a **Max-Heap** (let's call it `lo`) to store the smaller half of the numbers and a **Min-Heap** (`hi`) to store the larger half.\n2.  **Balancing**: Ensure the size difference between the two heaps is at most 1. \n    - If `len(lo) > len(hi) + 1`, move top of `lo` to `hi`.\n    - If `len(hi) > len(lo)`, move top of `hi` to `lo` (maintaining `lo` as the side that might have 1 extra element is a valid choice, or vice versa).\n3.  **Invariants**: All elements in `lo` must be less than or equal to all elements in `hi`.\n4.  **Find Median**: \n    - If `len(lo) == len(hi)`, median is `(lo.top + hi.top) / 2`.\n    - If `len(lo) > len(hi)`, median is `lo.top`.\n\n### Complexity Analysis\n- **Time Complexity**: $O(\\log N)$ for `addNum`, $O(1)$ for `findMedian`.\n- **Space Complexity**: $O(N)$ to store elements.\n\n### Code Logic\n```python\nimport heapq\n\nclass MedianFinder:\n    def __init__(self):\n        self.small = []  # max_heap (simulated with negatives)\n        self.large = []  # min_heap\n\n    def addNum(self, num):\n        # Always push to small first, then balance to large\n        heapq.heappush(self.small, -num)\n        heapq.heappush(self.large, -heapq.heappop(self.small))\n        \n        # Maintain size property: small can have 1 more than large, or equal\n        if len(self.small) < len(self.large):\n            heapq.heappush(self.small, -heapq.heappop(self.large))\n\n    def findMedian(self):\n        if len(self.small) > len(self.large):\n            return float(-self.small[0])\n        return (-self.small[0] + self.large[0]) / 2.0\n```",
+    "hints": [
+      "Try using two priority queues to maintain the dataset.",
+      "One heap can store the smaller half of the numbers, and the other can store the larger half.",
+      "The median is either the top of the larger heap or the average of the tops of both heaps.",
+      "Consider using a Max-Heap for the lower half and a Min-Heap for the upper half.",
+      "Ensure the heaps stay balanced in size after every addition."
+    ],
+    "boilerplate_python": "import sys\nimport heapq\n\ndef solve():\n    # Read all lines from standard input\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    \n    try:\n        Q = int(next(iterator))\n        # Initialize your data structure here\n        \n        for _ in range(Q):\n            cmd = next(iterator)\n            if cmd == \"add\":\n                num = int(next(iterator))\n                # Call addNum logic\n            elif cmd == \"find\":\n                # Call findMedian logic and print\n                pass\n                \n    except StopIteration:\n        pass\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNext()) return;\n        int Q = sc.nextInt();\n        \n        // Initialize data structure\n        \n        for (int i = 0; i < Q; i++) {\n            String cmd = sc.next();\n            if (cmd.equals(\"add\")) {\n                int num = sc.nextInt();\n                // Add num logic\n            } else if (cmd.equals(\"find\")) {\n                // Find median logic and print\n            }\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "3\nadd 1\nadd 2\nfind",
+        "expected_output": "1.5",
+        "is_public": true
+      },
+      {
+        "input_data": "5\nadd 3\nfind\nadd 2\nfind\nadd 4",
+        "expected_output": "3.0\n2.5",
+        "is_public": true
+      },
+      {
+        "input_data": "1\nfind",
+        "expected_output": "0.0",
+        "is_public": false
+      },
+      {
+        "input_data": "4\nadd -1\nfind\nadd -2\nfind",
+        "expected_output": "-1.0\n-1.5",
+        "is_public": false
+      },
+      {
+        "input_data": "6\nadd 100\nadd 20\nadd 5\nfind\nadd 3\nfind",
+        "expected_output": "20.0\n12.5",
+        "is_public": false
+      },
+      {
+        "input_data": "5\nadd 5\nadd 5\nadd 5\nfind\nadd 5",
+        "expected_output": "5.0",
+        "is_public": false
+      },
+      {
+        "input_data": "10\nadd 1\nadd 2\nadd 3\nadd 4\nadd 5\nadd 6\nadd 7\nadd 8\nadd 9\nfind",
+        "expected_output": "5.0",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 621,
+    "title": "Task Scheduler",
+    "description": "Given a characters array **tasks**, representing the tasks a CPU needs to do, where each letter represents a different task. Tasks could be done in any order. Each task is done in one unit of time. For each unit of time, the CPU could complete either one task or just be idle.\n\nHowever, there is a non-negative integer **n** that represents the cooldown period between two **same tasks** (the same letter in the array), that is that there must be at least **n** units of time between any two same tasks.\n\nReturn the *least number of units of times* that the CPU will take to finish all the given tasks.",
+    "input_format": "First line: An integer T representing the number of tasks.\nSecond line: T space-separated characters representing the tasks.\nThird line: An integer n representing the cooldown period.",
+    "output_format": "Print a single integer representing the total intervals required.",
+    "difficulty": "Medium",
+    "tags": [
+      "array",
+      "heap",
+      "queue",
+      "map"
+    ],
+    "solution": "### Observations\nThe bottleneck is the task with the highest frequency. We must schedule the most frequent task first and space them out by $n$. The idle slots can be filled by other less frequent tasks.\n\n### Approach\n1.  **Count Frequencies**: Store task counts in a map/array.\n2.  **Greedy Strategy**: Identify the maximum frequency (`max_freq`).\n3.  **Frame Construction**: Imagine we align the most frequent task. We have `max_freq - 1` groups of size `n + 1`. The last chunk contains only the tasks that have the same frequency as `max_freq`.\n4.  **Formula**: \n    - Minimum time = `(max_freq - 1) * (n + 1) + count_of_max_freq_tasks`.\n    - However, if the number of tasks is greater than this calculation (meaning we have enough variety to fill all idle slots and then some), the answer is simply the length of the task list.\n    - Result is `max(tasks.length, calculation)`.\n\n### Complexity Analysis\n- **Time Complexity**: $O(N)$ to count tasks, where N is the number of tasks.\n- **Space Complexity**: $O(1)$ as the task alphabet is fixed (26 uppercase letters).\n\n### Code Logic\n```python\nfrom collections import Counter\n\ndef solve(tasks, n):\n    counts = Counter(tasks)\n    max_freq = max(counts.values())\n    \n    # Count how many tasks have this max frequency\n    max_freq_tasks_count = sum(1 for v in counts.values() if v == max_freq)\n    \n    part_count = max_freq - 1\n    part_length = n + 1\n    empty_slots = part_count * part_length + max_freq_tasks_count\n    \n    return max(len(tasks), empty_slots)\n```",
+    "hints": [
+      "Which task constrains the schedule the most? The one with the highest frequency.",
+      "Calculate the frequency of each task.",
+      "Try to arrange the most frequent tasks first, leaving gaps of size n.",
+      "Calculate the minimum length based on the max frequency: (max_freq - 1) * (n + 1).",
+      "Don't forget to add the number of tasks that share the maximum frequency at the end.",
+      "The result can never be less than the total number of tasks."
+    ],
+    "boilerplate_python": "import sys\nfrom collections import Counter\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    \n    try:\n        T = int(next(iterator))\n        tasks = []\n        for _ in range(T):\n            tasks.append(next(iterator))\n        n = int(next(iterator))\n        \n        # Implement logic here\n        \n        print(0) # Placeholder output\n    except StopIteration:\n        return\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNext()) return;\n        int T = sc.nextInt();\n        char[] tasks = new char[T];\n        for(int i=0; i<T; i++) {\n            tasks[i] = sc.next().charAt(0);\n        }\n        int n = sc.nextInt();\n        \n        // Implement logic here\n        \n        System.out.println(0);\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "6\nA A A B B B\n2",
+        "expected_output": "8",
+        "is_public": true
+      },
+      {
+        "input_data": "6\nA A A B B B\n0",
+        "expected_output": "6",
+        "is_public": true
+      },
+      {
+        "input_data": "12\nA A A A A A B C D E F G\n2",
+        "expected_output": "16",
+        "is_public": false
+      },
+      {
+        "input_data": "1\nA\n5",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "4\nA A B B\n2",
+        "expected_output": "5",
+        "is_public": false
+      },
+      {
+        "input_data": "10\nA B C D E A B C D E\n10",
+        "expected_output": "13",
+        "is_public": false
+      },
+      {
+        "input_data": "9\nA A A B B B C C C\n1",
+        "expected_output": "9",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 253,
+    "title": "Meeting Rooms II",
+    "description": "Given an array of meeting time intervals consisting of start and end times `[[s1,e1],[s2,e2],...]`, find the **minimum number of conference rooms** required.\n\nNote: If a meeting ends at time K, a new meeting can start at time K.",
+    "input_format": "First line: An integer N representing the number of meetings.\nNext N lines: Two space-separated integers `start` and `end`.",
+    "output_format": "Print a single integer representing the minimum number of rooms.",
+    "difficulty": "Medium",
+    "tags": [
+      "array",
+      "heap"
+    ],
+    "solution": "### Observations\nWe need to find the maximum number of overlapping intervals at any point in time. If we process meetings chronologically, we need to know how many meetings have started but not yet ended.\n\n### Approach\n1.  **Min-Heap Approach**:\n    - Sort meetings by **start time**.\n    - Use a **Min-Heap** to keep track of the **end times** of ongoing meetings.\n    - Iterate through the sorted meetings:\n        - If the earliest ending meeting (heap top) ends before or at the current meeting's start time, remove it from the heap (room is freed).\n        - Add the current meeting's end time to the heap (room occupied).\n    - The size of the heap tells us how many rooms are currently in use. The answer is the heap size.\n\n2.  **Chronological Ordering (Alternate)**:\n    - Separate start and end times into two arrays and sort both.\n    - Iterate through start times. If a start time is less than the current end time, increment needed rooms. Else, decrement (one meeting ended).\n\n### Complexity Analysis\n- **Time Complexity**: $O(N \\log N)$ due to sorting.\n- **Space Complexity**: $O(N)$ for the heap.\n\n### Code Logic\n```python\nimport heapq\n\ndef solve(intervals):\n    if not intervals:\n        return 0\n    \n    # Sort by start time\n    intervals.sort(key=lambda x: x[0])\n    \n    # Min-heap to store end times\n    heap = []\n    heapq.heappush(heap, intervals[0][1])\n    \n    for i in range(1, len(intervals)):\n        # If the room with earliest end time is free\n        if intervals[i][0] >= heap[0]:\n            heapq.heappop(heap)\n        \n        # Add current meeting's end time\n        heapq.heappush(heap, intervals[i][1])\n    \n    return len(heap)\n```",
+    "hints": [
+      "Think about processing the meetings in order of their start times.",
+      "You need to keep track of end times of meetings currently in progress.",
+      "A Min-Heap can efficiently give you the meeting that ends the earliest.",
+      "If the current meeting starts after the earliest ending meeting finishes, you can reuse that room.",
+      "If not, you must allocate a new room."
+    ],
+    "boilerplate_python": "import sys\nimport heapq\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    \n    try:\n        N = int(next(iterator))\n        intervals = []\n        for _ in range(N):\n            s = int(next(iterator))\n            e = int(next(iterator))\n            intervals.append([s, e])\n            \n        # Logic\n        \n        print(0)\n    except StopIteration:\n        return\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNext()) return;\n        int N = sc.nextInt();\n        int[][] intervals = new int[N][2];\n        for(int i=0; i<N; i++) {\n            intervals[i][0] = sc.nextInt();\n            intervals[i][1] = sc.nextInt();\n        }\n        \n        // Logic\n        \n        System.out.println(0);\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "3\n0 30\n5 10\n15 20",
+        "expected_output": "2",
+        "is_public": true
+      },
+      {
+        "input_data": "2\n7 10\n2 4",
+        "expected_output": "1",
+        "is_public": true
+      },
+      {
+        "input_data": "4\n1 10\n2 7\n3 19\n8 12",
+        "expected_output": "3",
+        "is_public": false
+      },
+      {
+        "input_data": "3\n1 5\n5 10\n10 15",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "0",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n1 2\n2 3\n3 4\n1 3\n2 4",
+        "expected_output": "3",
+        "is_public": false
+      },
+      {
+        "input_data": "2\n1 10\n1 10",
+        "expected_output": "2",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 56,
+    "title": "Merge Intervals",
+    "description": "Given an array of **intervals** where `intervals[i] = [start_i, end_i]`, merge all overlapping intervals, and return an array of the non-overlapping intervals that cover all the intervals in the input.",
+    "input_format": "First line: An integer N.\nNext N lines: Two space-separated integers `start` and `end`.",
+    "output_format": "Print each merged interval on a new line as `start end`. The output must be sorted by start time.",
+    "difficulty": "Medium",
+    "tags": [
+      "array"
+    ],
+    "solution": "### Observations\nTo easily identify overlaps, intervals should be processed in order. If we sort by start time, we only need to compare the current interval with the last merged interval.\n\n### Approach\n1.  **Sort**: Sort the intervals by their start time.\n2.  **Iterate**: Initialize a result list `merged` with the first interval.\n3.  **Compare**: For each subsequent interval `curr`:\n    - If `curr.start` <= `merged[-1].end`, there is an overlap. Merge them by updating `merged[-1].end = max(merged[-1].end, curr.end)`.\n    - Otherwise, there is no overlap. Append `curr` to `merged`.\n\n### Complexity Analysis\n- **Time Complexity**: $O(N \\log N)$ for sorting.\n- **Space Complexity**: $O(N)$ to store the output.\n\n### Code Logic\n```python\ndef solve(intervals):\n    if not intervals: return []\n    intervals.sort(key=lambda x: x[0])\n    \n    merged = [intervals[0]]\n    for i in range(1, len(intervals)):\n        last = merged[-1]\n        curr = intervals[i]\n        \n        if curr[0] <= last[1]:\n            last[1] = max(last[1], curr[1])\n        else:\n            merged.append(curr)\n    return merged\n```",
+    "hints": [
+      "Sort the intervals based on their start times.",
+      "Iterate through the sorted intervals and maintain a list of merged intervals.",
+      "Compare the current interval's start time with the end time of the last interval in your merged list.",
+      "If they overlap, update the end time of the last merged interval to the maximum of both end times."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    \n    try:\n        N = int(next(iterator))\n        intervals = []\n        for _ in range(N):\n            s = int(next(iterator))\n            e = int(next(iterator))\n            intervals.append([s, e])\n            \n        # Logic to merge\n        \n        # Print result\n        # for interval in result:\n        #     print(f\"{interval[0]} {interval[1]}\")\n            \n    except StopIteration:\n        return\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNext()) return;\n        int N = sc.nextInt();\n        int[][] intervals = new int[N][2];\n        for(int i=0; i<N; i++) {\n            intervals[i][0] = sc.nextInt();\n            intervals[i][1] = sc.nextInt();\n        }\n        \n        // Logic\n        \n        // Print result\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "4\n1 3\n2 6\n8 10\n15 18",
+        "expected_output": "1 6\n8 10\n15 18",
+        "is_public": true
+      },
+      {
+        "input_data": "2\n1 4\n4 5",
+        "expected_output": "1 5",
+        "is_public": true
+      },
+      {
+        "input_data": "3\n1 4\n0 4\n3 5",
+        "expected_output": "0 5",
+        "is_public": false
+      },
+      {
+        "input_data": "1\n1 10",
+        "expected_output": "1 10",
+        "is_public": false
+      },
+      {
+        "input_data": "3\n1 4\n2 3\n5 6",
+        "expected_output": "1 4\n5 6",
+        "is_public": false
+      },
+      {
+        "input_data": "4\n1 10\n2 3\n4 5\n6 7",
+        "expected_output": "1 10",
+        "is_public": false
+      },
+      {
+        "input_data": "2\n1 4\n0 0",
+        "expected_output": "0 0\n1 4",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 57,
+    "title": "Insert Interval",
+    "description": "You are given an array of non-overlapping intervals `intervals` where `intervals[i] = [start_i, end_i]` represent the start and the end of the `i-th` interval and `intervals` is sorted in ascending order by `start_i`.\n\nYou are also given an interval `newInterval = [start, end]` that represents the start and end of another interval.\n\nInsert `newInterval` into `intervals` such that `intervals` is still sorted in ascending order by `start_i` and `intervals` still does not have any overlapping intervals (merge overlapping intervals if necessary).",
+    "input_format": "First line: An integer N.\nNext N lines: Two space-separated integers `start` and `end` for existing intervals.\nLast line: Two space-separated integers `newStart` and `newEnd`.",
+    "output_format": "Print each merged interval on a new line as `start end`.",
+    "difficulty": "Medium",
+    "tags": [
+      "array"
+    ],
+    "solution": "### Observations\nSince the input list is already sorted, we can process it in one pass. We have three phases: intervals strictly before the new one, intervals that overlap, and intervals strictly after.\n\n### Approach\n1.  **Before**: Iterate through intervals. If current interval ends before `newInterval` starts, add it to result.\n2.  **Overlap**: While current interval overlaps with `newInterval` (i.e., `curr.start <= newInterval.end`), merge them by updating `newInterval`: \n    - `newStart = min(newStart, curr.start)`\n    - `newEnd = max(newEnd, curr.end)`.\n3.  **Insert**: Add the merged `newInterval` to result.\n4.  **After**: Add all remaining intervals to result.\n\n### Complexity Analysis\n- **Time Complexity**: $O(N)$ since we iterate once.\n- **Space Complexity**: $O(N)$ for the result.\n\n### Code Logic\n```python\ndef solve(intervals, newInterval):\n    result = []\n    i = 0\n    n = len(intervals)\n    \n    # 1. Add all intervals ending before newInterval starts\n    while i < n and intervals[i][1] < newInterval[0]:\n        result.append(intervals[i])\n        i += 1\n        \n    # 2. Merge overlapping intervals\n    while i < n and intervals[i][0] <= newInterval[1]:\n        newInterval[0] = min(newInterval[0], intervals[i][0])\n        newInterval[1] = max(newInterval[1], intervals[i][1])\n        i += 1\n    result.append(newInterval)\n    \n    # 3. Add remaining\n    while i < n:\n        result.append(intervals[i])\n        i += 1\n        \n    return result\n```",
+    "hints": [
+      "The input intervals are already sorted.",
+      "Identify the intervals that come completely before the new interval.",
+      "Identify the intervals that overlap with the new interval and merge them into one.",
+      "Append the merged new interval.",
+      "Append the remaining intervals that come after the new interval."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    \n    try:\n        N = int(next(iterator))\n        intervals = []\n        for _ in range(N):\n            s = int(next(iterator))\n            e = int(next(iterator))\n            intervals.append([s, e])\n        \n        new_s = int(next(iterator))\n        new_e = int(next(iterator))\n        newInterval = [new_s, new_e]\n            \n        # Logic\n        \n        # Print result\n            \n    except StopIteration:\n        return\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNext()) return;\n        int N = sc.nextInt();\n        int[][] intervals = new int[N][2];\n        for(int i=0; i<N; i++) {\n            intervals[i][0] = sc.nextInt();\n            intervals[i][1] = sc.nextInt();\n        }\n        int newS = sc.nextInt();\n        int newE = sc.nextInt();\n        \n        // Logic\n        \n        // Print result\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "2\n1 3\n6 9\n2 5",
+        "expected_output": "1 5\n6 9",
+        "is_public": true
+      },
+      {
+        "input_data": "5\n1 2\n3 5\n6 7\n8 10\n12 16\n4 8",
+        "expected_output": "1 2\n3 10\n12 16",
+        "is_public": true
+      },
+      {
+        "input_data": "0\n5 7",
+        "expected_output": "5 7",
+        "is_public": false
+      },
+      {
+        "input_data": "1\n1 5\n2 3",
+        "expected_output": "1 5",
+        "is_public": false
+      },
+      {
+        "input_data": "1\n1 5\n6 8",
+        "expected_output": "1 5\n6 8",
+        "is_public": false
+      },
+      {
+        "input_data": "1\n1 5\n0 0",
+        "expected_output": "0 0\n1 5",
+        "is_public": false
+      },
+      {
+        "input_data": "2\n1 5\n10 15\n0 20",
+        "expected_output": "0 20",
+        "is_public": false
+      }
+    ]
+  }
+]

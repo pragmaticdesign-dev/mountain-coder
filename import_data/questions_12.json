@@ -1,0 +1,221 @@
+[
+  {
+    "id": 46,
+    "title": "Permutations",
+    "description": "Given an array **nums** of distinct integers, return all the possible permutations. You can return the answer in any order.\n\nExample:\nInput: **nums** = [1,2,3]\nOutput: [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]",
+    "input_format": "First line: Integer N (size of array).\nSecond line: N space-separated integers.",
+    "output_format": "Print each permutation on a new line, with elements space-separated.",
+    "difficulty": "Medium",
+    "tags": [
+      "array",
+      "traversal",
+      "searching"
+    ],
+    "solution": "### Observations\n- We need to find every possible ordering of the elements.\n- Since all integers are distinct, we don't need to worry about duplicates.\n- The number of permutations is N!, so the complexity will be factorial.\n\n### Approach\n1. **Backtracking:** Use a recursive function to build permutations.\n2. Maintain a `visited` set or a boolean array to track which numbers have been used in the current path.\n3. Iterate through `nums`. If a number is not used, add it to the current path and recurse.\n4. When the current path length equals `N`, add the path to the results.\n5. Backtrack by removing the last element and marking it as unused.\n\n### Complexity Analysis\n- **Time:** O(N * N!) - There are N! permutations, and copying the list takes O(N).\n- **Space:** O(N) - Recursion stack depth and storage for the current path.\n\n### Code Logic\n```python\ndef solve(nums):\n    res = []\n    def backtrack(path, used):\n        if len(path) == len(nums):\n            res.append(path[:])\n            return\n        for i in range(len(nums)):\n            if not used[i]:\n                used[i] = True\n                path.append(nums[i])\n                backtrack(path, used)\n                path.pop()\n                used[i] = False\n    backtrack([], [False]*len(nums))\n    return res\n```",
+    "hints": [
+      "Think about visualizing the problem as a tree where each node represents a choice.",
+      "At each step, you can choose any number that hasn't been chosen yet.",
+      "Use a boolean array or a set to keep track of the numbers currently in your path.",
+      "Remember to 'undo' your choice (backtrack) after the recursive call returns.",
+      "The base case for your recursion is when the current list size equals the input array size."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    n = int(input_data[0])\n    nums = [int(x) for x in input_data[1:n+1]]\n    \n    # Implement your logic here\n    # result = permutations(nums)\n    # for p in result: print(*p)\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNext()) return;\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) {\n            nums[i] = sc.nextInt();\n        }\n        // solve(nums);\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "3\n1 2 3",
+        "expected_output": "1 2 3\n1 3 2\n2 1 3\n2 3 1\n3 1 2\n3 2 1",
+        "is_public": true
+      },
+      {
+        "input_data": "2\n0 1",
+        "expected_output": "0 1\n1 0",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n1",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "4\n1 2 3 4",
+        "expected_output": "1 2 3 4\n1 2 4 3\n1 3 2 4\n1 3 4 2\n1 4 2 3\n1 4 3 2\n2 1 3 4\n2 1 4 3\n2 3 1 4\n2 3 4 1\n2 4 1 3\n2 4 3 1\n3 1 2 4\n3 1 4 2\n3 2 1 4\n3 2 4 1\n3 4 1 2\n3 4 2 1\n4 1 2 3\n4 1 3 2\n4 2 1 3\n4 2 3 1\n4 3 1 2\n4 3 2 1",
+        "is_public": false
+      },
+      {
+        "input_data": "3\n-1 -2 -3",
+        "expected_output": "-1 -2 -3\n-1 -3 -2\n-2 -1 -3\n-2 -3 -1\n-3 -1 -2\n-3 -2 -1",
+        "is_public": false
+      },
+      {
+        "input_data": "0\n",
+        "expected_output": "",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 78,
+    "title": "Subsets",
+    "description": "Given an integer array **nums** of unique elements, return all possible subsets (the power set). The solution set must not contain duplicate subsets. Return the solution in any order.\n\nExample:\nInput: **nums** = [1,2,3]\nOutput: [[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]",
+    "input_format": "First line: Integer N.\nSecond line: N space-separated integers.",
+    "output_format": "Print each subset on a new line, elements space-separated. Print 'EMPTY' for the empty set.",
+    "difficulty": "Medium",
+    "tags": [
+      "array",
+      "traversal"
+    ],
+    "solution": "### Observations\n- A subset is formed by either including or excluding each element.\n- For N elements, there are 2^N possible subsets.\n\n### Approach\n1. **Cascading:** Start with `[[]]`. For each number in `nums`, take all existing subsets, add the current number to them, and add these new subsets back to the result.\n2. **Backtracking:** Use an index `start` to traverse `nums`. Add the current path to results. Loop from `start` to `N`, add `nums[i]`, recurse, and backtrack.\n3. **Bit Manipulation:** Iterate from `0` to `2^N - 1`. If the j-th bit is set, include `nums[j]`.\n\n### Complexity Analysis\n- **Time:** O(N * 2^N) - We generate 2^N subsets, each of length up to N.\n- **Space:** O(N * 2^N) - Storing the output.\n\n### Code Logic\n```python\ndef solve(nums):\n    res = []\n    def backtrack(start, path):\n        res.append(path[:])\n        for i in range(start, len(nums)):\n            path.append(nums[i])\n            backtrack(i + 1, path)\n            path.pop()\n    backtrack(0, [])\n    return res\n```",
+    "hints": [
+      "The total number of subsets is 2 to the power of N.",
+      "Think about the decision you make for every element: either include it or exclude it.",
+      "You can build this iteratively. Start with an empty set, then for each number, add it to all existing sets.",
+      "Alternatively, use recursion where you track the current index.",
+      "Bit manipulation is another way: verify bits from 0 to 2^N."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    n = int(input_data[0])\n    nums = [int(x) for x in input_data[1:n+1]]\n    \n    # Logic here\n    # Print 'EMPTY' if list is empty, else print space separated\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNext()) return;\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) {\n            nums[i] = sc.nextInt();\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "3\n1 2 3",
+        "expected_output": "EMPTY\n1\n2\n1 2\n3\n1 3\n2 3\n1 2 3",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n0",
+        "expected_output": "EMPTY\n0",
+        "is_public": true
+      },
+      {
+        "input_data": "0\n",
+        "expected_output": "EMPTY",
+        "is_public": false
+      },
+      {
+        "input_data": "4\n1 2 3 4",
+        "expected_output": "EMPTY\n1\n2\n1 2\n3\n1 3\n2 3\n1 2 3\n4\n1 4\n2 4\n1 2 4\n3 4\n1 3 4\n2 3 4\n1 2 3 4",
+        "is_public": false
+      },
+      {
+        "input_data": "2\n10 20",
+        "expected_output": "EMPTY\n10\n20\n10 20",
+        "is_public": false
+      },
+      {
+        "input_data": "3\n-1 -2 -3",
+        "expected_output": "EMPTY\n-1\n-2\n-1 -2\n-3\n-1 -3\n-2 -3\n-1 -2 -3",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 51,
+    "title": "N-Queens",
+    "description": "The **n-queens** puzzle is the problem of placing **n** queens on an **n x n** chessboard such that no two queens attack each other.\n\nGiven an integer **n**, return all distinct solutions to the **n-queens puzzle**. Each solution contains a distinct board configuration of the queen placements, where 'Q' and '.' indicate a queen and an empty space, respectively.",
+    "input_format": "A single line containing the integer N.",
+    "output_format": "Print each solution grid separated by a blank line. If no solution, print nothing.",
+    "difficulty": "Hard",
+    "tags": [
+      "array",
+      "traversal",
+      "searching"
+    ],
+    "solution": "### Observations\n- A Queen attacks row-wise, column-wise, and diagonally.\n- We can place exactly one Queen per row.\n\n### Approach\n1. **State representation:** Use arrays (or sets) to track occupied columns (`cols`), main diagonals (`diag1`: r-c), and anti-diagonals (`diag2`: r+c).\n2. **Backtracking:** Iterate row by row (from 0 to N-1). In each row, try placing a Queen in every column.\n3. **Validation:** Check if the column or diagonals are already occupied.\n4. **Recursion:** If valid, mark the spot, move to the next row (`r+1`), and backtrack upon return.\n\n### Complexity Analysis\n- **Time:** O(N!) - Roughly N choices for row 1, N-1 for row 2, etc.\n- **Space:** O(N) - For the recursion stack and tracking arrays.\n\n### Code Logic\n```python\ndef solve(n):\n    cols = set()\n    posDiag = set() # (r + c)\n    negDiag = set() # (r - c)\n    res = []\n    board = [['.'] * n for _ in range(n)]\n\n    def backtrack(r):\n        if r == n:\n            copy = [\"\".join(row) for row in board]\n            res.append(copy)\n            return\n        for c in range(n):\n            if c in cols or (r+c) in posDiag or (r-c) in negDiag:\n                continue\n            cols.add(c)\n            posDiag.add(r+c)\n            negDiag.add(r-c)\n            board[r][c] = 'Q'\n            backtrack(r + 1)\n            cols.remove(c)\n            posDiag.remove(r+c)\n            negDiag.remove(r-c)\n            board[r][c] = '.'\n    backtrack(0)\n    return res\n```",
+    "hints": [
+      "You can place only one queen per row.",
+      "For a cell (r, c), the anti-diagonal is constant (r + c).",
+      "For a cell (r, c), the main diagonal is constant (r - c).",
+      "Use sets to keep track of occupied columns and both types of diagonals for O(1) lookup.",
+      "Base case is when row index equals N."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    try:\n        line = sys.stdin.read().strip()\n        if not line: return\n        n = int(line)\n    except ValueError: return\n    \n    # Logic here\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNext()) return;\n        int n = sc.nextInt();\n        // Logic here\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "4",
+        "expected_output": ".Q..\n...Q\nQ...\n..Q.\n\n..Q.\nQ...\n...Q\n.Q..",
+        "is_public": true
+      },
+      {
+        "input_data": "1",
+        "expected_output": "Q",
+        "is_public": true
+      },
+      {
+        "input_data": "2",
+        "expected_output": "",
+        "is_public": false
+      },
+      {
+        "input_data": "3",
+        "expected_output": "",
+        "is_public": false
+      },
+      {
+        "input_data": "5",
+        "expected_output": "Q....\n..Q..\n....Q\n.Q...\n...Q.\n\nQ....\n...Q.\n.Q...\n....Q\n..Q..\n\n.Q...\n...Q.\nQ....\n..Q..\n....Q\n\n.Q...\n....Q\n..Q..\nQ....\n...Q.\n\n..Q..\nQ....\n...Q.\n.Q...\n....Q\n\n..Q..\n....Q\n.Q...\n...Q.\nQ....\n\n...Q.\nQ....\n..Q..\n....Q\n.Q...\n\n...Q.\n.Q...\n....Q\n..Q..\nQ....\n\n....Q\n.Q...\n...Q.\nQ....\n..Q..\n\n....Q\n..Q..\nQ....\n...Q.\n.Q..",
+        "is_public": false
+      },
+      {
+        "input_data": "6",
+        "expected_output": ".Q....\n...Q..\n.....Q\nQ.....\n..Q...\n....Q.\n\n.Q....\n....Q.\n..Q...\nQ.....\n.....Q\n...Q..\n\n..Q...\n.....Q\n.Q....\n....Q.\nQ.....\n...Q..\n\n...Q..\nQ.....\n....Q.\n.Q....\n.....Q\n..Q...\n\n",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 37,
+    "title": "Sudoku Solver",
+    "description": "Write a program to solve a Sudoku puzzle by filling the empty cells.\n\nA sudoku solution must satisfy all of the following rules:\n1. Each of the digits `1-9` must occur exactly once in each row.\n2. Each of the digits `1-9` must occur exactly once in each column.\n3. Each of the digits `1-9` must occur exactly once in each of the 9 `3x3` sub-boxes of the grid.\n\nThe '.' character indicates empty cells.",
+    "input_format": "9 lines, each containing a string of 9 characters representing the row.",
+    "output_format": "9 lines representing the solved grid.",
+    "difficulty": "Hard",
+    "tags": [
+      "array",
+      "traversal",
+      "searching"
+    ],
+    "solution": "### Observations\n- This is an exact cover problem solvable by backtracking.\n- We need to fill every '.' such that row, column, and box constraints are met.\n\n### Approach\n1. **Find Empty:** Iterate through the grid to find the first cell `(r, c)` that is '.'. If none, the board is solved.\n2. **Try Digits:** For `k` from '1' to '9':\n   - Check `isValid(r, c, k)`: Is `k` in row `r`, column `c`, or the 3x3 subgrid?\n   - If valid, place `k` and recurse.\n   - If recursion returns `True`, propagate `True`.\n   - If not, reset cell to '.' (backtrack).\n3. **Subgrid Math:** The top-left of the 3x3 block for `(r, c)` is `(r // 3 * 3, c // 3 * 3)`.\n\n### Complexity Analysis\n- **Time:** O(9^M) where M is the number of empty cells.\n- **Space:** O(M) recursion depth.\n\n### Code Logic\n```python\ndef solve(board):\n    def isValid(r, c, k):\n        for i in range(9):\n            if board[r][i] == k: return False\n            if board[i][c] == k: return False\n            if board[3*(r//3) + i//3][3*(c//3) + i%3] == k: return False\n        return True\n\n    def backtrack():\n        for r in range(9):\n            for c in range(9):\n                if board[r][c] == '.':\n                    for k in \"123456789\":\n                        if isValid(r, c, k):\n                            board[r][c] = k\n                            if backtrack(): return True\n                            board[r][c] = '.'\n                    return False\n        return True\n    backtrack()\n    return board\n```",
+    "hints": [
+      "Try filling the first empty cell with numbers 1 through 9.",
+      "Before placing a number, verify if it exists in the current row, current column, and the specific 3x3 sub-box.",
+      "The formula for the 3x3 block index is (r/3)*3 and (c/3)*3.",
+      "If you reach a state where no number can be placed in an empty cell, backtrack to the previous cell.",
+      "Since there is a unique solution, you can return immediately after finding the first valid completed board."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    board = []\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    # Handle case where input might be split strangely or just lines\n    # Assuming standard 9 strings\n    if len(input_data) < 9: return\n    for i in range(9):\n        board.append(list(input_data[i]))\n        \n    # Logic\n    # print(\"\".join(row))\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        char[][] board = new char[9][9];\n        for (int i = 0; i < 9; i++) {\n            if (sc.hasNext()) {\n                board[i] = sc.next().toCharArray();\n            }\n        }\n        // solve(board)\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "53..7....\n6..195...\n.98....6.\n8...6...3\n4..8.3..1\n7...2...6\n.6....28.\n...419..5\n....8..79",
+        "expected_output": "534678912\n672195348\n198342567\n859761423\n426853791\n713924856\n961537284\n287419635\n345286179",
+        "is_public": true
+      },
+      {
+        "input_data": ".........\n.........\n.........\n.........\n.........\n.........\n.........\n.........\n.........",
+        "expected_output": "123456789\n456789123\n789123456\n231564897\n564897231\n897231564\n312645978\n645978312\n978312645",
+        "is_public": false
+      },
+      {
+        "input_data": "1........\n.........\n.........\n.........\n.........\n.........\n.........\n.........\n.........",
+        "expected_output": "123456789\n456789123\n789123456\n231564897\n564897231\n897231564\n312645978\n645978312\n978312645",
+        "is_public": false
+      },
+      {
+        "input_data": ".......1.\n.....2...\n...3.....\n.........\n.........\n.........\n.........\n.........\n.........",
+        "expected_output": "245678319\n136492578\n789315246\n312546897\n458927163\n697183425\n521734986\n864259731\n973861542",
+        "is_public": false
+      },
+      {
+        "input_data": "8........\n..36.....\n.7..9.2..\n.5...7...\n....457..\n...1...3.\n..1....68\n..85...1.\n.9....4..",
+        "expected_output": "812753649\n943682175\n675491283\n154237896\n369845721\n287169534\n521974368\n438526917\n796318452",
+        "is_public": false
+      },
+      {
+        "input_data": ".........\n.........\n.........\n.........\n.........\n.........\n.........\n.........\n........1",
+        "expected_output": "123456798\n456789123\n789123456\n214365879\n365897214\n897214365\n531642987\n642978531\n978531642",
+        "is_public": false
+      }
+    ]
+  }
+]

@@ -1,23 +1,135 @@
 [
   {
+    "id": 124,
+    "title": "Binary Tree Maximum Path Sum",
+    "description": "A **path** in a binary tree is a sequence of nodes where each pair of adjacent nodes in the sequence has an edge connecting them. A node can only appear in the sequence at most once. Note that the path does not need to pass through the **root**.\n\nThe **path sum** of a path is the sum of the node's values in the path.\n\nGiven the **root** of a binary tree, return the maximum **path sum** of any non-empty path.",
+    "input_format": "A single line containing space-separated values representing the binary tree in level-order traversal. Use 'null' for empty nodes.",
+    "output_format": "A single integer representing the maximum path sum.",
+    "difficulty": "Hard",
+    "tags": [
+      "tree",
+      "dp",
+      "traversal"
+    ],
+    "solution": "### Observations\n1. A path can start and end at any node.\n2. For any node, the maximum path passing through it (where it is the highest point of the path) consists of the node's value plus the max path extending to the left and the max path extending to the right.\n3. We cannot construct a valid path that branches into both children and then goes up to the parent. We must choose at most one child branch to extend upwards.\n\n### Approach\n1. Use recursion (Post-order traversal).\n2. For each node, calculate the maximum gain we can get from its left subtree and right subtree. (If a subtree gain is negative, ignore it, i.e., treat as 0).\n3. Update the global maximum path sum using `node.val + left_gain + right_gain`.\n4. Return `node.val + max(left_gain, right_gain)` to the parent node, as the path can only continue through one branch.\n\n### Complexity Analysis\n- **Time Complexity:** $O(N)$, where N is the number of nodes, as we visit each node once.\n- **Space Complexity:** $O(H)$, where H is the height of the tree, for recursion stack.\n\n### Code Logic\n```python\nclass Solution:\n    def maxPathSum(self, root):\n        self.max_sum = float('-inf')\n        \n        def get_max_gain(node):\n            if not node:\n                return 0\n            \n            # Gain from subtrees, ignore negative sums\n            left_gain = max(get_max_gain(node.left), 0)\n            right_gain = max(get_max_gain(node.right), 0)\n            \n            # Path including both children (splitting point)\n            current_path_sum = node.val + left_gain + right_gain\n            self.max_sum = max(self.max_sum, current_path_sum)\n            \n            # Return max path extending to parent\n            return node.val + max(left_gain, right_gain)\n        \n        get_max_gain(root)\n        return self.max_sum\n```",
+    "hints": [
+      "Can the maximum path pass through the root?",
+      "Can it exist entirely within one subtree?",
+      "For a specific node, what is the max path passing through it if it acts as the 'peak'?",
+      "Negative values should be treated as 0 gain.",
+      "Use a global variable to keep track of the maximum sum encountered."
+    ],
+    "boilerplate_python": "import sys\nimport collections\n\n# Definition for a binary tree node.\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef build_tree(nodes):\n    if not nodes or nodes[0] == \"null\": return None\n    root = TreeNode(int(nodes[0]))\n    q = collections.deque([root])\n    i = 1\n    while i < len(nodes):\n        curr = q.popleft()\n        if i < len(nodes) and nodes[i] != \"null\":\n            curr.left = TreeNode(int(nodes[i]))\n            q.append(curr.left)\n        i += 1\n        if i < len(nodes) and nodes[i] != \"null\":\n            curr.right = TreeNode(int(nodes[i]))\n            q.append(curr.right)\n        i += 1\n    return root\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    root = build_tree(input_data)\n    \n    # Write your solution here\n    # result = ...\n    # print(result)\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\nclass TreeNode {\n    int val;\n    TreeNode left;\n    TreeNode right;\n    TreeNode(int x) { val = x; }\n}\n\npublic class Solution {\n    public static TreeNode buildTree(String[] nodes) {\n        if (nodes.length == 0 || nodes[0].equals(\"null\")) return null;\n        TreeNode root = new TreeNode(Integer.parseInt(nodes[0]));\n        Queue<TreeNode> q = new LinkedList<>();\n        q.add(root);\n        int i = 1;\n        while (i < nodes.length) {\n            TreeNode curr = q.poll();\n            if (i < nodes.length && !nodes[i].equals(\"null\")) {\n                curr.left = new TreeNode(Integer.parseInt(nodes[i]));\n                q.add(curr.left);\n            }\n            i++;\n            if (i < nodes.length && !nodes[i].equals(\"null\")) {\n                curr.right = new TreeNode(Integer.parseInt(nodes[i]));\n                q.add(curr.right);\n            }\n            i++;\n        }\n        return root;\n    }\n\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (scanner.hasNextLine()) {\n            String[] parts = scanner.nextLine().split(\" \");\n            TreeNode root = buildTree(parts);\n            // Call your logic here\n            // System.out.println(result);\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "1 2 3",
+        "expected_output": "6",
+        "is_public": true
+      },
+      {
+        "input_data": "-10 9 20 null null 15 7",
+        "expected_output": "42",
+        "is_public": true
+      },
+      {
+        "input_data": "-3",
+        "expected_output": "-3",
+        "is_public": false
+      },
+      {
+        "input_data": "2 -1",
+        "expected_output": "2",
+        "is_public": false
+      },
+      {
+        "input_data": "5 4 8 11 null 13 4 7 2 null null null 1",
+        "expected_output": "48",
+        "is_public": false
+      },
+      {
+        "input_data": "-1 -2 -3",
+        "expected_output": "-1",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 297,
+    "title": "Serialize and Deserialize Binary Tree",
+    "description": "Serialization is the process of converting a data structure or object into a sequence of bits so that it can be stored in a file or memory buffer. Deserialization is the reverse process.\n\nDesign an algorithm to **serialize** and **deserialize** a binary tree. There is no restriction on how your serialization/deserialization algorithm should work. You just need to ensure that a binary tree can be serialized to a string and this string can be deserialized to the original tree structure.",
+    "input_format": "A single line representing a binary tree in standard level-order format (used by the judge to construct the tree passed to your function).",
+    "output_format": "The judge will serialize your tree, then deserialize it, and print the resulting tree in level-order format.",
+    "difficulty": "Hard",
+    "tags": [
+      "tree",
+      "string",
+      "traversal",
+      "queue"
+    ],
+    "solution": "### Observations\n1. To reconstruct a tree uniquely, we need to record null pointers.\n2. Standard DFS (Preorder) or BFS (Level Order) are the best candidates.\n\n### Approach\n1. **Serialize:** Perform a Preorder traversal (Root -> Left -> Right). If a node is null, append a specific marker (e.g., \"#\"). Join values with a delimiter.\n2. **Deserialize:** Split the string by the delimiter. Use an iterator or a queue. If the current value is the marker, return None. Otherwise, create a node and recursively build the left and right children.\n\n### Complexity Analysis\n- **Time Complexity:** $O(N)$ for both serialize and deserialize.\n- **Space Complexity:** $O(N)$ to store the string/recursion stack.\n\n### Code Logic\n```python\nclass Codec:\n    def serialize(self, root):\n        res = []\n        def dfs(node):\n            if not node:\n                res.append(\"#\")\n                return\n            res.append(str(node.val))\n            dfs(node.left)\n            dfs(node.right)\n        dfs(root)\n        return \",\".join(res)\n\n    def deserialize(self, data):\n        vals = iter(data.split(\",\"))\n        def dfs():\n            val = next(vals)\n            if val == \"#\":\n                return None\n            node = TreeNode(int(val))\n            node.left = dfs()\n            node.right = dfs()\n            return node\n        return dfs()\n```",
+    "hints": [
+      "You need to encode the structure, including empty nodes.",
+      "Preorder traversal is easy to implement recursively.",
+      "Level order traversal is easy to implement iteratively with a Queue.",
+      "Use a unique character (like '#' or 'N') to represent null nodes."
+    ],
+    "boilerplate_python": "import sys\nimport collections\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef build_tree(nodes):\n    if not nodes or nodes[0] == \"null\": return None\n    root = TreeNode(int(nodes[0]))\n    q = collections.deque([root])\n    i = 1\n    while i < len(nodes):\n        curr = q.popleft()\n        if i < len(nodes) and nodes[i] != \"null\":\n            curr.left = TreeNode(int(nodes[i]))\n            q.append(curr.left)\n        i += 1\n        if i < len(nodes) and nodes[i] != \"null\":\n            curr.right = TreeNode(int(nodes[i]))\n            q.append(curr.right)\n        i += 1\n    return root\n\ndef print_tree(root):\n    if not root: return \"null\"\n    res = []\n    q = collections.deque([root])\n    while q:\n        node = q.popleft()\n        if node:\n            res.append(str(node.val))\n            q.append(node.left)\n            q.append(node.right)\n        else:\n            res.append(\"null\")\n    while res and res[-1] == \"null\": res.pop()\n    print(\" \".join(res))\n\n# Implement Codec class with serialize and deserialize methods\nclass Codec:\n    def serialize(self, root): return \"\" # TODO\n    def deserialize(self, data): return None # TODO\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    root = build_tree(input_data)\n    \n    ser = Codec()\n    deser = Codec()\n    tree = deser.deserialize(ser.serialize(root))\n    print_tree(tree)\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\nclass TreeNode {\n    int val;\n    TreeNode left;\n    TreeNode right;\n    TreeNode(int x) { val = x; }\n}\n\npublic class Solution {\n    // Helper to build tree from judge input\n    public static TreeNode buildTree(String[] nodes) {\n        if (nodes.length == 0 || nodes[0].equals(\"null\")) return null;\n        TreeNode root = new TreeNode(Integer.parseInt(nodes[0]));\n        Queue<TreeNode> q = new LinkedList<>();\n        q.add(root);\n        int i = 1;\n        while (i < nodes.length) {\n            TreeNode curr = q.poll();\n            if (i < nodes.length && !nodes[i].equals(\"null\")) {\n                curr.left = new TreeNode(Integer.parseInt(nodes[i]));\n                q.add(curr.left);\n            }\n            i++;\n            if (i < nodes.length && !nodes[i].equals(\"null\")) {\n                curr.right = new TreeNode(Integer.parseInt(nodes[i]));\n                q.add(curr.right);\n            }\n            i++;\n        }\n        return root;\n    }\n\n    // Helper to print tree for judge output\n    public static void printTree(TreeNode root) {\n        if (root == null) { System.out.println(\"null\"); return; }\n        List<String> res = new ArrayList<>();\n        Queue<TreeNode> q = new LinkedList<>();\n        q.add(root);\n        while (!q.isEmpty()) {\n            TreeNode curr = q.poll();\n            if (curr == null) res.add(\"null\");\n            else {\n                res.add(String.valueOf(curr.val));\n                q.add(curr.left);\n                q.add(curr.right);\n            }\n        }\n        int i = res.size() - 1;\n        while (i >= 0 && res.get(i).equals(\"null\")) i--;\n        for (int k = 0; k <= i; k++) System.out.print(res.get(k) + (k == i ? \"\" : \" \"));\n        System.out.println();\n    }\n\n    public static class Codec {\n        public String serialize(TreeNode root) { return \"\"; } // TODO\n        public TreeNode deserialize(String data) { return null; } // TODO\n    }\n\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (scanner.hasNextLine()) {\n            String[] parts = scanner.nextLine().split(\" \");\n            TreeNode root = buildTree(parts);\n            Codec codec = new Codec();\n            printTree(codec.deserialize(codec.serialize(root)));\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "1 2 3 null null 4 5",
+        "expected_output": "1 2 3 null null 4 5",
+        "is_public": true
+      },
+      {
+        "input_data": "null",
+        "expected_output": "null",
+        "is_public": true
+      },
+      {
+        "input_data": "1",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "1 2",
+        "expected_output": "1 2",
+        "is_public": false
+      },
+      {
+        "input_data": "-10 1",
+        "expected_output": "-10 1",
+        "is_public": false
+      },
+      {
+        "input_data": "5 4 7 3 null 2 null -1 null 9",
+        "expected_output": "5 4 7 3 null 2 null -1 null 9",
+        "is_public": false
+      }
+    ]
+  },
+  {
     "id": 236,
     "title": "Lowest Common Ancestor of a Binary Tree",
-    "description": "Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in the tree.\n\nAccording to the definition of LCA on Wikipedia: \"The lowest common ancestor is defined between two nodes **p** and **q** as the lowest node in T that has both **p** and **q** as descendants (where we allow a node to be a descendant of itself).\"",
-    "input_format": "First line: Space-separated values representing the tree in level-order (use 'null' for empty nodes).\nSecond line: Integer P (value of node p).\nThird line: Integer Q (value of node q).",
-    "output_format": "Print the value of the LCA node.",
+    "description": "Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in the tree.\n\nAccording to the definition of LCA on Wikipedia: \"The lowest common ancestor is defined between two nodes **p** and **q** as the lowest node in T that has both **p** and **q** as descendants (where we allow **a node to be a descendant of itself**).\"",
+    "input_format": "First line: Tree in level-order format.\nSecond line: Integer value of node p.\nThird line: Integer value of node q.",
+    "output_format": "The value of the LCA node.",
     "difficulty": "Medium",
     "tags": [
       "tree",
-      "traversal"
+      "traversal",
+      "recursion"
     ],
-    "solution": "### Observations\nWe need to find a node where **p** is in the left subtree and **q** is in the right (or vice versa), or the node is one of **p** or **q** itself.\n\n### Approach\n1. Start a recursive DFS.\n2. If current node is `null`, return `null`.\n3. If current node is **p** or **q**, return current node.\n4. Recurse left and right.\n5. If both left and right calls return a non-null value, the current node is the LCA.\n6. If only one side returns non-null, pass that value up.\n\n### Complexity Analysis\n* **Time:** $O(N)$ where N is number of nodes.\n* **Space:** $O(H)$ for recursion stack height.\n\n### Code Logic (Python)\n```python\ndef lca(root, p_val, q_val):\n    if not root or root.val == p_val or root.val == q_val:\n        return root\n    left = lca(root.left, p_val, q_val)\n    right = lca(root.right, p_val, q_val)\n    if left and right:\n        return root\n    return left if left else right\n```",
+    "solution": "### Observations\n1. If the root is either `p` or `q`, then the root itself is the LCA.\n2. We need to search both left and right subtrees.\n\n### Approach\n1. Use recursion (DFS).\n2. If current node is null, return null.\n3. If current node is `p` or `q`, return current node.\n4. Recurse for left and right children.\n5. If both left and right recursive calls return a non-null value, it means `p` is in one side and `q` is in the other. Thus, the current node is the LCA.\n6. If only one side returns a non-null value, propagate that value up (that's the candidate LCA found so far).\n\n### Complexity Analysis\n- **Time Complexity:** $O(N)$ because we visit every node in worst case.\n- **Space Complexity:** $O(H)$ for recursion stack.\n\n### Code Logic\n```python\ndef lowestCommonAncestor(self, root, p, q):\n    if not root or root == p or root == q:\n        return root\n    \n    left = self.lowestCommonAncestor(root.left, p, q)\n    right = self.lowestCommonAncestor(root.right, p, q)\n    \n    if left and right:\n        return root\n    return left if left else right\n```",
     "hints": [
-      "Traverse the tree recursively.",
-      "If you find p or q, return that node immediately.",
-      "If a node receives non-null return values from both left and right subtrees, it is the LCA."
+      "Start simply: What if the root is one of the nodes?",
+      "Search the left and right subtrees.",
+      "If you find p in the left and q in the right, who is the parent?",
+      "If you find both p and q in the left subtree, where is the LCA?"
     ],
-    "boilerplate_python": "import sys\n\nclass TreeNode:\n    def __init__(self, x):\n        self.val = x\n        self.left = None\n        self.right = None\n\ndef build_tree(nodes):\n    if not nodes or nodes[0] == 'null': return None\n    root = TreeNode(int(nodes[0]))\n    queue = [root]\n    i = 1\n    while i < len(nodes):\n        curr = queue.pop(0)\n        if i < len(nodes) and nodes[i] != 'null':\n            curr.left = TreeNode(int(nodes[i]))\n            queue.append(curr.left)\n        i += 1\n        if i < len(nodes) and nodes[i] != 'null':\n            curr.right = TreeNode(int(nodes[i]))\n            queue.append(curr.right)\n        i += 1\n    return root\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    # Parsing assumes standard level order inputs\n    # Note: This is a simplified parser logic for the judge context\n    pass # Implement full parsing logic based on specific test format needs\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\n\nclass TreeNode {\n    int val;\n    TreeNode left, right;\n    TreeNode(int x) { val = x; }\n}\n\npublic class Solution {\n    public static void main(String[] args) {\n        // Boilerplate for Tree building usually complex\n        // Assume standard I/O implementation provided\n    }\n}",
+    "boilerplate_python": "import sys\nimport collections\n\nclass TreeNode:\n    def __init__(self, x):\n        self.val = x\n        self.left = None\n        self.right = None\n\ndef build_tree(nodes):\n    if not nodes or nodes[0] == \"null\": return None\n    root = TreeNode(int(nodes[0]))\n    q = collections.deque([root])\n    i = 1\n    nodes_map = {root.val: root}\n    while i < len(nodes):\n        curr = q.popleft()\n        if i < len(nodes) and nodes[i] != \"null\":\n            curr.left = TreeNode(int(nodes[i]))\n            nodes_map[curr.left.val] = curr.left\n            q.append(curr.left)\n        i += 1\n        if i < len(nodes) and nodes[i] != \"null\":\n            curr.right = TreeNode(int(nodes[i]))\n            nodes_map[curr.right.val] = curr.right\n            q.append(curr.right)\n        i += 1\n    return root, nodes_map\n\ndef solve():\n    lines = sys.stdin.read().splitlines()\n    if not lines: return\n    tree_data = lines[0].split()\n    p_val = int(lines[1])\n    q_val = int(lines[2])\n    \n    root, nodes_map = build_tree(tree_data)\n    p = nodes_map.get(p_val)\n    q = nodes_map.get(q_val)\n    \n    # Implement lowestCommonAncestor(root, p, q) here and print val\n    pass\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\nclass TreeNode {\n    int val;\n    TreeNode left;\n    TreeNode right;\n    TreeNode(int x) { val = x; }\n}\n\npublic class Solution {\n    static Map<Integer, TreeNode> nodesMap = new HashMap<>();\n\n    public static TreeNode buildTree(String[] nodes) {\n        if (nodes.length == 0 || nodes[0].equals(\"null\")) return null;\n        TreeNode root = new TreeNode(Integer.parseInt(nodes[0]));\n        nodesMap.put(root.val, root);\n        Queue<TreeNode> q = new LinkedList<>();\n        q.add(root);\n        int i = 1;\n        while (i < nodes.length) {\n            TreeNode curr = q.poll();\n            if (i < nodes.length && !nodes[i].equals(\"null\")) {\n                curr.left = new TreeNode(Integer.parseInt(nodes[i]));\n                nodesMap.put(curr.left.val, curr.left);\n                q.add(curr.left);\n            }\n            i++;\n            if (i < nodes.length && !nodes[i].equals(\"null\")) {\n                curr.right = new TreeNode(Integer.parseInt(nodes[i]));\n                nodesMap.put(curr.right.val, curr.right);\n                q.add(curr.right);\n            }\n            i++;\n        }\n        return root;\n    }\n\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (scanner.hasNextLine()) {\n            String[] parts = scanner.nextLine().split(\" \");\n            TreeNode root = buildTree(parts);\n            int pVal = Integer.parseInt(scanner.nextLine());\n            int qVal = Integer.parseInt(scanner.nextLine());\n            \n            TreeNode p = nodesMap.get(pVal);\n            TreeNode q = nodesMap.get(qVal);\n            \n            // Call logic here\n            // System.out.println(lca.val);\n        }\n    }\n}",
     "test_cases": [
       {
         "input_data": "3 5 1 6 2 0 8 null null 7 4\n5\n1",
@@ -35,383 +147,182 @@
         "is_public": false
       },
       {
-        "input_data": "2 null 1\n2\n1",
+        "input_data": "2 1\n2\n1",
         "expected_output": "2",
+        "is_public": false
+      },
+      {
+        "input_data": "-1 0 3 -2 4 null null 8\n8\n-2",
+        "expected_output": "-1",
         "is_public": false
       },
       {
         "input_data": "1 2 3 4 5 6 7\n4\n5",
         "expected_output": "2",
         "is_public": false
-      },
-      {
-        "input_data": "1 2 3 4 5 6 7\n4\n7",
-        "expected_output": "1",
-        "is_public": false
       }
     ]
   },
   {
-    "id": 95,
-    "title": "Unique Binary Search Trees II",
-    "description": "Given an integer **n**, return *all the structurally unique BST's* (binary search trees), which has exactly **n** nodes of unique values from `1` to `n`.\n\nThe output should be formatted as a list of Level Order traversals.",
-    "input_format": "A single integer n.",
-    "output_format": "Each line contains a level-order traversal of a unique BST.",
+    "id": 98,
+    "title": "Validate Binary Search Tree",
+    "description": "Given the **root** of a binary tree, determine if it is a valid binary search tree (BST).\n\nA valid BST is defined as follows:\n- The left subtree of a node contains only nodes with keys **less than** the node's key.\n- The right subtree of a node contains only nodes with keys **greater than** the node's key.\n- Both the left and right subtrees must also be binary search trees.",
+    "input_format": "A single line containing space-separated values representing the binary tree.",
+    "output_format": "\"true\" if valid, otherwise \"false\".",
     "difficulty": "Medium",
     "tags": [
-      "dp",
       "tree",
-      "bst"
+      "bst",
+      "traversal",
+      "recursion"
     ],
-    "solution": "### Observations\nTo construct a BST from 1 to n, any number `i` can be the root. If `i` is the root, then the left subtree must be built from `[1, i-1]` and the right subtree from `[i+1, n]`.\n\n### Approach\n1. **Recursive Function:** `generate(start, end)` returns a list of trees.\n2. **Base Case:** If `start > end`, return `[None]`.\n3. **Loop:** Iterate `i` from `start` to `end`.\n4. **Recursion:** Get all left subtrees `lefts = generate(start, i-1)` and right subtrees `rights = generate(i+1, end)`.\n5. **Combine:** For every combination of `l` in `lefts` and `r` in `rights`, create a root `i` connecting them.\n\n### Complexity Analysis\n* **Time:** Catalan number complexity $O(4^n / n^{1.5})$.\n* **Space:** Recursion stack.\n\n### Code Logic (Python)\n```python\ndef generate(start, end):\n    if start > end:\n        return [None]\n    all_trees = []\n    for i in range(start, end + 1):\n        left_trees = generate(start, i - 1)\n        right_trees = generate(i + 1, end)\n        for l in left_trees:\n            for r in right_trees:\n                curr = TreeNode(i)\n                curr.left = l\n                curr.right = r\n                all_trees.append(curr)\n    return all_trees\n```",
+    "solution": "### Observations\n1. Simply checking `left.val < node.val < right.val` is incorrect because it doesn't account for the entire subtree range (e.g., a node in the right subtree must still be larger than the root).\n\n### Approach\n1. Use recursion with a valid range `(min_val, max_val)`.\n2. Start with `(-infinity, +infinity)` for the root.\n3. When moving left, update `max_val` to `node.val`.\n4. When moving right, update `min_val` to `node.val`.\n5. If `node.val` violates the current range, return False.\n\n### Complexity Analysis\n- **Time Complexity:** $O(N)$ since we visit each node once.\n- **Space Complexity:** $O(H)$ for recursion stack.\n\n### Code Logic\n```python\nclass Solution:\n    def isValidBST(self, root):\n        def validate(node, low, high):\n            if not node:\n                return True\n            if not (low < node.val < high):\n                return False\n            return (validate(node.left, low, node.val) and \n                    validate(node.right, node.val, high))\n        \n        return validate(root, float('-inf'), float('inf'))\n```",
     "hints": [
-      "Pick a root i from 1 to n.",
-      "Recursively generate all left subtrees from 1 to i-1.",
-      "Recursively generate all right subtrees from i+1 to n.",
-      "Combine every left subtree with every right subtree for the chosen root."
+      "Checking only the immediate children is not enough.",
+      "Every node in the right subtree must be greater than the root.",
+      "Pass a range (min, max) down the recursion.",
+      "Use long/float infinity for initial boundaries."
     ],
-    "boilerplate_python": "import sys\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef solve():\n    try:\n        n = int(sys.stdin.read().strip())\n    except ValueError:\n        return\n    \n    # Write logic here\n    # format output as strings\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(sc.hasNextInt()){\n            int n = sc.nextInt();\n            // Write logic\n        }\n    }\n}",
+    "boilerplate_python": "import sys\nimport collections\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef build_tree(nodes):\n    if not nodes or nodes[0] == \"null\": return None\n    root = TreeNode(int(nodes[0]))\n    q = collections.deque([root])\n    i = 1\n    while i < len(nodes):\n        curr = q.popleft()\n        if i < len(nodes) and nodes[i] != \"null\":\n            curr.left = TreeNode(int(nodes[i]))\n            q.append(curr.left)\n        i += 1\n        if i < len(nodes) and nodes[i] != \"null\":\n            curr.right = TreeNode(int(nodes[i]))\n            q.append(curr.right)\n        i += 1\n    return root\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    root = build_tree(input_data)\n    \n    # Output \"true\" or \"false\"\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\nclass TreeNode {\n    int val;\n    TreeNode left;\n    TreeNode right;\n    TreeNode(int x) { val = x; }\n}\n\npublic class Solution {\n    public static TreeNode buildTree(String[] nodes) {\n        if (nodes.length == 0 || nodes[0].equals(\"null\")) return null;\n        TreeNode root = new TreeNode(Integer.parseInt(nodes[0]));\n        Queue<TreeNode> q = new LinkedList<>();\n        q.add(root);\n        int i = 1;\n        while (i < nodes.length) {\n            TreeNode curr = q.poll();\n            if (i < nodes.length && !nodes[i].equals(\"null\")) {\n                curr.left = new TreeNode(Integer.parseInt(nodes[i]));\n                q.add(curr.left);\n            }\n            i++;\n            if (i < nodes.length && !nodes[i].equals(\"null\")) {\n                curr.right = new TreeNode(Integer.parseInt(nodes[i]));\n                q.add(curr.right);\n            }\n            i++;\n        }\n        return root;\n    }\n\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (scanner.hasNextLine()) {\n            String[] parts = scanner.nextLine().split(\" \");\n            TreeNode root = buildTree(parts);\n            // print \"true\" or \"false\"\n        }\n    }\n}",
     "test_cases": [
       {
-        "input_data": "3",
-        "expected_output": "[1,null,2,null,3]\n[1,null,3,2]\n[2,1,3]\n[3,1,null,null,2]\n[3,2,null,1]",
+        "input_data": "2 1 3",
+        "expected_output": "true",
         "is_public": true
+      },
+      {
+        "input_data": "5 1 4 null null 3 6",
+        "expected_output": "false",
+        "is_public": true
+      },
+      {
+        "input_data": "10 5 15 null null 6 20",
+        "expected_output": "false",
+        "is_public": false
       },
       {
         "input_data": "1",
-        "expected_output": "[1]",
-        "is_public": true
-      },
-      {
-        "input_data": "0",
-        "expected_output": "[]",
+        "expected_output": "true",
         "is_public": false
       },
       {
-        "input_data": "2",
-        "expected_output": "[1,null,2]\n[2,1]",
+        "input_data": "2 2 2",
+        "expected_output": "false",
         "is_public": false
       },
       {
-        "input_data": "4",
-        "expected_output": "(List of 14 trees)",
-        "is_public": false
-      },
-      {
-        "input_data": "5",
-        "expected_output": "(List of 42 trees)",
+        "input_data": "2147483647",
+        "expected_output": "true",
         "is_public": false
       }
     ]
   },
   {
-    "id": 21,
-    "title": "Merge Two Sorted Lists",
-    "description": "You are given the heads of two sorted linked lists **list1** and **list2**.\n\nMerge the two lists in a one **sorted** list. The list should be made by splicing together the nodes of the first two lists.\n\nReturn the head of the merged linked list.",
-    "input_format": "First line: Space-separated integers for list1.\nSecond line: Space-separated integers for list2.",
-    "output_format": "Space-separated integers representing the merged list.",
-    "difficulty": "Easy",
+    "id": 105,
+    "title": "Construct Binary Tree from Preorder and Inorder Traversal",
+    "description": "Given two integer arrays **preorder** and **inorder** where **preorder** is the preorder traversal of a binary tree and **inorder** is the inorder traversal of the same tree, construct and return the binary tree.",
+    "input_format": "First line: Space-separated integers (Preorder).\nSecond line: Space-separated integers (Inorder).",
+    "output_format": "Level-order traversal of the constructed tree.",
+    "difficulty": "Medium",
     "tags": [
-      "linked_list",
-      "two_pointers"
+      "array",
+      "map",
+      "tree",
+      "traversal"
     ],
-    "solution": "### Observations\nSince both lists are sorted, we can iterate through both simultaneously, always picking the smaller node to append to our result.\n\n### Approach\n1. **Dummy Head:** Create a dummy node to simplify edge cases (empty lists).\n2. **Pointers:** Use a pointer `tail` to track the end of the new list.\n3. **Loop:** While both `l1` and `l2` are not null:\n   - If `l1.val < l2.val`, append `l1` to `tail.next`, move `l1`.\n   - Else, append `l2`, move `l2`.\n   - Move `tail`.\n4. **Cleanup:** Append the remaining non-null list to `tail.next`.\n\n### Complexity Analysis\n* **Time:** $O(N + M)$.\n* **Space:** $O(1)$.\n\n### Code Logic (Python)\n```python\ndummy = ListNode()\ntail = dummy\nwhile list1 and list2:\n    if list1.val < list2.val:\n        tail.next = list1\n        list1 = list1.next\n    else:\n        tail.next = list2\n        list2 = list2.next\n    tail = tail.next\ntail.next = list1 if list1 else list2\nreturn dummy.next\n```",
+    "solution": "### Observations\n1. `preorder[0]` is always the root.\n2. In `inorder`, elements to the left of the root value belong to the left subtree, and elements to the right belong to the right subtree.\n\n### Approach\n1. Use a Hash Map to store `val -> index` mapping for `inorder` array for O(1) lookups.\n2. Use a helper function `build(pre_start, pre_end, in_start, in_end)`.\n3. Identify root from `preorder[pre_start]`.\n4. Find root index in `inorder` using the map.\n5. Calculate size of left subtree.\n6. Recursively build left and right subtrees.\n\n### Complexity Analysis\n- **Time Complexity:** $O(N)$ (Map building + N recursive calls).\n- **Space Complexity:** $O(N)$ for the map and recursion stack.\n\n### Code Logic\n```python\nclass Solution:\n    def buildTree(self, preorder, inorder):\n        in_map = {val: i for i, val in enumerate(inorder)}\n        \n        def array_to_tree(left, right):\n            nonlocal preorder_index\n            if left > right: return None\n            \n            root_val = preorder[preorder_index]\n            root = TreeNode(root_val)\n            preorder_index += 1\n            \n            root.left = array_to_tree(left, in_map[root_val] - 1)\n            root.right = array_to_tree(in_map[root_val] + 1, right)\n            return root\n\n        preorder_index = 0\n        return array_to_tree(0, len(preorder) - 1)\n```",
     "hints": [
-      "Create a dummy node to act as the head of the result list.",
-      "Compare the current nodes of both lists and attach the smaller one to your result.",
-      "Don't forget to attach the remaining part of the non-empty list at the end."
+      "The first element in preorder is the root.",
+      "Find the root in the inorder array. Everything to the left is the left subtree.",
+      "Use a HashMap to quickly find the index of the root in the inorder array.",
+      "Keep track of the start and end indices for both arrays in your recursion."
     ],
-    "boilerplate_python": "import sys\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef solve():\n    lines = sys.stdin.read().splitlines()\n    # Parsing logic needed here to convert string to Linked List\n    # Then print result list\n    pass\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\n\nclass ListNode {\n    int val;\n    ListNode next;\n    ListNode(int val) { this.val = val; }\n}\n\npublic class Solution {\n    public static void main(String[] args) {\n        // Scanner logic\n    }\n}",
+    "boilerplate_python": "import sys\nimport collections\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef print_tree(root):\n    if not root: return\n    res = []\n    q = collections.deque([root])\n    while q:\n        node = q.popleft()\n        if node:\n            res.append(str(node.val))\n            q.append(node.left)\n            q.append(node.right)\n        else:\n            res.append(\"null\")\n    while res and res[-1] == \"null\": res.pop()\n    print(\" \".join(res))\n\ndef solve():\n    lines = sys.stdin.read().splitlines()\n    if len(lines) < 2: return\n    preorder = list(map(int, lines[0].split()))\n    inorder = list(map(int, lines[1].split()))\n    \n    # Construct tree and call print_tree(root)\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\nclass TreeNode {\n    int val;\n    TreeNode left;\n    TreeNode right;\n    TreeNode(int x) { val = x; }\n}\n\npublic class Solution {\n    public static void printTree(TreeNode root) {\n        if (root == null) { System.out.println(\"null\"); return; }\n        List<String> res = new ArrayList<>();\n        Queue<TreeNode> q = new LinkedList<>();\n        q.add(root);\n        while (!q.isEmpty()) {\n            TreeNode curr = q.poll();\n            if (curr == null) res.add(\"null\");\n            else {\n                res.add(String.valueOf(curr.val));\n                q.add(curr.left);\n                q.add(curr.right);\n            }\n        }\n        int i = res.size() - 1;\n        while (i >= 0 && res.get(i).equals(\"null\")) i--;\n        for (int k = 0; k <= i; k++) System.out.print(res.get(k) + (k == i ? \"\" : \" \"));\n        System.out.println();\n    }\n\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (scanner.hasNextLine()) {\n            String[] l1 = scanner.nextLine().split(\" \");\n            String[] l2 = scanner.nextLine().split(\" \");\n            int[] preorder = Arrays.stream(l1).mapToInt(Integer::parseInt).toArray();\n            int[] inorder = Arrays.stream(l2).mapToInt(Integer::parseInt).toArray();\n            \n            // Logic here\n        }\n    }\n}",
     "test_cases": [
       {
-        "input_data": "1 2 4\n1 3 4",
-        "expected_output": "1 1 2 3 4 4",
+        "input_data": "3 9 20 15 7\n9 3 15 20 7",
+        "expected_output": "3 9 20 null null 15 7",
         "is_public": true
       },
       {
-        "input_data": "\n0",
-        "expected_output": "0",
+        "input_data": "-1\n-1",
+        "expected_output": "-1",
         "is_public": true
       },
       {
-        "input_data": "\n",
-        "expected_output": "",
-        "is_public": false
-      },
-      {
-        "input_data": "1\n2",
+        "input_data": "1 2\n2 1",
         "expected_output": "1 2",
         "is_public": false
       },
       {
-        "input_data": "5 10 15\n2 3 20",
-        "expected_output": "2 3 5 10 15 20",
+        "input_data": "1 2\n1 2",
+        "expected_output": "1 null 2",
         "is_public": false
       },
       {
-        "input_data": "1 1 1\n1 1 1",
-        "expected_output": "1 1 1 1 1 1",
-        "is_public": false
-      }
-    ]
-  },
-  {
-    "id": 78,
-    "title": "Subsets",
-    "description": "Given an integer array **nums** of unique elements, return all possible subsets (the power set).\n\nThe solution set must not contain duplicate subsets. Return the solution in **lexicographical order** of the subsets.",
-    "input_format": "First line: N.\nSecond line: N space-separated integers.",
-    "output_format": "Each line represents a subset. Elements within subsets should be sorted.",
-    "difficulty": "Medium",
-    "tags": [
-      "searching",
-      "array"
-    ],
-    "solution": "### Observations\nA subset can be generated by deciding for each element whether to include it or not.\n\n### Approach\n1. **Backtracking:** `backtrack(index, current_subset)`.\n2. **Base Case:** If `index == n`, add copy of `current_subset` to results.\n3. **Recursive Step:**\n   - **Exclude:** `backtrack(index + 1, current_subset)`\n   - **Include:** `current_subset.append(nums[index])`, `backtrack(index + 1, current_subset)`, `current_subset.pop()`\n\n### Complexity Analysis\n* **Time:** $O(N \\cdot 2^N)$.\n* **Space:** $O(N)$ for recursion stack.\n\n### Code Logic (Python)\n```python\nres = []\ndef backtrack(i, path):\n    if i == len(nums):\n        res.append(path[:])\n        return\n    # Include\n    path.append(nums[i])\n    backtrack(i + 1, path)\n    path.pop()\n    # Exclude\n    backtrack(i + 1, path)\n```",
-    "hints": [
-      "For every element, you have two choices: either include it in the current subset or not.",
-      "You can also use bit manipulation (0 to 2^n - 1) to generate masks.",
-      "Ensure the output is sorted if the judge requires it."
-    ],
-    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        nums = [int(next(iterator)) for _ in range(n)]\n        nums.sort()\n    except StopIteration: return\n\n    # Write logic here\n    # Print each subset on a new line\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNext()) return;\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        Arrays.sort(nums);\n        // Logic\n    }\n}",
-    "test_cases": [
-      {
-        "input_data": "3\n1 2 3",
-        "expected_output": "[]\n[1]\n[1, 2]\n[1, 2, 3]\n[1, 3]\n[2]\n[2, 3]\n[3]",
-        "is_public": true
-      },
-      {
-        "input_data": "1\n0",
-        "expected_output": "[]\n[0]",
-        "is_public": true
-      },
-      {
-        "input_data": "0\n",
-        "expected_output": "[]",
+        "input_data": "1 2 3\n3 2 1",
+        "expected_output": "1 2 null 3",
         "is_public": false
       },
       {
-        "input_data": "2\n1 2",
-        "expected_output": "[]\n[1]\n[1, 2]\n[2]",
-        "is_public": false
-      },
-      {
-        "input_data": "4\n1 2 3 4",
-        "expected_output": "(16 lines)",
-        "is_public": false
-      },
-      {
-        "input_data": "2\n10 20",
-        "expected_output": "[]\n[10]\n[10, 20]\n[20]",
+        "input_data": "3 1 2 4\n1 2 3 4",
+        "expected_output": "3 1 4 null 2",
         "is_public": false
       }
     ]
   },
   {
-    "id": 39,
-    "title": "Combination Sum",
-    "description": "Given an array of **distinct** integers **candidates** and a target integer **target**, return a list of all unique combinations of **candidates** where the chosen numbers sum to **target**. You may return the combinations in any order.\n\nThe same number may be chosen from **candidates** an unlimited number of times.",
-    "input_format": "First line: N.\nSecond line: N space-separated integers.\nThird line: Integer target.",
-    "output_format": "Each line represents a combination.",
-    "difficulty": "Medium",
+    "id": 543,
+    "title": "Diameter of Binary Tree",
+    "description": "Given the **root** of a binary tree, return the length of the **diameter** of the tree.\n\nThe diameter of a binary tree is the **length** of the longest path between any two nodes in a tree. This path may or may not pass through the root.\n\nThe length of a path between two nodes is represented by the number of edges between them.",
+    "input_format": "A single line containing space-separated values representing the binary tree.",
+    "output_format": "A single integer representing the diameter.",
+    "difficulty": "Easy",
     "tags": [
-      "searching",
-      "array"
+      "tree",
+      "traversal",
+      "recursion"
     ],
-    "solution": "### Observations\nSince we can reuse numbers, in our recursion, when we choose an element, we don't increment the index for the next call. When we choose *not* to use an element, we increment the index.\n\n### Approach\n1. `dfs(i, current_total, path)`\n2. **Base Cases:**\n   - `current_total == target`: Found valid combination.\n   - `current_total > target` or `i >= len`: Invalid.\n3. **Recursive Step:**\n   - **Include `nums[i]`**: `dfs(i, current_total + nums[i], path + [nums[i]])` (Stay at `i`).\n   - **Exclude `nums[i]`**: `dfs(i + 1, current_total, path)`.\n\n### Complexity Analysis\n* **Time:** Exponential $O(N^{T/M})$ where T is target, M is min value.\n* **Space:** $O(T/M)$ for path.\n\n### Code Logic (Python)\n```python\nres = []\ndef dfs(i, cur, total):\n    if total == target:\n        res.append(cur.copy())\n        return\n    if i >= len(candidates) or total > target:\n        return\n\n    cur.append(candidates[i])\n    dfs(i, cur, total + candidates[i])\n    cur.pop()\n    dfs(i + 1, cur, total)\n```",
+    "solution": "### Observations\n1. The longest path must be between two leaf nodes (or a leaf and a non-leaf if tree is skewed).\n2. The diameter at any specific node is `Left Height + Right Height`.\n\n### Approach\n1. Use recursion (DFS) to calculate the height (max depth) of each node.\n2. `Height = 1 + max(left_height, right_height)`.\n3. At each node, calculate `left_height + right_height` and update a global variable `diameter`.\n4. Return the height to the parent.\n\n### Complexity Analysis\n- **Time Complexity:** $O(N)$ since we visit each node once.\n- **Space Complexity:** $O(H)$ for recursion stack.\n\n### Code Logic\n```python\nclass Solution:\n    def diameterOfBinaryTree(self, root):\n        self.ans = 0\n        \n        def depth(node):\n            if not node: return 0\n            left = depth(node.left)\n            right = depth(node.right)\n            \n            self.ans = max(self.ans, left + right)\n            return 1 + max(left, right)\n            \n        depth(root)\n        return self.ans\n```",
     "hints": [
-      "Since you can reuse numbers, when you include a number, recurse with the same index.",
-      "If the sum exceeds the target, stop exploring that path.",
-      "Sort the candidates to optimize pruning (stop early if current > target)."
+      "The diameter is the number of edges, which is nodes - 1 on the path.",
+      "At any node, the longest path through it is (depth of left child) + (depth of right child).",
+      "Use a global variable to keep track of the maximum path found so far.",
+      "The height function should return the max depth, but update the diameter as a side effect."
     ],
-    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        candidates = [int(next(iterator)) for _ in range(n)]\n        target = int(next(iterator))\n    except StopIteration: return\n\n    # Write logic\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNext()) return;\n        int n = sc.nextInt();\n        int[] candidates = new int[n];\n        for(int i=0; i<n; i++) candidates[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // Logic\n    }\n}",
+    "boilerplate_python": "import sys\nimport collections\n\nclass TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef build_tree(nodes):\n    if not nodes or nodes[0] == \"null\": return None\n    root = TreeNode(int(nodes[0]))\n    q = collections.deque([root])\n    i = 1\n    while i < len(nodes):\n        curr = q.popleft()\n        if i < len(nodes) and nodes[i] != \"null\":\n            curr.left = TreeNode(int(nodes[i]))\n            q.append(curr.left)\n        i += 1\n        if i < len(nodes) and nodes[i] != \"null\":\n            curr.right = TreeNode(int(nodes[i]))\n            q.append(curr.right)\n        i += 1\n    return root\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    root = build_tree(input_data)\n    \n    # Print integer diameter\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\nclass TreeNode {\n    int val;\n    TreeNode left;\n    TreeNode right;\n    TreeNode(int x) { val = x; }\n}\n\npublic class Solution {\n    public static TreeNode buildTree(String[] nodes) {\n        if (nodes.length == 0 || nodes[0].equals(\"null\")) return null;\n        TreeNode root = new TreeNode(Integer.parseInt(nodes[0]));\n        Queue<TreeNode> q = new LinkedList<>();\n        q.add(root);\n        int i = 1;\n        while (i < nodes.length) {\n            TreeNode curr = q.poll();\n            if (i < nodes.length && !nodes[i].equals(\"null\")) {\n                curr.left = new TreeNode(Integer.parseInt(nodes[i]));\n                q.add(curr.left);\n            }\n            i++;\n            if (i < nodes.length && !nodes[i].equals(\"null\")) {\n                curr.right = new TreeNode(Integer.parseInt(nodes[i]));\n                q.add(curr.right);\n            }\n            i++;\n        }\n        return root;\n    }\n\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (scanner.hasNextLine()) {\n            String[] parts = scanner.nextLine().split(\" \");\n            TreeNode root = buildTree(parts);\n            // print result\n        }\n    }\n}",
     "test_cases": [
       {
-        "input_data": "4\n2 3 6 7\n7",
-        "expected_output": "[2, 2, 3]\n[7]",
+        "input_data": "1 2 3 4 5",
+        "expected_output": "3",
         "is_public": true
       },
       {
-        "input_data": "3\n2 3 5\n8",
-        "expected_output": "[2, 2, 2, 2]\n[2, 3, 3]\n[3, 5]",
-        "is_public": true
-      },
-      {
-        "input_data": "1\n2\n1",
-        "expected_output": "",
-        "is_public": false
-      },
-      {
-        "input_data": "1\n1\n1",
-        "expected_output": "[1]",
-        "is_public": false
-      },
-      {
-        "input_data": "1\n1\n2",
-        "expected_output": "[1, 1]",
-        "is_public": false
-      },
-      {
-        "input_data": "2\n3 5\n2",
-        "expected_output": "",
-        "is_public": false
-      }
-    ]
-  },
-  {
-    "id": 46,
-    "title": "Permutations",
-    "description": "Given an array **nums** of distinct integers, return all the possible permutations. You can return the answer in any order (but output must be deterministic/lexicographical for the judge).",
-    "input_format": "First line: N.\nSecond line: N space-separated integers.",
-    "output_format": "Each line is a space-separated permutation.",
-    "difficulty": "Medium",
-    "tags": [
-      "searching",
-      "array"
-    ],
-    "solution": "### Observations\nWe need to arrange N distinct numbers in N positions. \n\n### Approach\n1. **Backtracking:** `backtrack(path, visited)`.\n2. **Loop:** Iterate through all numbers in `nums`.\n3. **Check:** If `nums[i]` is not in `visited`:\n   - Add to `path`, add to `visited`.\n   - Recurse.\n   - Backtrack (remove from `path`, remove from `visited`).\n4. **Base Case:** If `len(path) == len(nums)`, record permutation.\n\n### Complexity Analysis\n* **Time:** $O(N! \\cdot N)$.\n* **Space:** $O(N)$.\n\n### Code Logic (Python)\n```python\nres = []\ndef backtrack(path):\n    if len(path) == len(nums):\n        res.append(path[:])\n        return\n    for x in nums:\n        if x not in path:\n            path.append(x)\n            backtrack(path)\n            path.pop()\n```",
-    "hints": [
-      "Think of filling N slots one by one.",
-      "Keep track of used numbers to avoid duplicates in the same permutation.",
-      "The total number of results is N!."
-    ],
-    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        nums = [int(next(iterator)) for _ in range(n)]\n        nums.sort()\n    except StopIteration: return\n    \n    # Logic\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNext()) return;\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        Arrays.sort(nums);\n        // Logic\n    }\n}",
-    "test_cases": [
-      {
-        "input_data": "3\n1 2 3",
-        "expected_output": "1 2 3\n1 3 2\n2 1 3\n2 3 1\n3 1 2\n3 2 1",
-        "is_public": true
-      },
-      {
-        "input_data": "2\n0 1",
-        "expected_output": "0 1\n1 0",
-        "is_public": true
-      },
-      {
-        "input_data": "1\n1",
+        "input_data": "1 2",
         "expected_output": "1",
-        "is_public": false
-      },
-      {
-        "input_data": "2\n1 2",
-        "expected_output": "1 2\n2 1",
-        "is_public": false
-      },
-      {
-        "input_data": "3\n3 2 1",
-        "expected_output": "(6 lines, sorted)",
-        "is_public": false
-      },
-      {
-        "input_data": "4\n1 2 3 4",
-        "expected_output": "(24 lines)",
-        "is_public": false
-      }
-    ]
-  },
-  {
-    "id": 79,
-    "title": "Word Search",
-    "description": "Given an $m \\times n$ grid of characters **board** and a string **word**, return `true` if **word** exists in the grid.\n\nThe word can be constructed from letters of sequentially adjacent cells, where adjacent cells are horizontally or vertically neighboring. The same letter cell may not be used more than once.",
-    "input_format": "First line: R C (rows, cols).\nNext R lines: C space-separated chars.\nLast line: String word.",
-    "output_format": "true or false",
-    "difficulty": "Medium",
-    "tags": [
-      "array",
-      "searching"
-    ],
-    "solution": "### Observations\nWe need to explore the grid to match the sequence of characters in `word`.\n\n### Approach\n1. Iterate through every cell `(r, c)` in the grid.\n2. If `board[r][c]` matches `word[0]`, start DFS.\n3. **DFS(r, c, index):**\n   - If `index == len(word)`, return True.\n   - Mark `(r, c)` as visited (e.g., replace char with '#').\n   - Check all 4 directions. If neighbor matches `word[index+1]`, recurse.\n   - Backtrack: Restore `board[r][c]`.\n\n### Complexity Analysis\n* **Time:** $O(N \\cdot 3^L)$ where N is cells, L is word length.\n* **Space:** $O(L)$ for recursion.\n\n### Code Logic (Python)\n```python\ndef dfs(r, c, i):\n    if i == len(word):\n        return True\n    if r < 0 or c < 0 or r >= R or c >= C or board[r][c] != word[i]:\n        return False\n    \n    temp, board[r][c] = board[r][c], '#'\n    res = (dfs(r+1, c, i+1) or dfs(r-1, c, i+1) or \n           dfs(r, c+1, i+1) or dfs(r, c-1, i+1))\n    board[r][c] = temp\n    return res\n```",
-    "hints": [
-      "Start a DFS from every cell that matches the first letter.",
-      "Mark visited cells to avoid cycles.",
-      "Don't forget to unmark (backtrack) after returning from recursion."
-    ],
-    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    iterator = iter(input_data)\n    try:\n        R = int(next(iterator))\n        C = int(next(iterator))\n        board = []\n        for _ in range(R):\n            row = [next(iterator) for _ in range(C)]\n            board.append(row)\n        word = next(iterator)\n    except StopIteration: return\n    \n    # Logic\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNext()) return;\n        int R = sc.nextInt();\n        int C = sc.nextInt();\n        char[][] board = new char[R][C];\n        for(int i=0; i<R; i++){\n            for(int j=0; j<C; j++){\n                board[i][j] = sc.next().charAt(0);\n            }\n        }\n        String word = sc.next();\n        // Logic\n    }\n}",
-    "test_cases": [
-      {
-        "input_data": "3 4\nA B C E\nS F C S\nA D E E\nABCCED",
-        "expected_output": "true",
-        "is_public": true
-      },
-      {
-        "input_data": "3 4\nA B C E\nS F C S\nA D E E\nSEE",
-        "expected_output": "true",
-        "is_public": true
-      },
-      {
-        "input_data": "3 4\nA B C E\nS F C S\nA D E E\nABCB",
-        "expected_output": "false",
-        "is_public": true
-      },
-      {
-        "input_data": "1 1\nA\nA",
-        "expected_output": "true",
-        "is_public": false
-      },
-      {
-        "input_data": "1 1\nA\nB",
-        "expected_output": "false",
-        "is_public": false
-      },
-      {
-        "input_data": "2 2\nA B\nC D\nACDB",
-        "expected_output": "false",
-        "is_public": false
-      }
-    ]
-  },
-  {
-    "id": 51,
-    "title": "N-Queens",
-    "description": "The **n-queens** puzzle is the problem of placing `n` queens on an $n \\times n$ chessboard such that no two queens attack each other.\n\nGiven an integer **n**, return all distinct solutions to the **n-queens puzzle**. You may return the answer in any order.",
-    "input_format": "Integer n.",
-    "output_format": "Print each solution board separated by a newline.",
-    "difficulty": "Hard",
-    "tags": [
-      "searching"
-    ],
-    "solution": "### Observations\nWe need to place one Queen per row such that no two Queens share a column or diagonal.\n\n### Approach\n1. **State:** `cols`, `diag1` (r+c), `diag2` (r-c) sets to track attacks.\n2. **Backtrack(row):**\n   - If `row == n`, we found a solution.\n   - Iterate `col` from 0 to `n-1`.\n   - If `col` not in `cols` and diagonals safe:\n     - Place Queen.\n     - Update sets.\n     - Recurse `row + 1`.\n     - Backtrack (remove Queen, revert sets).\n\n### Complexity Analysis\n* **Time:** $O(N!)$.\n* **Space:** $O(N)$.\n\n### Code Logic (Python)\n```python\ncols = set()\nposDiag = set() # (r + c)\nnegDiag = set() # (r - c)\n\ndef backtrack(r):\n    if r == n:\n        # format board\n        return\n    for c in range(n):\n        if c in cols or (r + c) in posDiag or (r - c) in negDiag:\n            continue\n        \n        cols.add(c)\n        posDiag.add(r + c)\n        negDiag.add(r - c)\n        board[r][c] = \"Q\"\n        \n        backtrack(r + 1)\n        \n        cols.remove(c)\n        posDiag.remove(r + c)\n        negDiag.remove(r - c)\n        board[r][c] = \".\"\n```",
-    "hints": [
-      "Place queens row by row.",
-      "Maintain sets to quickly check if a column or diagonal is occupied.",
-      "The sum (row + col) is constant for one diagonal, (row - col) is constant for the anti-diagonal."
-    ],
-    "boilerplate_python": "import sys\n\ndef solve():\n    try:\n        n = int(sys.stdin.read().strip())\n    except: return\n    \n    # Logic\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNext()) return;\n        int n = sc.nextInt();\n        // Logic\n    }\n}",
-    "test_cases": [
-      {
-        "input_data": "4",
-        "expected_output": ".Q..\n...Q\nQ...\n..Q.\n\n..Q.\nQ...\n...Q\n.Q..",
         "is_public": true
       },
       {
         "input_data": "1",
-        "expected_output": "Q",
-        "is_public": true
-      },
-      {
-        "input_data": "2",
-        "expected_output": "",
+        "expected_output": "0",
         "is_public": false
       },
       {
-        "input_data": "3",
-        "expected_output": "",
+        "input_data": "3 1 null null 2",
+        "expected_output": "2",
         "is_public": false
       },
       {
-        "input_data": "5",
-        "expected_output": "(10 solutions)",
+        "input_data": "1 2 3 4 5 null null 6 null null 7 8 9",
+        "expected_output": "6",
         "is_public": false
       },
       {
-        "input_data": "6",
-        "expected_output": "(4 solutions)",
+        "input_data": "4 -7 -3 null null -9 -3 9 -7 -4 null 6 null -6 -6 null null 0 6 5 null 9 null null -1 -4 null null null -2",
+        "expected_output": "8",
         "is_public": false
       }
     ]

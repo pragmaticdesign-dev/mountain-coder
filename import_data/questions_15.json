@@ -1,0 +1,288 @@
+[
+  {
+    "id": 204,
+    "title": "Count Primes",
+    "description": "Given an integer **n**, return the number of prime numbers that are strictly less than **n**.\n\nA **prime number** is a natural number greater than 1 that is not a product of two smaller natural numbers.",
+    "input_format": "A single integer n.",
+    "output_format": "Print a single integer representing the count of primes less than n.",
+    "difficulty": "Medium",
+    "tags": [
+      "array",
+      "maths"
+    ],
+    "solution": "### Observations\nChecking primality for every number up to **n** individually takes $O(n \\sqrt{n})$, which is too slow for large inputs ($n=5*10^6$). We need a way to mark non-primes efficiently.\n\n### Approach\n1. **Sieve of Eratosthenes**: Create a boolean array `isPrime` of size **n**, initialized to `True`.\n2. 0 and 1 are not primes, so mark them `False`.\n3. Iterate from $i = 2$ to $\\sqrt{n}$:\n   - If `isPrime[i]` is true, then $i$ is prime.\n   - Mark all multiples of $i$ starting from $i*i$ (optimization) as `False`.\n4. Count the number of `True` values in the array.\n\n### Complexity Analysis\n- **Time Complexity:** $O(n \\log \\log n)$ due to the harmonic series of sum of reciprocals of primes.\n- **Space Complexity:** $O(n)$ for the boolean array.\n\n### Code Logic\n```python\nif n <= 2: return 0\nis_prime = [True] * n\nis_prime[0] = is_prime[1] = False\nfor i in range(2, int(n**0.5) + 1):\n    if is_prime[i]:\n        # Start from i*i, increment by i\n        for multiple in range(i*i, n, i):\n            is_prime[multiple] = False\nreturn sum(is_prime)\n```",
+    "hints": [
+      "Checking every number for primality is too slow ($O(n\\sqrt{n})$).",
+      "Can we mark multiples of a number as non-prime?",
+      "Use the Sieve of Eratosthenes algorithm.",
+      "You only need to iterate up to the square root of n to mark multiples.",
+      "Start marking multiples from $i^2$ to optimize.",
+      "Remember that the problem asks for primes STRICTLY less than n."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    # Reading input\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    n = int(input_data[0])\n\n    # Write your solution here\n    # print(result)\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (scanner.hasNextInt()) {\n            int n = scanner.nextInt();\n            // Write your solution here\n            // System.out.println(result);\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "10",
+        "expected_output": "4",
+        "is_public": true
+      },
+      {
+        "input_data": "0",
+        "expected_output": "0",
+        "is_public": true
+      },
+      {
+        "input_data": "1",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "2",
+        "expected_output": "0",
+        "is_public": false
+      },
+      {
+        "input_data": "3",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "499979",
+        "expected_output": "41537",
+        "is_public": false
+      },
+      {
+        "input_data": "5000000",
+        "expected_output": "348513",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 1071,
+    "title": "Greatest Common Divisor of Strings",
+    "description": "For two strings **s** and **t**, we say \"**t** divides **s**\" if and only if **s** = **t** + **t** + ... + **t** (i.e., **t** is concatenated with itself one or more times).\n\nGiven two strings **str1** and **str2**, return the largest string **x** such that **x** divides both **str1** and **str2**.",
+    "input_format": "First line: String str1\nSecond line: String str2",
+    "output_format": "Print the resulting GCD string.",
+    "difficulty": "Easy",
+    "tags": [
+      "string",
+      "maths"
+    ],
+    "solution": "### Observations\nIf a string **base** divides both **str1** and **str2**, then **str1** and **str2** must be made up of multiples of **base**. A necessary condition is that `str1 + str2 == str2 + str1`. If this is not true, no such common divisor exists.\n\n### Approach\n1. Check if `str1 + str2 == str2 + str1`. If not, return an empty string.\n2. If the condition holds, the length of the GCD string must be the mathematical GCD of the lengths of **str1** and **str2**.\n3. The answer is simply the prefix of **str1** with length equal to `gcd(len(str1), len(str2))`.\n\n### Complexity Analysis\n- **Time Complexity:** $O(N + M)$ where N and M are string lengths (for concatenation check).\n- **Space Complexity:** $O(N + M)$ to create the concatenated strings for checking.\n\n### Code Logic\n```python\nimport math\nif str1 + str2 != str2 + str1:\n    return \"\"\ngcd_len = math.gcd(len(str1), len(str2))\nreturn str1[:gcd_len]\n```",
+    "hints": [
+      "Think about the properties of string concatenation order.",
+      "If a solution exists, does str1 + str2 equal str2 + str1?",
+      "If the order doesn't matter, the answer involves the GCD of lengths.",
+      "Use the Euclidean algorithm to find the GCD of the lengths."
+    ],
+    "boilerplate_python": "import sys\nimport math\n\ndef solve():\n    lines = sys.stdin.read().split()\n    if len(lines) < 2:\n        return\n    str1 = lines[0]\n    str2 = lines[1]\n    \n    # Write logic here\n    # print(result)\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (scanner.hasNext()) {\n            String str1 = scanner.next();\n            String str2 = scanner.next();\n            // Write logic here\n            // System.out.println(result);\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "ABCABC\nABC",
+        "expected_output": "ABC",
+        "is_public": true
+      },
+      {
+        "input_data": "ABABAB\nABAB",
+        "expected_output": "AB",
+        "is_public": true
+      },
+      {
+        "input_data": "LEET\nCODE",
+        "expected_output": "",
+        "is_public": true
+      },
+      {
+        "input_data": "ABCDEF\nABC",
+        "expected_output": "",
+        "is_public": false
+      },
+      {
+        "input_data": "AAAAAA\nAA",
+        "expected_output": "AA",
+        "is_public": false
+      },
+      {
+        "input_data": "TAUXXTAUXXTAUXXTAUXXTAUXX\nTAUXXTAUXXTAUXXTAUXXTAUXXTAUXXTAUXXTAUXXTAUXX",
+        "expected_output": "TAUXX",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 2521,
+    "title": "Distinct Prime Factors of Product of Array",
+    "description": "Given an array of positive integers **nums**, return the number of **distinct prime factors** in the product of the elements of **nums**.\n\nNote that:\n- The product of an array is the result of multiplying all elements together.\n- A distinct prime factor is a prime number that divides the product.",
+    "input_format": "First line: Integer N (size of array)\nSecond line: N integers separated by space (nums)",
+    "output_format": "Print a single integer representing the count of distinct prime factors.",
+    "difficulty": "Medium",
+    "tags": [
+      "array",
+      "set",
+      "maths"
+    ],
+    "solution": "### Observations\nCalculating the actual product of the array will cause an overflow even with 64-bit integers. We should not compute the product. Instead, the prime factors of the product are simply the union of the prime factors of each individual number in **nums**.\n\n### Approach\n1. Initialize an empty Set `primes` to store distinct factors.\n2. Iterate through each number `x` in **nums**.\n3. For each `x`, find its prime factors by trial division:\n   - Check divisibility by $d=2$ up to $\\sqrt{x}$.\n   - While `x % d == 0`, add `d` to the Set and divide `x` by `d` repeatedly.\n   - Increment `d`.\n4. If `x > 1` after the loop, the remaining `x` is also a prime factor; add it to the Set.\n5. Return the size of the Set.\n\n### Complexity Analysis\n- **Time Complexity:** $O(N \\sqrt{M})$ where N is the array length and M is the maximum value in nums.\n- **Space Complexity:** $O(K)$ where K is the number of distinct prime factors.\n\n### Code Logic\n```python\ndistinct_primes = set()\nfor x in nums:\n    d = 2\n    temp = x\n    while d * d <= temp:\n        if temp % d == 0:\n            distinct_primes.add(d)\n            while temp % d == 0:\n                temp //= d\n        d += 1\n    if temp > 1:\n        distinct_primes.add(temp)\nreturn len(distinct_primes)\n```",
+    "hints": [
+      "Do not calculate the product of the elements; it will overflow.",
+      "The prime factors of the product are the union of prime factors of the individual numbers.",
+      "Use a Set to store unique prime factors encountered.",
+      "Factorize each number individually using trial division up to its square root."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    \n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        nums = [int(next(iterator)) for _ in range(n)]\n    except StopIteration:\n        return\n\n    # Write logic here\n    # print(result)\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (scanner.hasNextInt()) {\n            int n = scanner.nextInt();\n            int[] nums = new int[n];\n            for(int i=0; i<n; i++) nums[i] = scanner.nextInt();\n            \n            // Write logic here\n            // System.out.println(result);\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "4\n2 4 3 7",
+        "expected_output": "3",
+        "is_public": true
+      },
+      {
+        "input_data": "4\n2 4 8 16",
+        "expected_output": "1",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n2",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "3\n10 100 1000",
+        "expected_output": "2",
+        "is_public": false
+      },
+      {
+        "input_data": "2\n997 997",
+        "expected_output": "1",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n2 3 5 7 11",
+        "expected_output": "5",
+        "is_public": false
+      },
+      {
+        "input_data": "2\n1000 999",
+        "expected_output": "4",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 523,
+    "title": "Continuous Subarray Sum",
+    "description": "Given an integer array **nums** and an integer **k**, return `true` if **nums** has a **good subarray** or `false` otherwise.\n\nA **good subarray** is a subarray where:\n- Its length is **at least two**.\n- The sum of the elements of the subarray is a multiple of **k**.",
+    "input_format": "First line: Integer N (size)\nSecond line: N integers separated by space (nums)\nThird line: Integer k",
+    "output_format": "Print \"true\" if a valid subarray exists, otherwise \"false\".",
+    "difficulty": "Medium",
+    "tags": [
+      "array",
+      "map",
+      "maths"
+    ],
+    "solution": "### Observations\nA subarray sum `sum(i, j)` is a multiple of `k` if `(prefix_sum[j] - prefix_sum[i-1]) % k == 0`. This implies `prefix_sum[j] % k == prefix_sum[i-1] % k`.\n\n### Approach\n1. Use a HashMap to store the first occurrence of each remainder: `{ remainder: index }`.\n2. Initialize map with `{0: -1}` to handle cases where the sub-array starts from index 0.\n3. Iterate through the array maintaining a `cumulative_sum`.\n4. Calculate `remainder = cumulative_sum % k`.\n5. If `remainder` is already in the map:\n   - Check the distance between current index `i` and `map[remainder]`.\n   - If `i - map[remainder] >= 2`, return True.\n6. Else, store `map[remainder] = i`.\n7. If loop finishes, return False.\n\n### Complexity Analysis\n- **Time Complexity:** $O(N)$ one pass.\n- **Space Complexity:** $O(min(N, K))$ for the map.\n\n### Code Logic\n```python\nremainder_map = {0: -1}\ncurrent_sum = 0\nfor i, num in enumerate(nums):\n    current_sum += num\n    rem = current_sum % k\n    if rem in remainder_map:\n        if i - remainder_map[rem] >= 2:\n            return True\n    else:\n        remainder_map[rem] = i\nreturn False\n```",
+    "hints": [
+      "Think about Prefix Sums.",
+      "If `(sum[j] - sum[i]) % k == 0`, what does that say about `sum[j] % k` and `sum[i] % k`?",
+      "Use a Hash Map to store the first index where a specific remainder % k occurred.",
+      "Don't forget the constraint that the subarray length must be at least 2.",
+      "Initialize the map with {0: -1} to handle subarrays starting from the beginning."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    \n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        nums = [int(next(iterator)) for _ in range(n)]\n        k = int(next(iterator))\n    except StopIteration:\n        return\n\n    # Write logic here\n    # print(\"true\" if result else \"false\")\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (scanner.hasNextInt()) {\n            int n = scanner.nextInt();\n            int[] nums = new int[n];\n            for(int i=0; i<n; i++) nums[i] = scanner.nextInt();\n            int k = scanner.nextInt();\n            \n            // Write logic here\n            // System.out.println(result ? \"true\" : \"false\");\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "5\n23 2 4 6 7\n6",
+        "expected_output": "true",
+        "is_public": true
+      },
+      {
+        "input_data": "5\n23 2 6 4 7\n6",
+        "expected_output": "true",
+        "is_public": true
+      },
+      {
+        "input_data": "5\n23 2 6 4 7\n13",
+        "expected_output": "false",
+        "is_public": true
+      },
+      {
+        "input_data": "2\n1 0\n2",
+        "expected_output": "false",
+        "is_public": false
+      },
+      {
+        "input_data": "3\n23 2 4\n6",
+        "expected_output": "true",
+        "is_public": false
+      },
+      {
+        "input_data": "3\n5 0 0\n3",
+        "expected_output": "true",
+        "is_public": false
+      },
+      {
+        "input_data": "2\n1 2\n4",
+        "expected_output": "false",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 974,
+    "title": "Subarray Sums Divisible by K",
+    "description": "Given an integer array **nums** and an integer **k**, return the number of non-empty subarrays that have a sum divisible by **k**.\n\nA **subarray** is a contiguous part of an array.",
+    "input_format": "First line: Integer N (size)\nSecond line: N integers separated by space (nums)\nThird line: Integer k",
+    "output_format": "Print a single integer representing the count of valid subarrays.",
+    "difficulty": "Medium",
+    "tags": [
+      "array",
+      "map",
+      "maths"
+    ],
+    "solution": "### Observations\nSimilar to the \"Continuous Subarray Sum\", we rely on prefix sums. If `prefix_sum[j]` and `prefix_sum[i]` have the same remainder when divided by `k`, then the subarray between `i+1` and `j` is divisible by `k`.\n\n### Approach\n1. Use a map (or array since `k` is small-ish) to store the frequency of remainders: `count_map = {0: 1}` (base case for sum divisible from start).\n2. Iterate through `nums`, maintaining `prefix_sum`.\n3. Calculate `rem = prefix_sum % k`.\n   - **Important:** In Python, modulo of negative numbers is positive, but in Java/C++, it can be negative. Normalize `rem` to be positive: `rem = (rem % k + k) % k`.\n4. If `rem` exists in `count_map`, add `count_map[rem]` to the total result (because this current prefix can form a valid subarray with *all* previous prefixes having the same remainder).\n5. Increment `count_map[rem]`.\n\n### Complexity Analysis\n- **Time Complexity:** $O(N)$ one pass.\n- **Space Complexity:** $O(K)$ to store frequencies of remainders.\n\n### Code Logic\n```python\ncount_map = {0: 1}\nprefix_sum = 0\nres = 0\nfor x in nums:\n    prefix_sum += x\n    rem = prefix_sum % k\n    # Python handles negative mod correctly for this math logic, \n    # but strictly speaking: rem = (prefix_sum % k + k) % k\n    if rem in count_map:\n        res += count_map[rem]\n        count_map[rem] += 1\n    else:\n        count_map[rem] = 1\nreturn res\n```",
+    "hints": [
+      "Use Prefix Sums.",
+      "If `(prefix[j] - prefix[i])` is divisible by `k`, then `prefix[j] % k == prefix[i] % k`.",
+      "Store the frequency of each remainder encountered so far.",
+      "Be careful with negative numbers and modulo operations."
+    ],
+    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    \n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        nums = [int(next(iterator)) for _ in range(n)]\n        k = int(next(iterator))\n    except StopIteration:\n        return\n\n    # Write logic here\n    # print(result)\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (scanner.hasNextInt()) {\n            int n = scanner.nextInt();\n            int[] nums = new int[n];\n            for(int i=0; i<n; i++) nums[i] = scanner.nextInt();\n            int k = scanner.nextInt();\n            \n            // Write logic here\n            // System.out.println(result);\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "6\n4 5 0 -2 -3 1\n5",
+        "expected_output": "7",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n5\n9",
+        "expected_output": "0",
+        "is_public": true
+      },
+      {
+        "input_data": "3\n-1 2 9\n2",
+        "expected_output": "2",
+        "is_public": false
+      },
+      {
+        "input_data": "4\n2 -2 2 -4\n6",
+        "expected_output": "2",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n0 0 0 0 0\n5",
+        "expected_output": "15",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n1 2 3 4 5\n1",
+        "expected_output": "15",
+        "is_public": false
+      }
+    ]
+  }
+]

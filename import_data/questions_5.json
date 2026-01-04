@@ -1,424 +1,268 @@
 [
   {
-    "id": 34,
-    "title": "Find First and Last Position of Element in Sorted Array",
-    "description": "Given an array of integers **nums** sorted in non-decreasing order, find the starting and ending position of a given **target** value.\n\nIf **target** is not found in the array, return `[-1, -1]`.\n\nYou must write an algorithm with $O(\\log n)$ runtime complexity.",
-    "input_format": "First line: An integer N (size of the array).\nSecond line: N space-separated integers representing the array nums.\nThird line: An integer target.",
-    "output_format": "Two space-separated integers representing the first and last position.",
-    "difficulty": "Medium",
+    "id": 23,
+    "title": "Merge k Sorted Lists",
+    "description": "You are given an array of `k` linked-lists `lists`, each linked-list is sorted in ascending order.\n\nMerge all the linked-lists into one sorted linked-list and return it.\n\n**Example:**\nInput: `lists = [[1,4,5],[1,3,4],[2,6]]`\nOutput: `[1,1,2,3,4,4,5,6]`",
+    "input_format": "First line: An integer k (number of lists).\nNext k lines: Each line starts with space-separated integers representing the sorted elements of a list. (Empty lines denote empty lists).",
+    "output_format": "A single line containing the space-separated integers of the merged sorted list.",
+    "difficulty": "Hard",
     "tags": [
-      "array",
+      "linked_list",
+      "heap",
       "binary_search"
     ],
-    "solution": "### Observations\nSince the array is sorted, we can use **Binary Search**. However, a standard binary search only finds *one* instance. We need to find the boundaries.\n\n### Approach\n1. **Find First Occurrence:** Use binary search. When `nums[mid] == target`, don't stop. Record the index and continue searching in the *left* half (`high = mid - 1`) to see if there is an earlier occurrence.\n2. **Find Last Occurrence:** Use binary search. When `nums[mid] == target`, record the index and search in the *right* half (`low = mid + 1`) to see if there is a later occurrence.\n\n### Complexity Analysis\n* **Time:** $O(\\log n)$ because we perform two binary searches.\n* **Space:** $O(1)$ auxiliary space.\n\n### Code Logic (Python)\n```python\ndef binary_search(nums, target, find_first):\n    l, r = 0, len(nums) - 1\n    ans = -1\n    while l <= r:\n        mid = (l + r) // 2\n        if nums[mid] == target:\n            ans = mid\n            if find_first:\n                r = mid - 1\n            else:\n                l = mid + 1\n        elif nums[mid] < target:\n            l = mid + 1\n        else:\n            r = mid - 1\n    return ans\n```",
+    "solution": "### Observations\nMerging two sorted lists is straightforward using two pointers. However, checking `k` lists sequentially is inefficient ($O(kN)$). We need a way to efficiently find the minimum element among the heads of all `k` lists at once.\n\n### Approach\n1. **Min-Heap (Priority Queue):** \n   - Push the head node of every list into a Min-Heap. The heap stores tuples of `(value, list_index, node)`.\n   - Extract the minimum node from the heap and add it to our result list.\n   - If the extracted node has a `next` node, push that `next` node into the heap.\n   - Repeat until the heap is empty.\n\n### Complexity Analysis\n- **Time Complexity:** $O(N \\log k)$, where $N$ is the total number of nodes and $k$ is the number of lists.\n- **Space Complexity:** $O(k)$ for the heap.\n\n### Code Logic\n```python\nimport heapq\n\ndef solve(lists):\n    min_heap = []\n    # Push first element of each list\n    for i, lst in enumerate(lists):\n        if lst:\n            heapq.heappush(min_heap, (lst[0], i, 0)) # (val, list_idx, element_idx)\n            \n    result = []\n    while min_heap:\n        val, list_idx, elem_idx = heapq.heappop(min_heap)\n        result.append(val)\n        \n        # If there is a next element in this specific list, push it\n        if elem_idx + 1 < len(lists[list_idx]):\n            next_val = lists[list_idx][elem_idx + 1]\n            heapq.heappush(min_heap, (next_val, list_idx, elem_idx + 1))\n            \n    return result\n```",
     "hints": [
-      "Standard binary search finds any index of the target. How can you modify it to find the leftmost index?",
-      "If nums[mid] == target, finding the first position requires checking the left subarray.",
-      "If nums[mid] == target, finding the last position requires checking the right subarray.",
-      "You can implement two separate binary search functions or one function with a boolean flag."
+      "Think about how you merge just 2 sorted lists.",
+      "To merge k lists, you need to know the smallest current node among all k lists.",
+      "A linear scan to find the minimum takes O(k). Can we do better?",
+      "Use a Min-Heap or Priority Queue to store the current head of each list.",
+      "The heap size will never exceed k."
     ],
-    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    \n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        nums = [int(next(iterator)) for _ in range(n)]\n        target = int(next(iterator))\n    except StopIteration:\n        return\n\n    # Write your solution here\n    # Print output as: print(f\"{first} {last}\")\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        if (!scanner.hasNextInt()) return;\n        \n        int n = scanner.nextInt();\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) {\n            nums[i] = scanner.nextInt();\n        }\n        int target = scanner.nextInt();\n        \n        // Write your solution here\n        // System.out.println(first + \" \" + last);\n    }\n}",
+    "boilerplate_python": "import sys\nimport heapq\n\n# Helper function if you want to use LL nodes, but here we process arrays for I/O simplicity\ndef solve():\n    try:\n        input_data = sys.stdin.read().split('\\n')\n        if not input_data: return\n        \n        iterator = iter(input_data)\n        try:\n            k_line = next(iterator).strip()\n            if not k_line:\n                return\n            k = int(k_line)\n        except StopIteration:\n            return\n\n        lists = []\n        for _ in range(k):\n            try:\n                line = next(iterator).strip()\n                if line:\n                    lists.append(list(map(int, line.split())))\n                else:\n                    lists.append([])\n            except StopIteration:\n                lists.append([])\n\n        # LOGIC START\n        min_heap = []\n        for i, lst in enumerate(lists):\n            if lst:\n                heapq.heappush(min_heap, (lst[0], i, 0))\n        \n        res = []\n        while min_heap:\n            val, list_idx, elem_idx = heapq.heappop(min_heap)\n            res.append(str(val))\n            if elem_idx + 1 < len(lists[list_idx]):\n                heapq.heappush(min_heap, (lists[list_idx][elem_idx+1], list_idx, elem_idx + 1))\n        \n        print(\" \".join(res))\n        # LOGIC END\n        \n    except Exception as e:\n        return\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    static class Node implements Comparable<Node> {\n        int val;\n        int listIdx;\n        int elemIdx;\n        \n        public Node(int val, int listIdx, int elemIdx) {\n            this.val = val;\n            this.listIdx = listIdx;\n            this.elemIdx = elemIdx;\n        }\n        public int compareTo(Node other) {\n            return Integer.compare(this.val, other.val);\n        }\n    }\n\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        try {\n            String line = br.readLine();\n            if (line == null || line.trim().isEmpty()) return;\n            int k = Integer.parseInt(line.trim());\n            \n            List<List<Integer>> lists = new ArrayList<>();\n            for (int i = 0; i < k; i++) {\n                String listLine = br.readLine();\n                List<Integer> currentList = new ArrayList<>();\n                if (listLine != null && !listLine.trim().isEmpty()) {\n                    String[] parts = listLine.trim().split(\"\\\\s+\");\n                    for (String p : parts) currentList.add(Integer.parseInt(p));\n                }\n                lists.add(currentList);\n            }\n            \n            PriorityQueue<Node> pq = new PriorityQueue<>();\n            for(int i=0; i<k; i++) {\n                if(!lists.get(i).isEmpty()) {\n                    pq.add(new Node(lists.get(i).get(0), i, 0));\n                }\n            }\n            \n            StringBuilder sb = new StringBuilder();\n            while(!pq.isEmpty()) {\n                Node min = pq.poll();\n                sb.append(min.val).append(\" \");\n                if(min.elemIdx + 1 < lists.get(min.listIdx).size()) {\n                    pq.add(new Node(lists.get(min.listIdx).get(min.elemIdx + 1), min.listIdx, min.elemIdx + 1));\n                }\n            }\n            System.out.println(sb.toString().trim());\n            \n        } catch(Exception e) {\n            return;\n        }\n    }\n}",
     "test_cases": [
       {
-        "input_data": "6\n5 7 7 8 8 10\n8",
-        "expected_output": "3 4",
+        "input_data": "3\n1 4 5\n1 3 4\n2 6",
+        "expected_output": "1 1 2 3 4 4 5 6",
         "is_public": true
       },
       {
-        "input_data": "6\n5 7 7 8 8 10\n6",
-        "expected_output": "-1 -1",
+        "input_data": "1\n1 2 3",
+        "expected_output": "1 2 3",
         "is_public": true
       },
       {
-        "input_data": "0\n\n0",
-        "expected_output": "-1 -1",
+        "input_data": "3\n\n\n",
+        "expected_output": "",
         "is_public": false
       },
       {
-        "input_data": "1\n1\n1",
-        "expected_output": "0 0",
+        "input_data": "2\n1\n0",
+        "expected_output": "0 1",
         "is_public": false
       },
       {
-        "input_data": "5\n2 2 2 2 2\n2",
-        "expected_output": "0 4",
+        "input_data": "4\n1 10 20\n2 5\n\n3 30",
+        "expected_output": "1 2 3 5 10 20 30",
         "is_public": false
       },
       {
-        "input_data": "5\n2 2 2 2 2\n3",
-        "expected_output": "-1 -1",
+        "input_data": "3\n-10 -5\n-8 -2\n0",
+        "expected_output": "-10 -8 -5 -2 0",
         "is_public": false
       }
     ]
   },
   {
-    "id": 74,
-    "title": "Search a 2D Matrix",
-    "description": "Write an efficient algorithm that searches for a value **target** in an $m \\times n$ integer matrix **matrix**. This matrix has the following properties:\n\n* Integers in each row are sorted from left to right.\n* The first integer of each row is greater than the last integer of the previous row.",
-    "input_format": "First line: Two integers R and C (Rows and Columns).\nNext R lines: C space-separated integers per line.\nLast line: Integer target.",
-    "output_format": "Print \"true\" if the target is found, otherwise \"false\".",
-    "difficulty": "Medium",
+    "id": 25,
+    "title": "Reverse Nodes in k-Group",
+    "description": "Given the head of a linked list, reverse the nodes of the list **k** at a time, and return the modified list.\n\n**k** is a positive integer and is less than or equal to the length of the linked list. If the number of nodes is not a multiple of **k** then left-out nodes, in the end, should remain as it is.\n\nYou may not alter the values in the list's nodes, only nodes themselves may be changed.",
+    "input_format": "First line: n (size of list)\nSecond line: k (group size)\nThird line: n space-separated integers representing the list.",
+    "output_format": "Space-separated integers representing the modified list.",
+    "difficulty": "Hard",
     "tags": [
-      "array",
-      "binary_search"
+      "linked_list",
+      "traversal"
     ],
-    "solution": "### Observations\nThe matrix properties imply that if we flatten the matrix, it forms a strictly sorted 1D array. \n\n### Approach\nInstead of creating a 1D array (which takes space), we can treat the matrix as a virtual sorted array of size $R \\times C$.\n1. **Virtual Indexing:** An index `mid` in range $[0, R \\times C - 1]$ maps to `matrix[mid // C][mid % C]`.\n2. **Binary Search:** Perform standard binary search on the range $[0, R \\times C - 1]$.\n\n### Complexity Analysis\n* **Time:** $O(\\log(R \\times C))$, which is standard binary search.\n* **Space:** $O(1)$.\n\n### Code Logic (Java)\n```java\nint low = 0;\nint high = R * C - 1;\nwhile (low <= high) {\n    int mid = low + (high - low) / 2;\n    int midVal = matrix[mid / C][mid % C];\n    if (midVal == target) return true;\n    else if (midVal < target) low = mid + 1;\n    else high = mid - 1;\n}\nreturn false;\n```",
+    "solution": "### Observations\nWe need to process the list in chunks of size $k$. If a chunk has fewer than $k$ nodes (at the end), we leave it alone. Otherwise, we reverse that chunk and connect it back to the previous part and the next part.\n\n### Approach\n1. **Count Nodes:** Calculate length to know how many groups of $k$ exist.\n2. **Iterative Reversal:**\n   - Use a dummy node pointing to the head.\n   - Iterate through the list. Check if there are at least $k$ nodes left.\n   - If yes, reverse the next $k$ nodes. This involves standard linked list reversal logic (changing `next` pointers) repeated $k-1$ times.\n   - Update the connection from the `pre` group to the newly reversed group's head.\n   - Move `pre` and `curr` pointers forward.\n\n### Complexity Analysis\n- **Time Complexity:** $O(N)$. We process each node roughly twice (once to count, once to reverse).\n- **Space Complexity:** $O(1)$. In-place pointer manipulation.\n\n### Code Logic\n```python\ndef solve(head, k):\n    if not head or k == 1: return head\n    \n    # Dummy node initialization\n    dummy = ListNode(0)\n    dummy.next = head\n    curr, n, pre = head, 0, dummy\n    \n    while curr:\n        curr = curr.next\n        n += 1\n        \n    while n >= k:\n        curr = pre.next\n        nex = curr.next\n        for _ in range(k-1):\n            curr.next = nex.next\n            nex.next = pre.next\n            pre.next = nex\n            nex = curr.next\n        pre = curr\n        n -= k\n    return dummy.next\n```",
     "hints": [
-      "Treat the 2D matrix as a single sorted 1D array.",
-      "The total number of elements is rows * cols.",
-      "How can you convert a 1D index back to row and column coordinates? Think division and modulo."
+      "Use a dummy head to handle the edge case where the head itself changes.",
+      "First, iterate through the list to count total nodes.",
+      "You only reverse if 'count >= k'.",
+      "Standard reversal: store next, change next to prev, move prev and curr.",
+      "Maintain pointers to the node *before* the group and the *first* node of the group (which becomes the last after reversal)."
     ],
-    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    iterator = iter(input_data)\n    try:\n        R = int(next(iterator))\n        C = int(next(iterator))\n        matrix = []\n        for _ in range(R):\n            row = [int(next(iterator)) for _ in range(C)]\n            matrix.append(row)\n        target = int(next(iterator))\n    except StopIteration:\n        return\n\n    # Write logic here\n    # print(\"true\" or \"false\")\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNext()) return;\n        int R = sc.nextInt();\n        int C = sc.nextInt();\n        int[][] matrix = new int[R][C];\n        for(int i=0; i<R; i++) {\n            for(int j=0; j<C; j++) {\n                matrix[i][j] = sc.nextInt();\n            }\n        }\n        int target = sc.nextInt();\n        // Write logic here\n        // System.out.println(\"true\" or \"false\");\n    }\n}",
+    "boilerplate_python": "import sys\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    \n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        k = int(next(iterator))\n        vals = []\n        for _ in range(n):\n            vals.append(int(next(iterator)))\n    except StopIteration:\n        return\n\n    if n == 0:\n        print(\"\")\n        return\n\n    # Build List\n    dummy = ListNode(0)\n    curr = dummy\n    for v in vals:\n        curr.next = ListNode(v)\n        curr = curr.next\n    head = dummy.next\n\n    # LOGIC START\n    dummy_res = ListNode(0, head)\n    pre = dummy_res\n    curr = head\n    \n    # Count length\n    length = 0\n    temp = head\n    while temp:\n        length += 1\n        temp = temp.next\n        \n    while length >= k:\n        curr = pre.next\n        nex = curr.next\n        for _ in range(k-1):\n            curr.next = nex.next\n            nex.next = pre.next\n            pre.next = nex\n            nex = curr.next\n        pre = curr\n        length -= k\n    \n    # LOGIC END\n    \n    # Print\n    res = []\n    ptr = dummy_res.next\n    while ptr:\n        res.append(str(ptr.val))\n        ptr = ptr.next\n    print(\" \".join(res))\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    static class ListNode {\n        int val;\n        ListNode next;\n        ListNode(int x) { val = x; }\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if (!sc.hasNextInt()) return;\n        int n = sc.nextInt();\n        if (!sc.hasNextInt()) return;\n        int k = sc.nextInt();\n        \n        ListNode dummy = new ListNode(0);\n        ListNode curr = dummy;\n        for (int i = 0; i < n; i++) {\n            curr.next = new ListNode(sc.nextInt());\n            curr = curr.next;\n        }\n        ListNode head = dummy.next;\n\n        // LOGIC\n        ListNode dummyRes = new ListNode(0);\n        dummyRes.next = head;\n        ListNode pre = dummyRes;\n        curr = head;\n        \n        int length = 0;\n        ListNode temp = head;\n        while (temp != null) {\n            length++;\n            temp = temp.next;\n        }\n        \n        while (length >= k) {\n            curr = pre.next;\n            ListNode nex = curr.next;\n            for (int i = 0; i < k - 1; i++) {\n                curr.next = nex.next;\n                nex.next = pre.next;\n                pre.next = nex;\n                nex = curr.next;\n            }\n            pre = curr;\n            length -= k;\n        }\n\n        // PRINT\n        temp = dummyRes.next;\n        while (temp != null) {\n            System.out.print(temp.val + (temp.next != null ? \" \" : \"\"));\n            temp = temp.next;\n        }\n    }\n}",
     "test_cases": [
       {
-        "input_data": "3 4\n1 3 5 7\n10 11 16 20\n23 30 34 60\n3",
-        "expected_output": "true",
+        "input_data": "5\n2\n1 2 3 4 5",
+        "expected_output": "2 1 4 3 5",
         "is_public": true
       },
       {
-        "input_data": "3 4\n1 3 5 7\n10 11 16 20\n23 30 34 60\n13",
-        "expected_output": "false",
+        "input_data": "5\n3\n1 2 3 4 5",
+        "expected_output": "3 2 1 4 5",
         "is_public": true
       },
       {
-        "input_data": "1 1\n10\n10",
-        "expected_output": "true",
+        "input_data": "2\n2\n1 2",
+        "expected_output": "2 1",
         "is_public": false
       },
       {
-        "input_data": "1 1\n10\n5",
-        "expected_output": "false",
+        "input_data": "1\n1\n100",
+        "expected_output": "100",
         "is_public": false
       },
       {
-        "input_data": "2 2\n1 2\n3 4\n4",
-        "expected_output": "true",
+        "input_data": "6\n4\n1 2 3 4 5 6",
+        "expected_output": "4 3 2 1 5 6",
         "is_public": false
       },
       {
-        "input_data": "2 2\n1 2\n3 4\n0",
-        "expected_output": "false",
+        "input_data": "0\n1\n",
+        "expected_output": "",
         "is_public": false
       }
     ]
   },
   {
-    "id": 162,
-    "title": "Find Peak Element",
-    "description": "A peak element is an element that is strictly greater than its neighbors.\nGiven a **0-indexed** integer array **nums**, find a peak element, and return its index. If the array contains multiple peaks, return the index to **any of the peaks**.\n\nYou may imagine that `nums[-1] = nums[n] = -∞`.\n\nYou must write an algorithm that runs in $O(\\log n)$ time.",
-    "input_format": "First line: Integer N.\nSecond line: N space-separated integers.",
-    "output_format": "An integer representing the index of the peak element.",
+    "id": 138,
+    "title": "Copy List with Random Pointer",
+    "description": "A linked list of length `n` is given such that each node contains an additional **random** pointer, which could point to any node in the list, or null.\n\nConstruct a **deep copy** of the list. The deep copy should consist of exactly `n` brand new nodes, where each new node has its value set to the value of its corresponding original node. Both the `next` and `random` pointer of the new nodes should point to new nodes in the copied list.",
+    "input_format": "First line: n\nNext n lines: Pair of integers `val` and `random_index`. `random_index` is the 0-based index of the node the random pointer points to, or -1 if null.",
+    "output_format": "Same format as input: n lines of `val random_index` describing the copied list.",
     "difficulty": "Medium",
     "tags": [
-      "array",
-      "binary_search"
+      "linked_list",
+      "map"
     ],
-    "solution": "### Observations\nThe constraints say $O(\\log n)$, implying Binary Search. Since the array isn't sorted, how does BS work? If we are on an ascending slope, a peak must exist to the right. If we are on a descending slope, a peak must exist to the left.\n\n### Approach\n1. Initialize `l = 0`, `r = n - 1`.\n2. Calculate `mid`.\n3. Compare `nums[mid]` with `nums[mid + 1]`.\n    * If `nums[mid] < nums[mid + 1]`: We are on an upward slope. The peak is to the right. `l = mid + 1`.\n    * If `nums[mid] > nums[mid + 1]`: We are on a downward slope (or a local peak). The peak is at `mid` or to the left. `r = mid`.\n4. **Loop Termination:** When `l == r`, we found a peak.\n\n### Complexity Analysis\n* **Time:** $O(\\log n)$.\n* **Space:** $O(1)$.\n\n### Code Logic (Python)\n```python\nwhile l < r:\n    mid = (l + r) // 2\n    if nums[mid] > nums[mid + 1]:\n        # We are falling, so peak is mid or left\n        r = mid\n    else:\n        # We are rising, so peak is strictly right\n        l = mid + 1\nreturn l\n```",
+    "solution": "### Observations\nA standard copy fails because the `random` pointer might point to a node we haven't created yet. We need a way to map original nodes to their copies.\n\n### Approach\n1. **HashMap:** Create a map `old_to_new = { old_node : new_node }`.\n   - Pass 1: Iterate through the original list, create a new node for every old node, and store the mapping.\n   - Pass 2: Iterate again. For every old node, set `old_to_new[old].next = old_to_new[old.next]` and `old_to_new[old].random = old_to_new[old.random]`.\n2. **Interweaving (Space Optimization):** \n   - Insert copied nodes directly after original nodes: `A -> A' -> B -> B'`.\n   - Assign random pointers: `curr.next.random = curr.random.next`.\n   - Separate the lists.\n\n### Complexity Analysis\n- **Time:** $O(N)$\n- **Space:** $O(N)$ with HashMap, or $O(1)$ (excluding result) with interweaving.\n\n### Code Logic\n```python\n# Using HashMap approach for clarity\ndef solve(head):\n    if not head: return None\n    old_to_new = {None: None}\n    \n    curr = head\n    while curr:\n        old_to_new[curr] = Node(curr.val)\n        curr = curr.next\n        \n    curr = head\n    while curr:\n        copy = old_to_new[curr]\n        copy.next = old_to_new[curr.next]\n        copy.random = old_to_new[curr.random]\n        curr = curr.next\n        \n    return old_to_new[head]\n```",
     "hints": [
-      "Think of the array as a mountain range.",
-      "If nums[i] < nums[i+1], then we are climbing up. Where must the peak be?",
-      "If nums[i] > nums[i+1], we are going down. Where is the peak relative to i?",
-      "You don't need to check both neighbors, checking the right neighbor is sufficient to determine slope."
+      "You need to keep track of which new node corresponds to which old node.",
+      "Use a HashMap where Key=OriginalNode and Value=NewNode.",
+      "Can you do it without extra space? Try inserting the new nodes *between* the original nodes."
     ],
-    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        nums = [int(next(iterator)) for _ in range(n)]\n    except StopIteration:\n        return\n\n    # Write logic here\n    # print(index)\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNext()) return;\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        \n        // Write logic here\n        // System.out.println(index);\n    }\n}",
+    "boilerplate_python": "import sys\n\nclass Node:\n    def __init__(self, val=0, next=None, random=None):\n        self.val = val\n        self.next = next\n        self.random = random\n        self.index = -1 # Helper for input parsing\n\ndef solve():\n    lines = sys.stdin.read().split('\\n')\n    lines = [l for l in lines if l.strip()]\n    if not lines: return\n    \n    try:\n        n = int(lines[0])\n        if n == 0: \n            return\n        \n        nodes = [Node() for _ in range(n)]\n        raw_data = []\n        \n        for i in range(n):\n            parts = list(map(int, lines[i+1].split()))\n            val = parts[0]\n            rnd_idx = parts[1]\n            nodes[i].val = val\n            nodes[i].index = i\n            raw_data.append(rnd_idx)\n            \n        # Build connections\n        for i in range(n):\n            if i < n - 1:\n                nodes[i].next = nodes[i+1]\n            if raw_data[i] != -1:\n                nodes[i].random = nodes[raw_data[i]]\n        \n        head = nodes[0]\n        \n        # LOGIC: Deep Copy\n        old_to_new = {None: None}\n        curr = head\n        while curr:\n            old_to_new[curr] = Node(curr.val)\n            old_to_new[curr].index = curr.index # keep index for verification output\n            curr = curr.next\n        \n        curr = head\n        while curr:\n            copy = old_to_new[curr]\n            copy.next = old_to_new[curr.next]\n            copy.random = old_to_new[curr.random]\n            curr = curr.next\n            \n        new_head = old_to_new[head]\n        \n        # Output generation\n        # We need to find the index of the random node in the NEW list\n        # Since we mapped old->new, we can reverse lookup or just use the stored index\n        \n        # Map new node object to its index (0 to n-1)\n        node_to_idx = {}\n        curr = new_head\n        idx = 0\n        while curr:\n            node_to_idx[curr] = idx\n            idx += 1\n            curr = curr.next\n            \n        curr = new_head\n        while curr:\n            val = curr.val\n            rnd_idx = -1\n            if curr.random:\n                rnd_idx = node_to_idx[curr.random]\n            print(f\"{val} {rnd_idx}\")\n            curr = curr.next\n            \n    except Exception:\n        return\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    static class Node {\n        int val;\n        Node next;\n        Node random;\n        public Node(int val) {\n            this.val = val;\n            this.next = null;\n            this.random = null;\n        }\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNextInt()) return;\n        int n = sc.nextInt();\n        if (n == 0) return;\n        \n        Node[] nodes = new Node[n];\n        int[] randomIndices = new int[n];\n        \n        for(int i=0; i<n; i++) {\n            nodes[i] = new Node(0);\n        }\n        \n        for(int i=0; i<n; i++) {\n            nodes[i].val = sc.nextInt();\n            randomIndices[i] = sc.nextInt();\n        }\n        \n        for(int i=0; i<n; i++) {\n            if(i < n-1) nodes[i].next = nodes[i+1];\n            if(randomIndices[i] != -1) nodes[i].random = nodes[randomIndices[i]];\n        }\n        \n        Node head = nodes[0];\n        \n        // LOGIC\n        Map<Node, Node> map = new HashMap<>();\n        Node curr = head;\n        while(curr != null) {\n            map.put(curr, new Node(curr.val));\n            curr = curr.next;\n        }\n        \n        curr = head;\n        while(curr != null) {\n            map.get(curr).next = map.get(curr.next);\n            map.get(curr).random = map.get(curr.random);\n            curr = curr.next;\n        }\n        \n        Node newHead = map.get(head);\n        \n        // OUTPUT\n        Map<Node, Integer> nodeToIdx = new HashMap<>();\n        curr = newHead;\n        int idx = 0;\n        while(curr != null) {\n            nodeToIdx.put(curr, idx++);\n            curr = curr.next;\n        }\n        \n        curr = newHead;\n        while(curr != null) {\n            int rnd = -1;\n            if(curr.random != null) rnd = nodeToIdx.get(curr.random);\n            System.out.println(curr.val + \" \" + rnd);\n            curr = curr.next;\n        }\n    }\n}",
     "test_cases": [
       {
-        "input_data": "4\n1 2 3 1",
-        "expected_output": "2",
+        "input_data": "3\n7 -1\n13 0\n11 4",
+        "expected_output": "7 -1\n13 0\n11 -1",
         "is_public": true
       },
       {
-        "input_data": "7\n1 2 1 3 5 6 4",
-        "expected_output": "5",
+        "input_data": "2\n1 1\n2 1",
+        "expected_output": "1 1\n2 1",
+        "is_public": true
+      },
+      {
+        "input_data": "3\n3 -1\n3 0\n3 -1",
+        "expected_output": "3 -1\n3 0\n3 -1",
+        "is_public": false
+      },
+      {
+        "input_data": "1\n100 0",
+        "expected_output": "100 0",
+        "is_public": false
+      },
+      {
+        "input_data": "0",
+        "expected_output": "",
+        "is_public": false
+      },
+      {
+        "input_data": "5\n1 4\n2 3\n3 2\n4 1\n5 0",
+        "expected_output": "1 4\n2 3\n3 2\n4 1\n5 0",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 146,
+    "title": "LRU Cache",
+    "description": "Design a data structure that follows the constraints of a **Least Recently Used (LRU) cache**.\n\nImplement the `LRUCache` class:\n* `LRUCache(int capacity)` Initialize the LRU cache with positive size capacity.\n* `int get(int key)` Return the value of the key if the key exists, otherwise return -1.\n* `void put(int key, int value)` Update the value of the key if the key exists. Otherwise, add the key-value pair to the cache. If the number of keys exceeds the capacity from this operation, **evict** the least recently used key.\n\nThe functions `get` and `put` must each run in $O(1)$ average time complexity.",
+    "input_format": "Line 1: Capacity (integer)\nLine 2: Q (number of operations)\nNext Q lines: Either \"put key value\" or \"get key\"",
+    "output_format": "For each \"get\" operation, print the result on a new line.",
+    "difficulty": "Medium",
+    "tags": [
+      "linked_list",
+      "map"
+    ],
+    "solution": "### Observations\nTo achieve $O(1)$ for both `get` and `put`, we need fast access (HashMap) and fast ordering (Linked List).\n\n### Approach\n1. **Doubly Linked List (DLL):** Maintains the order of usage. Head = Most Recently Used, Tail = Least Recently Used.\n2. **HashMap:** Maps `key` -> `Node` in the DLL. This allows us to access any node in $O(1)$ without traversing the list.\n3. **Operations:**\n   - `get(key)`: If in map, move the node to the Head of DLL. Return value.\n   - `put(key, val)`: \n     - If exists: Update value, move to Head.\n     - If new: Create node, add to Head, add to Map.\n     - If over capacity: Remove Tail node (LRU) from DLL and Map.\n\n### Complexity Analysis\n- **Time:** $O(1)$ for both operations.\n- **Space:** $O(C)$ where C is capacity.\n\n### Code Logic\n```python\nfrom collections import OrderedDict\n\n# Python's OrderedDict is implemented as a Hash Map + Doubly Linked List\nclass LRUCache:\n    def __init__(self, capacity: int):\n        self.cache = OrderedDict()\n        self.capacity = capacity\n\n    def get(self, key: int) -> int:\n        if key not in self.cache:\n            return -1\n        self.cache.move_to_end(key)\n        return self.cache[key]\n\n    def put(self, key: int, value: int) -> None:\n        if key in self.cache:\n            self.cache.move_to_end(key)\n        self.cache[key] = value\n        if len(self.cache) > self.capacity:\n            self.cache.popitem(last=False)\n```",
+    "hints": [
+      "Use a HashMap to store key-value pairs for O(1) access.",
+      "How can you keep track of the order of usage? An array is too slow to shift.",
+      "A Doubly Linked List allows removing and adding nodes in O(1).",
+      "Combine HashMap and Doubly Linked List: Map<Key, Node>.",
+      "Python's `OrderedDict` or Java's `LinkedHashMap` can simplify this."
+    ],
+    "boilerplate_python": "import sys\nfrom collections import OrderedDict\n\nclass LRUCache:\n    def __init__(self, capacity: int):\n        self.cache = OrderedDict()\n        self.capacity = capacity\n\n    def get(self, key: int) -> int:\n        if key not in self.cache:\n            return -1\n        self.cache.move_to_end(key)\n        return self.cache[key]\n\n    def put(self, key: int, value: int) -> None:\n        if key in self.cache:\n            self.cache.move_to_end(key)\n        self.cache[key] = value\n        if len(self.cache) > self.capacity:\n            self.cache.popitem(last=False)\n\ndef solve():\n    input_data = sys.stdin.read().split('\\n')\n    iterator = iter(input_data)\n    try:\n        capacity = int(next(iterator))\n        q = int(next(iterator))\n        obj = LRUCache(capacity)\n        \n        for _ in range(q):\n            line = next(iterator).split()\n            op = line[0]\n            if op == \"put\":\n                obj.put(int(line[1]), int(line[2]))\n            elif op == \"get\":\n                print(obj.get(int(line[1])))\n    except StopIteration:\n        pass\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    static class LRUCache {\n        private final int capacity;\n        private final LinkedHashMap<Integer, Integer> map;\n\n        public LRUCache(int capacity) {\n            this.capacity = capacity;\n            this.map = new LinkedHashMap<Integer, Integer>(capacity, 0.75f, true) {\n                protected boolean removeEldestEntry(Map.Entry<Integer, Integer> eldest) {\n                    return size() > Solution.LRUCache.this.capacity;\n                }\n            };\n        }\n\n        public int get(int key) {\n            return map.getOrDefault(key, -1);\n        }\n\n        public void put(int key, int value) {\n            map.put(key, value);\n        }\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNextInt()) return;\n        int cap = sc.nextInt();\n        int q = sc.nextInt();\n        LRUCache obj = new LRUCache(cap);\n        \n        for(int i=0; i<q; i++) {\n            String op = sc.next();\n            if(op.equals(\"put\")) {\n                int k = sc.nextInt();\n                int v = sc.nextInt();\n                obj.put(k, v);\n            } else {\n                int k = sc.nextInt();\n                System.out.println(obj.get(k));\n            }\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "2\n5\nput 1 1\nput 2 2\nget 1\nput 3 3\nget 2",
+        "expected_output": "1\n-1",
+        "is_public": true
+      },
+      {
+        "input_data": "1\n3\nput 2 1\nget 2\nput 3 2",
+        "expected_output": "1",
+        "is_public": true
+      },
+      {
+        "input_data": "2\n6\nget 2\nput 2 6\nget 1\nput 1 5\nput 1 2\nget 1",
+        "expected_output": "-1\n-1\n2",
+        "is_public": false
+      },
+      {
+        "input_data": "2\n4\nput 1 1\nput 2 2\nput 3 3\nget 1",
+        "expected_output": "-1",
+        "is_public": false
+      },
+      {
+        "input_data": "1\n5\nput 1 1\nput 2 2\nput 3 3\nget 1\nget 3",
+        "expected_output": "-1\n3",
+        "is_public": false
+      },
+      {
+        "input_data": "3\n4\nput 1 1\nput 2 2\nput 3 3\nput 4 4",
+        "expected_output": "",
+        "is_public": false
+      }
+    ]
+  },
+  {
+    "id": 143,
+    "title": "Reorder List",
+    "description": "You are given the head of a singly linked-list. The list can be represented as:\n$L_0 \\rightarrow L_1 \\rightarrow ... \\rightarrow L_{n-1} \\rightarrow L_n$\n\nReorder the list to be on the following form:\n$L_0 \\rightarrow L_n \\rightarrow L_1 \\rightarrow L_{n-1} \\rightarrow L_2 \\rightarrow L_{n-2} \\rightarrow ...$\n\nYou may not modify the values in the list's nodes. Only nodes themselves may be changed.",
+    "input_format": "First line: n\nSecond line: n space-separated integers.",
+    "output_format": "Space-separated integers of the reordered list.",
+    "difficulty": "Medium",
+    "tags": [
+      "linked_list",
+      "two_pointers",
+      "stacks"
+    ],
+    "solution": "### Observations\nThe pattern asks us to merge the first node with the last, the second with the second last, and so on. This looks like we are merging the first half of the list with the reversed second half.\n\n### Approach\n1. **Find Middle:** Use the slow/fast pointer technique to find the middle of the Linked List.\n2. **Reverse Second Half:** Reverse the list starting from the middle node to the end.\n3. **Merge:** Merge the two halves. Take one node from the first half, then one from the reversed second half, and repeat.\n\n### Complexity Analysis\n- **Time Complexity:** $O(N)$.\n- **Space Complexity:** $O(1)$.\n\n### Code Logic\n```python\ndef solve(head):\n    if not head: return\n    \n    # 1. Find middle\n    slow, fast = head, head\n    while fast and fast.next:\n        slow = slow.next\n        fast = fast.next.next\n        \n    # 2. Reverse second half\n    prev, curr = None, slow.next\n    slow.next = None # cut the list\n    while curr:\n        tmp = curr.next\n        curr.next = prev\n        prev = curr\n        curr = tmp\n        \n    # 3. Merge\n    first, second = head, prev\n    while second:\n        tmp1, tmp2 = first.next, second.next\n        first.next = second\n        second.next = tmp1\n        first, second = tmp1, tmp2\n```",
+    "hints": [
+      "Can you find the middle of the linked list?",
+      "Try reversing the second half of the linked list.",
+      "Merge the first half and the reversed second half one by one."
+    ],
+    "boilerplate_python": "import sys\n\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    \n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        if n == 0: return\n        vals = []\n        for _ in range(n):\n            vals.append(int(next(iterator)))\n            \n        dummy = ListNode(0)\n        curr = dummy\n        for v in vals:\n            curr.next = ListNode(v)\n            curr = curr.next\n        head = dummy.next\n        \n        # LOGIC\n        slow, fast = head, head\n        while fast and fast.next:\n            slow = slow.next\n            fast = fast.next.next\n            \n        prev, curr = None, slow.next\n        slow.next = None\n        while curr:\n            tmp = curr.next\n            curr.next = prev\n            prev = curr\n            curr = tmp\n            \n        first, second = head, prev\n        while second:\n            tmp1, tmp2 = first.next, second.next\n            first.next = second\n            second.next = tmp1\n            first, second = tmp1, tmp2\n            \n        # PRINT\n        res = []\n        ptr = head\n        while ptr:\n            res.append(str(ptr.val))\n            ptr = ptr.next\n        print(\" \".join(res))\n        \n    except StopIteration:\n        return\n\nif __name__ == '__main__':\n    solve()",
+    "boilerplate_java": "import java.util.*;\nimport java.io.*;\n\npublic class Solution {\n    static class ListNode {\n        int val;\n        ListNode next;\n        ListNode(int x) { val = x; }\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNextInt()) return;\n        int n = sc.nextInt();\n        if(n == 0) return;\n        \n        ListNode dummy = new ListNode(0);\n        ListNode curr = dummy;\n        for(int i=0; i<n; i++) {\n            curr.next = new ListNode(sc.nextInt());\n            curr = curr.next;\n        }\n        ListNode head = dummy.next;\n\n        // LOGIC\n        ListNode slow = head, fast = head;\n        while (fast != null && fast.next != null) {\n            slow = slow.next;\n            fast = fast.next.next;\n        }\n\n        ListNode prev = null, current = slow.next;\n        slow.next = null;\n        while (current != null) {\n            ListNode tmp = current.next;\n            current.next = prev;\n            prev = current;\n            current = tmp;\n        }\n\n        ListNode first = head, second = prev;\n        while (second != null) {\n            ListNode tmp1 = first.next;\n            ListNode tmp2 = second.next;\n            first.next = second;\n            second.next = tmp1;\n            first = tmp1;\n            second = tmp2;\n        }\n\n        // PRINT\n        curr = head;\n        while(curr != null) {\n            System.out.print(curr.val + (curr.next != null ? \" \" : \"\"));\n            curr = curr.next;\n        }\n    }\n}",
+    "test_cases": [
+      {
+        "input_data": "4\n1 2 3 4",
+        "expected_output": "1 4 2 3",
+        "is_public": true
+      },
+      {
+        "input_data": "5\n1 2 3 4 5",
+        "expected_output": "1 5 2 4 3",
         "is_public": true
       },
       {
         "input_data": "1\n10",
-        "expected_output": "0",
+        "expected_output": "10",
         "is_public": false
       },
       {
         "input_data": "2\n1 2",
-        "expected_output": "1",
+        "expected_output": "1 2",
         "is_public": false
       },
       {
-        "input_data": "2\n2 1",
-        "expected_output": "0",
+        "input_data": "0",
+        "expected_output": "",
         "is_public": false
       },
       {
-        "input_data": "5\n1 2 3 4 5",
-        "expected_output": "4",
-        "is_public": false
-      }
-    ]
-  },
-  {
-    "id": 153,
-    "title": "Find Minimum in Rotated Sorted Array",
-    "description": "Suppose an array of length `n` sorted in ascending order is rotated between `1` and `n` times. For example, the array `nums = [0,1,2,4,5,6,7]` might become:\n* `[4,5,6,7,0,1,2]` if it was rotated 4 times.\n\nGiven the sorted rotated array **nums** of unique elements, return the *minimum element* of this array.\n\nYou must write an algorithm that runs in $O(\\log n)$ time.",
-    "input_format": "First line: Integer N.\nSecond line: N space-separated integers.",
-    "output_format": "Print the minimum integer.",
-    "difficulty": "Medium",
-    "tags": [
-      "array",
-      "binary_search"
-    ],
-    "solution": "### Observations\nThe array is \"partially\" sorted. If `nums[mid] > nums[high]`, it means the pivot (minimum) is in the right half (because the left side is sorted and greater than the far right). If `nums[mid] < nums[high]`, the right side is sorted, so the minimum is either at `mid` or to the left.\n\n### Approach\n1. `low = 0`, `high = n - 1`.\n2. Loop while `low < high`.\n3. `mid = (low + high) / 2`.\n4. Compare `nums[mid]` with `nums[high]`:\n   - If `nums[mid] > nums[high]`: Smallest value is to the right. `low = mid + 1`.\n   - If `nums[mid] < nums[high]`: Smallest value is at `mid` or left. `high = mid`.\n5. When loop ends, `nums[low]` is the minimum.\n\n### Complexity Analysis\n* **Time:** $O(\\log n)$.\n* **Space:** $O(1)$.\n\n### Code Logic (Java)\n```java\nwhile (low < high) {\n    int mid = low + (high - low) / 2;\n    if (nums[mid] > nums[high]) {\n        low = mid + 1;\n    } else {\n        high = mid;\n    }\n}\nreturn nums[low];\n```",
-    "hints": [
-      "If the array is not rotated (e.g., [1, 2, 3]), nums[low] < nums[high].",
-      "Compare the middle element with the last element.",
-      "If mid > last, the disruption is to the right.",
-      "If mid < last, the right half is sorted, so the minimum is at mid or to the left."
-    ],
-    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        nums = [int(next(iterator)) for _ in range(n)]\n    except StopIteration:\n        return\n\n    # Write logic here\n    # print(min_val)\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNext()) return;\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        \n        // Write logic here\n        // System.out.println(result);\n    }\n}",
-    "test_cases": [
-      {
-        "input_data": "5\n3 4 5 1 2",
-        "expected_output": "1",
-        "is_public": true
-      },
-      {
-        "input_data": "7\n4 5 6 7 0 1 2",
-        "expected_output": "0",
-        "is_public": true
-      },
-      {
-        "input_data": "4\n11 13 15 17",
-        "expected_output": "11",
-        "is_public": true
-      },
-      {
-        "input_data": "1\n5",
-        "expected_output": "5",
-        "is_public": false
-      },
-      {
-        "input_data": "2\n2 1",
-        "expected_output": "1",
-        "is_public": false
-      },
-      {
-        "input_data": "3\n3 1 2",
-        "expected_output": "1",
-        "is_public": false
-      }
-    ]
-  },
-  {
-    "id": 875,
-    "title": "Koko Eating Bananas",
-    "description": "Koko loves to eat bananas. There are `n` piles of bananas, the `i-th` pile has `piles[i]` bananas. The guards have gone and will come back in `h` hours.\n\nKoko can decide her bananas-per-hour eating speed of `k`. Each hour, she chooses some pile of bananas and eats `k` bananas from that pile. If the pile has less than `k` bananas, she eats all of them instead and will not eat any more bananas during this hour.\n\nReturn the minimum integer `k` such that she can eat all the bananas within `h` hours.",
-    "input_format": "First line: N (number of piles).\nSecond line: N space-separated integers (piles).\nThird line: Integer H (hours).",
-    "output_format": "Print the minimum integer k.",
-    "difficulty": "Medium",
-    "tags": [
-      "array",
-      "binary_search"
-    ],
-    "solution": "### Observations\nWe need to find the minimum speed `k`. \n* If Koko eats at speed 1, it takes $\\sum piles$ hours (too slow).\n* If Koko eats at speed `max(piles)`, it takes `N` hours (very fast).\n\nThe possible values of `k` range from `1` to `max(piles)`. This range is sorted (higher speed = less time). We can use Binary Search on the answer `k`.\n\n### Approach\n1. **Range:** `low = 1`, `high = max(piles)`.\n2. **Check Function:** For a given speed `mid`, calculate total hours needed: `sum(ceil(pile / mid))`.\n3. **Logic:**\n   - If `hours_needed <= h`: This speed works, try smaller (`high = mid - 1`, store `ans = mid`).\n   - If `hours_needed > h`: Too slow, increase speed (`low = mid + 1`).\n\n### Complexity Analysis\n* **Time:** $O(N \\log M)$ where $M$ is the max pile size.\n* **Space:** $O(1)$.\n\n### Code Logic (Python)\n```python\nimport math\n\ndef check(k, piles):\n    hours = 0\n    for p in piles:\n        hours += math.ceil(p / k)\n    return hours\n\nlow, high = 1, max(piles)\nans = high\nwhile low <= high:\n    mid = (low + high) // 2\n    if check(mid, piles) <= h:\n        ans = mid\n        high = mid - 1\n    else:\n        low = mid + 1\nreturn ans\n```",
-    "hints": [
-      "The speed k is inversely proportional to the time taken.",
-      "The minimum possible speed is 1, the maximum useful speed is the size of the largest pile.",
-      "Use Binary Search on the range [1, max(piles)].",
-      "For a specific speed, iterate through the piles to calculate total hours required."
-    ],
-    "boilerplate_python": "import sys\nimport math\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        piles = [int(next(iterator)) for _ in range(n)]\n        h = int(next(iterator))\n    except StopIteration:\n        return\n\n    # Write logic here\n    # print(min_k)\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNext()) return;\n        int n = sc.nextInt();\n        int[] piles = new int[n];\n        for(int i=0; i<n; i++) piles[i] = sc.nextInt();\n        int h = sc.nextInt();\n        \n        // Write logic here\n        // System.out.println(ans);\n    }\n}",
-    "test_cases": [
-      {
-        "input_data": "4\n3 6 7 11\n8",
-        "expected_output": "4",
-        "is_public": true
-      },
-      {
-        "input_data": "5\n30 11 23 4 20\n5",
-        "expected_output": "30",
-        "is_public": true
-      },
-      {
-        "input_data": "5\n30 11 23 4 20\n6",
-        "expected_output": "23",
-        "is_public": true
-      },
-      {
-        "input_data": "1\n1000000000\n2",
-        "expected_output": "500000000",
-        "is_public": false
-      },
-      {
-        "input_data": "3\n1 1 1\n3",
-        "expected_output": "1",
-        "is_public": false
-      },
-      {
-        "input_data": "3\n1 1 1\n1000",
-        "expected_output": "1",
-        "is_public": false
-      }
-    ]
-  },
-  {
-    "id": 1011,
-    "title": "Capacity To Ship Packages Within D Days",
-    "description": "A conveyor belt has packages that must be shipped from one port to another within `days` days.\n\nThe `i-th` package on the conveyor belt has a weight of `weights[i]`. Each day, we load the ship with packages on the conveyor belt (in the order given by `weights`). We may not load more weight than the maximum weight capacity of the ship.\n\nReturn the least weight capacity of the ship that will result in all the packages on the conveyor belt being shipped within `days` days.",
-    "input_format": "First line: N (number of packages).\nSecond line: N space-separated weights.\nThird line: Integer D (days).",
-    "output_format": "Print the minimum capacity.",
-    "difficulty": "Medium",
-    "tags": [
-      "array",
-      "binary_search"
-    ],
-    "solution": "### Observations\nWe need to find a minimum capacity. \n- Minimum possible capacity must be at least `max(weights)` (must carry the heaviest item).\n- Maximum necessary capacity is `sum(weights)` (carry everything in 1 day).\n\nSince monotonicity holds (higher capacity -> fewer days), we can Binary Search on the capacity.\n\n### Approach\n1. `low = max(weights)`, `high = sum(weights)`.\n2. **Check Function:** For capacity `cap`, iterate through weights adding them to a current load. If `current + w > cap`, increment days used and reset `current = w`.\n3. If `days_needed <= D`: Capacity is sufficient, try smaller (`high = mid`).\n4. If `days_needed > D`: Capacity too small, increase (`low = mid + 1`).\n\n### Complexity Analysis\n* **Time:** $O(N \\log(\\sum weights))$.\n* **Space:** $O(1)$.\n\n### Code Logic (Java)\n```java\nint left = maxWeight, right = totalWeight;\nwhile (left < right) {\n    int mid = left + (right - left) / 2;\n    int daysNeeded = 1, currentLoad = 0;\n    for (int w : weights) {\n        if (currentLoad + w > mid) {\n            daysNeeded++;\n            currentLoad = 0;\n        }\n        currentLoad += w;\n    }\n    if (daysNeeded <= D) right = mid;\n    else left = mid + 1;\n}\nreturn left;\n```",
-    "hints": [
-      "The capacity must be at least the maximum weight of a single package.",
-      "The capacity can be at most the sum of all weights.",
-      "Use Binary Search on the range [max(weight), sum(weight)].",
-      "Greedily fill the ship each day to see how many days a specific capacity requires."
-    ],
-    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        weights = [int(next(iterator)) for _ in range(n)]\n        days = int(next(iterator))\n    except StopIteration:\n        return\n\n    # Write logic here\n    # print(capacity)\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNext()) return;\n        int n = sc.nextInt();\n        int[] weights = new int[n];\n        for(int i=0; i<n; i++) weights[i] = sc.nextInt();\n        int days = sc.nextInt();\n        \n        // Write logic here\n        // System.out.println(capacity);\n    }\n}",
-    "test_cases": [
-      {
-        "input_data": "10\n1 2 3 4 5 6 7 8 9 10\n5",
-        "expected_output": "15",
-        "is_public": true
-      },
-      {
-        "input_data": "6\n3 2 2 4 1 4\n3",
-        "expected_output": "6",
-        "is_public": true
-      },
-      {
-        "input_data": "5\n1 2 3 1 1\n4",
-        "expected_output": "3",
-        "is_public": true
-      },
-      {
-        "input_data": "1\n10\n1",
-        "expected_output": "10",
-        "is_public": false
-      },
-      {
-        "input_data": "3\n10 10 10\n3",
-        "expected_output": "10",
-        "is_public": false
-      },
-      {
-        "input_data": "3\n10 50 10\n2",
-        "expected_output": "60",
-        "is_public": false
-      }
-    ]
-  },
-  {
-    "id": 410,
-    "title": "Split Array Largest Sum",
-    "description": "Given an integer array **nums** and an integer **k**, split **nums** into **k** non-empty subarrays such that the largest sum of any subarray is minimized.\n\nReturn the minimized largest sum of the split.",
-    "input_format": "First line: N (array size).\nSecond line: N space-separated integers.\nThird line: Integer k.",
-    "output_format": "Print the result integer.",
-    "difficulty": "Hard",
-    "tags": [
-      "array",
-      "binary_search",
-      "dp"
-    ],
-    "solution": "### Observations\nThis is identical to the \"Capacity to Ship Packages\" problem. We want to find a maximum subarray sum `S` such that we can split the array into `k` parts where no part exceeds `S`. \n\n### Approach\n1. **Range:** `low = max(nums)`, `high = sum(nums)`.\n2. **Check:** Can we split `nums` into $\\le k$ subarrays such that every subarray sum is $\\le mid$?\n3. Iterate through `nums`, accumulating sum. If `sum + current > mid`, start a new subarray. Count subarrays.\n4. If count $\\le k$, we can achieve this (maybe even smaller max sum), so `high = mid`.\n5. Else, we need larger sums, so `low = mid + 1`.\n\n### Complexity Analysis\n* **Time:** $O(N \\log(\\sum nums))$.\n* **Space:** $O(1)$.\n\n### Code Logic (Python)\n```python\ndef can_split(limit, nums, k):\n    count = 1\n    current_sum = 0\n    for x in nums:\n        if current_sum + x > limit:\n            count += 1\n            current_sum = x\n        else:\n            current_sum += x\n    return count <= k\n\nl, r = max(nums), sum(nums)\nwhile l < r:\n    mid = (l + r) // 2\n    if can_split(mid, nums, k):\n        r = mid\n    else:\n        l = mid + 1\nreturn l\n```",
-    "hints": [
-      "The problem asks to minimize the maximum sum.",
-      "If the max sum is very large, we need few splits. If small, we need many splits.",
-      "Binary search on the answer (the largest sum allowed).",
-      "Lower bound is max element, upper bound is total sum."
-    ],
-    "boilerplate_python": "import sys\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        nums = [int(next(iterator)) for _ in range(n)]\n        k = int(next(iterator))\n    except StopIteration:\n        return\n\n    # Write logic here\n    # print(result)\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNext()) return;\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int k = sc.nextInt();\n        \n        // Write logic here\n        // System.out.println(result);\n    }\n}",
-    "test_cases": [
-      {
-        "input_data": "5\n7 2 5 10 8\n2",
-        "expected_output": "18",
-        "is_public": true
-      },
-      {
-        "input_data": "5\n1 2 3 4 5\n2",
-        "expected_output": "9",
-        "is_public": true
-      },
-      {
-        "input_data": "5\n1 4 4 4 1\n3",
-        "expected_output": "4",
-        "is_public": true
-      },
-      {
-        "input_data": "1\n10\n1",
-        "expected_output": "10",
-        "is_public": false
-      },
-      {
-        "input_data": "3\n5 5 5\n3",
-        "expected_output": "5",
-        "is_public": false
-      },
-      {
-        "input_data": "3\n1 2 3\n1",
-        "expected_output": "6",
-        "is_public": false
-      }
-    ]
-  },
-  {
-    "id": 1283,
-    "title": "Find the Smallest Divisor Given a Threshold",
-    "description": "Given an array of integers **nums** and an integer **threshold**, we will choose a positive integer `divisor`, divide all the array by it, and sum the division's result. Find the **smallest** `divisor` such that the result of the sum is less than or equal to **threshold**.\n\nEach result of the division is rounded to the nearest integer greater than or equal to that element. (For example: 7/3 = 3 and 10/2 = 5).",
-    "input_format": "First line: N (array size).\nSecond line: N space-separated integers.\nThird line: Integer threshold.",
-    "output_format": "Print the smallest divisor.",
-    "difficulty": "Medium",
-    "tags": [
-      "array",
-      "binary_search"
-    ],
-    "solution": "### Observations\n1. As the divisor increases, the sum of results decreases. This monotonicity suggests Binary Search.\n2. The range of divisors is `[1, max(nums)]`. (Actually, `max(nums)` gives sum equal to size `N`. If `threshold < N`, no solution exists, but problem constraints usually guarantee a solution or `threshold >= N`).\n\n### Approach\n1. `low = 1`, `high = max(nums)` (or a sufficiently large number like 10^6).\n2. **Loop:** `while low < high`.\n3. `mid = (low + high) / 2`.\n4. **Calculate Sum:** `sum = Σ ceil(x / mid)`.\n5. If `sum <= threshold`: This divisor works, try smaller. `high = mid`.\n6. If `sum > threshold`: Sum is too big, need larger divisor. `low = mid + 1`.\n\n### Complexity Analysis\n* **Time:** $O(N \\log(\\max(nums)))$.\n* **Space:** $O(1)$.\n\n### Code Logic (Java)\n```java\nint left = 1, right = 1000000; // or max(nums)\nwhile (left < right) {\n    int mid = left + (right - left) / 2;\n    int sum = 0;\n    for (int num : nums) {\n        sum += (num + mid - 1) / mid; // Equivalent to ceil(num/mid)\n    }\n    if (sum <= threshold) right = mid;\n    else left = mid + 1;\n}\nreturn left;\n```",
-    "hints": [
-      "If the divisor is 1, the sum is the sum of all elements.",
-      "If the divisor is very large, the sum becomes the length of the array.",
-      "The function f(divisor) = sum is monotonically decreasing.",
-      "Use (num + div - 1) / div to compute ceil(num / div) using integer arithmetic."
-    ],
-    "boilerplate_python": "import sys\nimport math\n\ndef solve():\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n    iterator = iter(input_data)\n    try:\n        n = int(next(iterator))\n        nums = [int(next(iterator)) for _ in range(n)]\n        threshold = int(next(iterator))\n    except StopIteration:\n        return\n\n    # Write logic here\n    # print(result)\n\nif __name__ == '__main__':\n    solve()",
-    "boilerplate_java": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(!sc.hasNext()) return;\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int threshold = sc.nextInt();\n        \n        // Write logic here\n        // System.out.println(result);\n    }\n}",
-    "test_cases": [
-      {
-        "input_data": "4\n1 2 5 9\n6",
-        "expected_output": "5",
-        "is_public": true
-      },
-      {
-        "input_data": "5\n44 22 33 11 1\n5",
-        "expected_output": "44",
-        "is_public": true
-      },
-      {
-        "input_data": "4\n2 3 5 7\n11",
-        "expected_output": "3",
-        "is_public": true
-      },
-      {
-        "input_data": "1\n19\n5",
-        "expected_output": "4",
-        "is_public": false
-      },
-      {
-        "input_data": "3\n1 1 1\n3",
-        "expected_output": "1",
-        "is_public": false
-      },
-      {
-        "input_data": "2\n10 10\n100",
-        "expected_output": "1",
+        "input_data": "6\n1 2 3 4 5 6",
+        "expected_output": "1 6 2 5 3 4",
         "is_public": false
       }
     ]
