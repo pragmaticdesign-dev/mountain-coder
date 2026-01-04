@@ -15,6 +15,15 @@ services:
       
     environment:
       - PYTHONUNBUFFERED=1
+    
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'    # Limits to 50% of one CPU core
+          memory: 512M    # Limits RAM to 512 Megabytes
+        reservations:
+          cpus: '0.25'    # Optional: Guarantees at least 25% CPU
+          memory: 256M    # Optional: Guarantees at least 256MB RAM
       
     # ✅ THE MAGIC COMMAND
     # 1. Starts server in background (&)
