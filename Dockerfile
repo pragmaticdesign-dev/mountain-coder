@@ -5,6 +5,8 @@ RUN apt-get update && \
     apt-get install -y openjdk-17-jdk wget tar && \
     apt-get clean
 
+RUN java -Xshare:dump
+
 WORKDIR /app
 
 # Install Python Deps
@@ -27,5 +29,6 @@ COPY ./app /app
 
 # ✅ NEW: Copy the import script so Docker can see it
 COPY import_script.py .
+
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

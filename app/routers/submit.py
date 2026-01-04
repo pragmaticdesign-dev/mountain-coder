@@ -1,241 +1,199 @@
 import subprocess
 import time
 import os
+import tempfile
+import shutil
+import uuid
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import Tuple, List, Dict, Any
+from typing import Tuple, List, Dict, Any, Optional
 import models, schemas
 from database import get_db
 
 router = APIRouter(tags=["Submit"])
 
-
 # ============================================================================
-# CONSTANTS
+# CONSTANTS & CONFIG
 # ============================================================================
 
-EXECUTION_TIMEOUT = 2  # seconds
+EXECUTION_TIMEOUT = 2
+COMPILATION_TIMEOUT = 60  # Reduced: we only compile once now
 DEFAULT_NO_OUTPUT_MESSAGE = "[Process finished with no output. Did you forget input?]"
+MAX_WORKERS = 2
 
 LANGUAGE_CONFIGS = {
     "python": {
-        "file": "temp.py",
-        "compile": None,
-        "run": ["python3", "temp.py"]
+        "extension": ".py",
+        "requires_compile": False,
+        "run_cmd": ["python3", "{file}"]
     },
     "java": {
-        "file": "Solution.java",
-        "compile": ["javac", "Solution.java"],
-        "run": ["java", "Solution"]
+        "extension": ".java",
+        "class_name": "Solution",
+        "requires_compile": True,
+        # REMOVED: -J-Xms256m -J-Xmx512m (Let JVM handle memory defaults for compilation)
+      "compile_cmd": ["javac", "-J-Xshare:on", "-J-XX:TieredStopAtLevel=1", "{file}"],
+      "run_cmd": ["java", "-Xshare:on", "-Xmx256m", "-cp", "{dir}", "Solution"]
     }
 }
 
-
 # ============================================================================
-# HELPER FUNCTIONS - Code Execution
+# CORE EXECUTION ENGINE (Refactored)
 # ============================================================================
 
-def write_code_to_file(filename: str, code: str):
-    """Write code to a temporary file"""
-    with open(filename, "w") as f:
-        f.write(code)
+def create_workspace_and_compile(language: str, code: str) -> Tuple[Optional[Path], str, Optional[List[str]]]:
+    """
+    1. Creates workspace
+    2. Writes code to file
+    3. Compiles (if needed)
+    Returns: (workspace_path, error_message, run_command_template)
+    """
+    if language not in LANGUAGE_CONFIGS:
+        return None, f"Unsupported language: {language}", None
 
+    config = LANGUAGE_CONFIGS[language]
+    workspace_id = str(uuid.uuid4())
+    workspace = Path(tempfile.gettempdir()) / f"code_exec_{workspace_id}"
+    workspace.mkdir(exist_ok=True)
 
-def compile_code(compile_cmd: List[str]) -> Tuple[bool, str]:
-    """Compile code and return success status and error message"""
-    proc = subprocess.run(compile_cmd, capture_output=True, text=True)
-    if proc.returncode != 0:
-        return False, f"Compilation Error:\n{proc.stderr}"
-    return True, ""
+    try:
+        # 1. Determine filename and write code
+        filename = f"{config.get('class_name', f'code_{workspace_id}')}{config['extension']}"
+        file_path = workspace / filename
+        file_path.write_text(code, encoding='utf-8')
 
+        # 2. Compile if required
+        if config["requires_compile"]:
+            cmd = [arg.format(file=str(file_path), dir=str(workspace)) for arg in config["compile_cmd"]]
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=COMPILATION_TIMEOUT, cwd=workspace
+            )
+            if result.returncode != 0:
+                return workspace, f"Compilation Error:\n{result.stderr}", None
 
-def execute_code(run_cmd: List[str], input_data: str) -> Tuple[str, str]:
-    """Execute code with input and return output and error"""
+        # 3. Prepare run command
+        # We format 'file' and 'dir' now so we don't do it per test case
+        run_cmd_template = [arg.format(file=str(file_path), dir=str(workspace)) for arg in config["run_cmd"]]
+        return workspace, "", run_cmd_template
+
+    except subprocess.TimeoutExpired:
+        return workspace, "Compilation Timeout", None
+    except Exception as e:
+        return workspace, f"System Error: {str(e)}", None
+
+def run_test_case_in_workspace(
+    run_cmd: List[str], 
+    input_data: str, 
+    workspace: Path
+) -> Tuple[str, str, float]:
+    """Executes a single test run in an existing workspace."""
+    start_time = time.time()
     try:
         proc = subprocess.run(
             run_cmd,
             input=input_data,
-            text=True,
             capture_output=True,
-            timeout=EXECUTION_TIMEOUT
+            text=True,
+            timeout=EXECUTION_TIMEOUT,
+            cwd=workspace
         )
-        return proc.stdout, proc.stderr
+        runtime = (time.time() - start_time) * 1000
+        error = proc.stderr if proc.returncode != 0 else ""
+        return proc.stdout, error, runtime
     except subprocess.TimeoutExpired:
-        return "", "Time Limit Exceeded"
+        return "", f"Time Limit Exceeded ({EXECUTION_TIMEOUT}s)", (time.time() - start_time) * 1000
     except Exception as e:
-        return "", str(e)
+        return "", str(e), 0.0
 
-
-def run_code_docker(language: str, code: str, input_str: str) -> Tuple[str, str]:
-    """
-    Execute code in specified language with given input.
-    Returns (stdout, stderr) tuple.
-    NOTE: Currently runs on local machine, not Docker.
-    """
-    if language not in LANGUAGE_CONFIGS:
-        return "", f"Unsupported language: {language}"
-    
-    config = LANGUAGE_CONFIGS[language]
-    
+def cleanup_workspace(workspace: Path):
     try:
-        # Write code to file
-        write_code_to_file(config["file"], code)
-        
-        # Compile if needed
-        if config["compile"]:
-            success, error = compile_code(config["compile"])
-            if not success:
-                return "", error
-        
-        # Execute code
-        return execute_code(config["run"], input_str)
-    
-    except Exception as e:
-        return "", str(e)
-
+        if workspace and workspace.exists():
+            shutil.rmtree(workspace)
+    except Exception:
+        pass
 
 # ============================================================================
-# HELPER FUNCTIONS - Test Case Processing
+# API HANDLERS
 # ============================================================================
-
-def normalize_output(output: str) -> str:
-    """Normalize output by stripping whitespace"""
-    return output.strip() if output else ""
-
-
-def compare_outputs(actual: str, expected: str) -> bool:
-    """Compare actual and expected outputs after normalization"""
-    return normalize_output(actual) == normalize_output(expected)
-
-
-def run_single_test_case(
-    test_case: models.TestCase,
-    language: str,
-    code: str,
-    index: int
-) -> Dict[str, Any]:
-    """Run a single test case and return result details"""
-    start_time = time.time()
-    actual_output, error = run_code_docker(language, code, test_case.input_data)
-    runtime_ms = (time.time() - start_time) * 1000
-    
-    passed = not error and compare_outputs(actual_output, test_case.expected_output)
-    
-    return {
-        "test_case": index + 1,
-        "status": "Pass" if passed else "Fail",
-        "expected": test_case.expected_output,
-        "actual": actual_output if not error else error,
-        "runtime_ms": round(runtime_ms, 2),
-        "passed": passed
-    }
-
-
-def run_all_test_cases(
-    test_cases: List[models.TestCase],
-    language: str,
-    code: str,
-    fail_fast: bool = True
-) -> Tuple[List[Dict], float]:
-    """
-    Run all test cases and return results with total runtime.
-    If fail_fast is True, stops at first failure.
-    """
-    results = []
-    total_runtime = 0.0
-    
-    for idx, test in enumerate(test_cases):
-        result = run_single_test_case(test, language, code, idx)
-        total_runtime += result["runtime_ms"]
-        results.append(result)
-        
-        # Fail fast optimization
-        if fail_fast and not result["passed"]:
-            break
-    
-    return results, total_runtime
-
-
-def build_submit_response(
-    results: List[Dict],
-    total_tests: int,
-    total_runtime: float
-) -> Dict[str, Any]:
-    """Build submission response from test results"""
-    passed_count = sum(1 for r in results if r["status"] == "Pass")
-    all_passed = passed_count == total_tests and len(results) == total_tests
-    
-    # Remove 'passed' field from results (internal use only)
-    clean_results = [
-        {k: v for k, v in r.items() if k != "passed"}
-        for r in results
-    ]
-    
-    return {
-        "status": "Accepted" if all_passed else "Wrong Answer",
-        "total_passed": passed_count,
-        "total_tests": total_tests,
-        "runtime": round(total_runtime, 2),
-        "details": clean_results
-    }
-
-
-def build_error_response(message: str) -> Dict[str, Any]:
-    """Build error response for submission"""
-    return {
-        "status": "Error",
-        "total_passed": 0,
-        "total_tests": 0,
-        "runtime": 0.0,
-        "details": [{
-            "status": "Fail",
-            "actual": message,
-            "expected": ""
-        }]
-    }
-
-
-# ============================================================================
-# API ENDPOINTS
-# ============================================================================
-
-@router.post("/submit/run")
-def run_custom_code(req: schemas.RunRequest):
-    """Run custom code with user-provided input (no test cases)"""
-    actual_output, error = run_code_docker(req.language, req.code, req.input_data)
-    
-    # Provide helpful message if no output generated
-    if not error and not actual_output:
-        actual_output = DEFAULT_NO_OUTPUT_MESSAGE
-    
-    return {
-        "output": actual_output if not error else error,
-        "is_error": bool(error)
-    }
-
 
 @router.post("/submit", response_model=schemas.SubmitResponse)
 def submit_solution(sub: schemas.SubmitRequest, db: Session = Depends(get_db)):
-    """Submit solution and run against all test cases"""
-    # Fetch question
-    question = db.query(models.Question).filter(
-        models.Question.id == sub.question_id
-    ).first()
-    
+    question = db.query(models.Question).filter(models.Question.id == sub.question_id).first()
     if not question:
         raise HTTPException(status_code=404, detail="Question not found")
-    
-    # Validate test cases exist
     if not question.test_cases:
-        return build_error_response("No test cases found")
+        return {"status": "Error", "details": [{"actual": "No test cases found"}]}
+
+    # 1. SETUP: Create Workspace & Compile ONCE
+    workspace, error, run_cmd = create_workspace_and_compile(sub.language, sub.code)
     
-    # Run all test cases
-    results, total_runtime = run_all_test_cases(
-        question.test_cases,
-        sub.language,
-        sub.code,
-        fail_fast=True
-    )
+    # Handle Compilation/Setup Errors immediately
+    if error:
+        cleanup_workspace(workspace)
+        return {
+            "status": "Compilation Error",
+            "total_passed": 0,
+            "total_tests": 0,
+            "runtime": 0.0,
+            "details": [{"status": "Fail", "actual": error, "expected": ""}]
+        }
+
+    results = []
+    total_runtime = 0.0
+    all_passed = True
+
+    try:
+        # 2. EXECUTE: Loop through test cases using the SAME workspace/binary
+        for idx, test in enumerate(question.test_cases):
+            actual, err, runtime = run_test_case_in_workspace(run_cmd, test.input_data, workspace)
+            
+            # Normalize and Compare
+            actual_clean = actual.strip()
+            expected_clean = test.expected_output.strip() if test.expected_output else ""
+            
+            # Note: If stderr exists, it's a Runtime Error (Fail)
+            passed = (not err) and (actual_clean == expected_clean)
+            
+            total_runtime += runtime
+            results.append({
+                "test_case": idx + 1,
+                "status": "Pass" if passed else "Fail",
+                "expected": expected_clean,
+                "actual": err if err else actual_clean,
+                "runtime_ms": round(runtime, 2)
+            })
+
+            if not passed:
+                all_passed = False
+                break  # Fail fast
+                
+    finally:
+        # 3. TEARDOWN: Clean up after all tests are done
+        cleanup_workspace(workspace)
+
+    return {
+        "status": "Accepted" if all_passed else "Wrong Answer",
+        "total_passed": sum(1 for r in results if r["status"] == "Pass"),
+        "total_tests": len(question.test_cases),
+        "runtime": round(total_runtime, 2),
+        "details": results
+    }
+
+@router.post("/submit/run")
+def run_custom_code(req: schemas.RunRequest):
+    """Refactored to use the same efficient flow"""
+    workspace, error, run_cmd = create_workspace_and_compile(req.language, req.code)
     
-    # Build and return response
-    return build_submit_response(results, len(question.test_cases), total_runtime)
+    if error:
+        cleanup_workspace(workspace)
+        return {"output": error, "is_error": True}
+
+    try:
+        actual, err, _ = run_test_case_in_workspace(run_cmd, req.input_data, workspace)
+        output = err if err else actual
+        if not output: output = DEFAULT_NO_OUTPUT_MESSAGE
+        return {"output": output, "is_error": bool(err)}
+    finally:
+        cleanup_workspace(workspace)
