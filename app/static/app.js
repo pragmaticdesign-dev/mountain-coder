@@ -26,7 +26,8 @@ const TABS = {
 
 const TOPICS = [
     'array', 'map', 'two_pointers', 'string', 
-    'dp', 'tree', 'graph', 'binary_search'
+    'dp', 'tree', 'graph', 'binary_search',"maths",
+    "recursion"
 ];
 
 const DIFFICULTY_COLORS = {
