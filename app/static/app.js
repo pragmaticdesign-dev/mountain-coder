@@ -419,7 +419,22 @@ function renderQuestionHints(hints) {
 }
 
 function renderQuestionSolution(solution) {
-    getElement('q-solution').innerHTML = renderMarkdown(solution);
+    let content = renderMarkdown(solution);
+    
+    // NEW: Append solution image if it exists (hidden automatically if missing)
+    if (currentQuestionId) {
+        content += `
+            <div class="solution-image-container">
+                <img 
+                    src="/images/${currentQuestionId}.png" 
+                    class="solution-image" 
+                    onerror="this.parentElement.style.display='none'"
+                />
+            </div>
+        `;
+    }
+
+    getElement('q-solution').innerHTML = content;
 }
 
 // ============================================================================

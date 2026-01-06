@@ -290,11 +290,6 @@
         "input_data": "0.00001 2147483647",
         "expected_output": "0.0",
         "is_public": false
-      },
-      {
-        "input_data": "34.00515 -3",
-        "expected_output": "2.543598504037596e-05",
-        "is_public": false
       }
     ]
   }

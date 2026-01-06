@@ -9,6 +9,8 @@ app = FastAPI(title="Mountain Coder 🏔️")
 # Mount Static Files (UI + Monaco Editor)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+app.mount("/images", StaticFiles(directory="import_data/images"), name="images")
+
 app.include_router(questions.router)
 app.include_router(submit.router)
 

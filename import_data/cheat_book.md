@@ -513,7 +513,12 @@ if 0 < x < 10: # Instead of: x > 0 and x < 10
     pass
 
 ```
+The * symbol before a list in Python is the unpacking operator (often called the "splat" operator).
+```python
+list1 = [1, 2]
+list2 = [3, 4]
 
-```
-
+merged = [*list1, *list2]
+first, *rest = [1, 2, 3, 4]
+print(rest)
 ```

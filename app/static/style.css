@@ -153,3 +153,16 @@ select#lang-select:hover { border-color: #555; }
 #output-text {
     margin: 0;
 }
+
+.solution-image-container {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+}
+
+.solution-image {
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
